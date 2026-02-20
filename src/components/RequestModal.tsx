@@ -7,7 +7,7 @@ interface RequestModalProps {
   onClose: () => void;
 }
 
-const SIZES = ['6', '8', '10', '12', '14', '16', '18', '20'];
+const SIZES = ['6', '8', '10', '12', '14', '16', '18', '20', '22'];
 
 export default function RequestModal({ product, onClose }: RequestModalProps) {
   const [form, setForm] = useState({
@@ -91,7 +91,7 @@ export default function RequestModal({ product, onClose }: RequestModalProps) {
               {/* Header */}
               <div className="flex gap-4 mb-8">
                 <img
-                  src={product.frontImg}
+                  src={product.images[0]}
                   alt={product.name}
                   className="w-20 h-24 object-cover flex-shrink-0"
                 />

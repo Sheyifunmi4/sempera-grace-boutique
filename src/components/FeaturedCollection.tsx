@@ -1,48 +1,69 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import p1Front from '@/assets/product-1-front.jpg';
-import p1Back from '@/assets/product-1-back.jpg';
-import p2Front from '@/assets/product-2-front.jpg';
-import p2Back from '@/assets/product-2-back.jpg';
-import p3Front from '@/assets/product-3-front.jpg';
-import p3Back from '@/assets/product-3-back.jpg';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+
+import elanBlueRhinestone1 from '@/assets/elan-blue-rhinestone-1.jpg';
+import elanBlueRhinestone2 from '@/assets/elan-blue-rhinestone-2.jpg';
+import elanBlueRhinestone3 from '@/assets/elan-blue-rhinestone-3.jpg';
+import elanBrownKaftan1 from '@/assets/elan-brown-kaftan-1.jpg';
+import elanBrownKaftan2 from '@/assets/elan-brown-kaftan-2.jpg';
+import elanRoyalBlue1 from '@/assets/elan-royal-blue-1.jpg';
+import elanRoyalBlue2 from '@/assets/elan-royal-blue-2.jpg';
+import elanRoyalBlue3 from '@/assets/elan-royal-blue-3.jpg';
+import elanRoyalBlue4 from '@/assets/elan-royal-blue-4.jpg';
+import elanOliveGreen1 from '@/assets/elan-olive-green-1.jpg';
 
 export interface Product {
   id: string;
   code: string;
   name: string;
+  description: string;
   price: string;
-  frontImg: string;
-  backImg: string;
+  images: string[];
   fabric: string;
+  sizes: string;
 }
 
 export const PRODUCTS: Product[] = [
   {
     id: '1',
-    code: 'SP-GC-001',
-    name: 'The Champagne Power Suit',
-    price: '£485',
-    frontImg: p1Front,
-    backImg: p1Back,
-    fabric: '82% Wool, 18% Elastane',
+    code: 'SP-EL-001',
+    name: 'Metallic Blue Rhinestone Kaftan',
+    description: 'Metallic Blue rich aunty outfit. Available in different colours.',
+    price: '₦34,999',
+    images: [elanBlueRhinestone1, elanBlueRhinestone2, elanBlueRhinestone3],
+    fabric: 'Premium Embellished Fabric',
+    sizes: '6–22',
   },
   {
     id: '2',
-    code: 'SP-GC-002',
-    name: 'Ivory Draped Midi Dress',
-    price: '£320',
-    frontImg: p2Front,
-    backImg: p2Back,
-    fabric: '100% Silk Charmeuse',
+    code: 'SP-EL-002',
+    name: 'Chocolate Sequin-Neck Kaftan',
+    description: 'Chocolate Brown rich aunty outfit. Available in different colours.',
+    price: '₦34,999',
+    images: [elanBrownKaftan1, elanBrownKaftan2],
+    fabric: 'Premium Satin with Sequin Embellishment',
+    sizes: '6–22',
   },
   {
     id: '3',
-    code: 'SP-GC-003',
-    name: 'Sage Grace Two-Piece Set',
-    price: '£395',
-    frontImg: p3Front,
-    backImg: p3Back,
-    fabric: '95% Linen, 5% Elastane',
+    code: 'SP-EL-003',
+    name: 'Royal Blue Brocade Set',
+    description: 'Royal Blue rich aunty outfit with headwrap. Available in different colours.',
+    price: '₦34,999',
+    images: [elanRoyalBlue1, elanRoyalBlue2, elanRoyalBlue3, elanRoyalBlue4],
+    fabric: 'Brocade & Satin Blend',
+    sizes: '6–22',
+  },
+  {
+    id: '4',
+    code: 'SP-EL-004',
+    name: 'Olive Green Crystal Kaftan',
+    description: 'Olive Green rich aunty outfit. Available in different colours.',
+    price: '₦34,999',
+    images: [elanOliveGreen1],
+    fabric: 'Premium Satin with Crystal Detailing',
+    sizes: '6–22',
   },
 ];
 
@@ -52,26 +73,67 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, onRequest }: ProductCardProps) {
+  const [currentImg, setCurrentImg] = useState(0);
+
+  const nextImg = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentImg((prev) => (prev + 1) % product.images.length);
+  };
+
+  const prevImg = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentImg((prev) => (prev - 1 + product.images.length) % product.images.length);
+  };
+
   return (
     <div className="product-card group">
-      {/* Image Container */}
-      <div className="product-card-img aspect-[3/4] bg-cream relative overflow-hidden mb-5">
+      {/* Image Container with Slideshow */}
+      <div className="aspect-[3/4] bg-cream relative overflow-hidden mb-5">
         <img
-          src={product.frontImg}
-          alt={product.name}
-          className="front w-full h-full object-cover"
+          src={product.images[currentImg]}
+          alt={`${product.name} — view ${currentImg + 1}`}
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
         />
-        <img
-          src={product.backImg}
-          alt={`${product.name} — back view`}
-          className="back w-full h-full object-cover"
-        />
-        {/* Hover label */}
-        <div className="absolute bottom-4 left-0 right-0 flex justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-          <span className="section-eyebrow bg-background/90 backdrop-blur-sm px-4 py-2 text-muted-foreground">
-            Back View
-          </span>
-        </div>
+
+        {/* Navigation Arrows */}
+        {product.images.length > 1 && (
+          <>
+            <button
+              onClick={prevImg}
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center text-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-background"
+              aria-label="Previous image"
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <button
+              onClick={nextImg}
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center text-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-background"
+              aria-label="Next image"
+            >
+              <ChevronRight size={18} />
+            </button>
+          </>
+        )}
+
+        {/* Dot Indicators */}
+        {product.images.length > 1 && (
+          <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5">
+            {product.images.map((_, i) => (
+              <button
+                key={i}
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setCurrentImg(i); }}
+                className="w-2 h-2 rounded-full transition-all duration-300"
+                style={{
+                  backgroundColor: i === currentImg ? 'hsl(var(--primary))' : 'hsla(var(--background) / 0.7)',
+                  transform: i === currentImg ? 'scale(1.3)' : 'scale(1)',
+                }}
+                aria-label={`View image ${i + 1}`}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Product Info */}
@@ -85,6 +147,15 @@ export function ProductCard({ product, onRequest }: ProductCardProps) {
             {product.name}
           </h3>
         </Link>
+        <p
+          className="font-sans text-muted-foreground"
+          style={{ fontSize: '0.85rem', lineHeight: 1.6, fontWeight: 300 }}
+        >
+          {product.description}
+        </p>
+        <p className="font-sans text-muted-foreground" style={{ fontSize: '0.78rem', letterSpacing: '0.08em' }}>
+          Sizes: {product.sizes}
+        </p>
         <p
           className="font-sans text-foreground"
           style={{ fontSize: '1rem', fontWeight: 400, letterSpacing: '0.04em' }}
@@ -119,7 +190,7 @@ export default function FeaturedCollection({ onRequest }: FeaturedCollectionProp
             className="font-serif text-foreground mb-5"
             style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 300 }}
           >
-            The Grace Collection
+            The ELÁN Collection
           </h2>
           <span className="gold-divider mx-auto mb-5" />
           <p
@@ -131,7 +202,7 @@ export default function FeaturedCollection({ onRequest }: FeaturedCollectionProp
         </div>
 
         {/* Product Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 lg:gap-14">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 lg:gap-14">
           {PRODUCTS.map((product, i) => (
             <div key={product.id} className={`reveal delay-${(i + 1) * 100}`}>
               <ProductCard product={product} onRequest={onRequest} />
