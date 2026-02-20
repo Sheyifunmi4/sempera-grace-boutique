@@ -31,10 +31,11 @@ const Index = () => {
         id: 'general',
         code: 'SP-GEN',
         name: 'Enquire About a Piece',
+        description: '',
         price: '',
-        frontImg: '',
-        backImg: '',
+        images: [],
         fabric: '',
+        sizes: '6–22',
       });
     }
   };

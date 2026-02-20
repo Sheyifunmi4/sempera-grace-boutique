@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import SemperaNav from '@/components/SemperaNav';
 import SemperaFooter from '@/components/SemperaFooter';
 import RequestModal from '@/components/RequestModal';
@@ -23,14 +23,17 @@ export default function ProductDetail() {
     );
   }
 
-  const images = [
-    { src: product.frontImg, label: 'Front View' },
-    { src: product.backImg, label: 'Back View' },
-  ];
+  const images = product.images.map((src, i) => ({
+    src,
+    label: i === 0 ? 'Front View' : `View ${i + 1}`,
+  }));
 
   const whatsappMessage = encodeURIComponent(
     `Hello, I'm interested in: ${product.name} (${product.code}) — ${product.price}`
   );
+
+  const nextImg = () => setActiveImg((prev) => (prev + 1) % images.length);
+  const prevImg = () => setActiveImg((prev) => (prev - 1 + images.length) % images.length);
 
   return (
     <div className="min-h-screen bg-background">
@@ -54,21 +57,37 @@ export default function ProductDetail() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
             {/* Image Gallery */}
             <div className="space-y-4">
-              {/* Main Image */}
+              {/* Main Image with Arrows */}
               <div className="aspect-[3/4] overflow-hidden bg-cream relative group">
                 <img
                   src={images[activeImg].src}
                   alt={images[activeImg].label}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
+                {images.length > 1 && (
+                  <>
+                    <button
+                      onClick={prevImg}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center text-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-background"
+                    >
+                      <ChevronLeft size={20} />
+                    </button>
+                    <button
+                      onClick={nextImg}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center text-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-background"
+                    >
+                      <ChevronRight size={20} />
+                    </button>
+                  </>
+                )}
               </div>
               {/* Thumbnails */}
-              <div className="flex gap-3">
+              <div className="flex gap-3 overflow-x-auto">
                 {images.map((img, i) => (
                   <button
                     key={i}
                     onClick={() => setActiveImg(i)}
-                    className="w-20 aspect-square overflow-hidden border-2 transition-all duration-300"
+                    className="w-20 aspect-square overflow-hidden border-2 transition-all duration-300 flex-shrink-0"
                     style={{
                       borderColor: activeImg === i ? 'hsl(var(--primary))' : 'transparent',
                     }}
@@ -78,21 +97,6 @@ export default function ProductDetail() {
                       alt={img.label}
                       className="w-full h-full object-cover"
                     />
-                  </button>
-                ))}
-              </div>
-              {/* View labels */}
-              <div className="flex gap-3">
-                {images.map((img, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setActiveImg(i)}
-                    className="section-eyebrow transition-colors duration-300"
-                    style={{
-                      color: activeImg === i ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground))',
-                    }}
-                  >
-                    {img.label}
                   </button>
                 ))}
               </div>
@@ -109,6 +113,12 @@ export default function ProductDetail() {
                   {product.name}
                 </h1>
                 <p
+                  className="font-sans text-muted-foreground mb-3"
+                  style={{ fontSize: '0.95rem', lineHeight: 1.7, fontWeight: 300 }}
+                >
+                  {product.description}
+                </p>
+                <p
                   className="font-sans text-foreground"
                   style={{ fontSize: '1.3rem', fontWeight: 400, letterSpacing: '0.03em' }}
                 >
@@ -117,6 +127,19 @@ export default function ProductDetail() {
               </div>
 
               <span className="gold-divider" />
+
+              {/* Sizes */}
+              <div>
+                <h3
+                  className="font-sans text-foreground mb-3"
+                  style={{ fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 400 }}
+                >
+                  Available Sizes
+                </h3>
+                <p className="font-sans text-muted-foreground" style={{ fontSize: '0.95rem', lineHeight: 1.8, fontWeight: 300 }}>
+                  {product.sizes}
+                </p>
+              </div>
 
               {/* Fabric Details */}
               <div>
