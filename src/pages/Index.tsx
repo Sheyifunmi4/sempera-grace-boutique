@@ -1,12 +1,83 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState, useRef } from 'react';
+import SemperaNav from '@/components/SemperaNav';
+import HeroSection from '@/components/HeroSection';
+import FeaturedCollection from '@/components/FeaturedCollection';
+import CategorySection from '@/components/CategorySection';
+import AboutSection from '@/components/AboutSection';
+import WhySection from '@/components/WhySection';
+import InstagramGallery from '@/components/InstagramGallery';
+import Newsletter from '@/components/Newsletter';
+import SemperaFooter from '@/components/SemperaFooter';
+import RequestModal from '@/components/RequestModal';
+import { useScrollReveal } from '@/hooks/use-scroll-reveal';
+import type { Product } from '@/components/FeaturedCollection';
 
 const Index = () => {
+  const [modalProduct, setModalProduct] = useState<Product | null>(null);
+  const collectionRef = useRef<HTMLElement>(null);
+  const pageRef = useScrollReveal();
+
+  const scrollToCollection = () => {
+    const el = document.getElementById('collection');
+    el?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const openRequestModal = (product?: Product) => {
+    if (product) {
+      setModalProduct(product);
+    } else {
+      // Generic request — use first product as placeholder
+      setModalProduct({
+        id: 'general',
+        code: 'SP-GEN',
+        name: 'Enquire About a Piece',
+        price: '',
+        frontImg: '',
+        backImg: '',
+        fabric: '',
+      });
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div ref={pageRef} className="bg-background">
+      {/* Navigation */}
+      <SemperaNav onRequestPiece={() => openRequestModal()} />
+
+      {/* Hero */}
+      <HeroSection
+        onExplore={scrollToCollection}
+        onRequest={() => openRequestModal()}
+      />
+
+      {/* Featured Collection */}
+      <FeaturedCollection onRequest={openRequestModal} />
+
+      {/* Shop by Category */}
+      <CategorySection />
+
+      {/* About */}
+      <AboutSection />
+
+      {/* Why Sempera */}
+      <WhySection />
+
+      {/* Instagram Gallery */}
+      <InstagramGallery />
+
+      {/* Newsletter */}
+      <Newsletter />
+
+      {/* Footer */}
+      <SemperaFooter />
+
+      {/* Request Modal */}
+      {modalProduct && (
+        <RequestModal
+          product={modalProduct}
+          onClose={() => setModalProduct(null)}
+        />
+      )}
     </div>
   );
 };
