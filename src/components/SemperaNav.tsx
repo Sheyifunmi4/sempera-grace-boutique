@@ -4,8 +4,8 @@ import { Menu, X } from 'lucide-react';
 import semperaLogo from '@/assets/sempera-logo.png';
 
 const navItems = [
-  { label: 'Shop', href: '/shop' },
-  { label: 'Collection', href: '/collection' },
+  { label: 'Shop', href: '/#collection' },
+  { label: 'Collection', href: '/#collection' },
   { label: 'About', href: '/#about' },
   { label: 'Contact', href: '/#contact' },
 ];
@@ -22,8 +22,14 @@ export default function SemperaNav({ onRequestPiece }: SemperaNavProps) {
     setMenuOpen(false);
     if (href.startsWith('/#')) {
       const id = href.slice(2);
-      const el = document.getElementById(id);
-      el?.scrollIntoView({ behavior: 'smooth' });
+      // If already on homepage, scroll directly
+      if (location.pathname === '/') {
+        const el = document.getElementById(id);
+        el?.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        // Navigate home then scroll after a short delay
+        window.location.href = href;
+      }
     }
   };
 
@@ -32,7 +38,7 @@ export default function SemperaNav({ onRequestPiece }: SemperaNavProps) {
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
 
-          {/* Logo — large image, matches original HTML nav presence */}
+          {/* Logo */}
           <Link to="/" className="flex-shrink-0">
             <img
               src={semperaLogo}
@@ -43,21 +49,15 @@ export default function SemperaNav({ onRequestPiece }: SemperaNavProps) {
 
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-10">
-            {navItems.map((item) =>
-              item.href.startsWith('/#') ? (
-                <button
-                  key={item.label}
-                  onClick={() => handleAnchorClick(item.href)}
-                  className="nav-link bg-transparent border-none p-0"
-                >
-                  {item.label}
-                </button>
-              ) : (
-                <Link key={item.label} to={item.href} className="nav-link">
-                  {item.label}
-                </Link>
-              )
-            )}
+            {navItems.map((item) => (
+              <button
+                key={item.label}
+                onClick={() => handleAnchorClick(item.href)}
+                className="nav-link bg-transparent border-none p-0"
+              >
+                {item.label}
+              </button>
+            ))}
           </nav>
 
           {/* Desktop CTA */}
@@ -82,26 +82,15 @@ export default function SemperaNav({ onRequestPiece }: SemperaNavProps) {
       {menuOpen && (
         <div className="lg:hidden bg-background border-t border-border/40 py-6 px-6">
           <nav className="flex flex-col gap-5">
-            {navItems.map((item) =>
-              item.href.startsWith('/#') ? (
-                <button
-                  key={item.label}
-                  onClick={() => handleAnchorClick(item.href)}
-                  className="nav-link text-left bg-transparent border-none p-0 text-base"
-                >
-                  {item.label}
-                </button>
-              ) : (
-                <Link
-                  key={item.label}
-                  to={item.href}
-                  className="nav-link text-base"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  {item.label}
-                </Link>
-              )
-            )}
+            {navItems.map((item) => (
+              <button
+                key={item.label}
+                onClick={() => handleAnchorClick(item.href)}
+                className="nav-link text-left bg-transparent border-none p-0 text-base"
+              >
+                {item.label}
+              </button>
+            ))}
             <button
               onClick={() => {
                 setMenuOpen(false);
