@@ -39,6 +39,10 @@ import elanGracefulShort4 from '@/assets/elan-graceful-short-4.jpg';
 import elanAnkaraPatch1 from '@/assets/elan-ankara-patch-1.jpg';
 import elanAnkaraPatch2 from '@/assets/elan-ankara-patch-2.jpg';
 import elanAnkaraPatch3 from '@/assets/elan-ankara-patch-3.jpg';
+import elanCrystalBlue1 from '@/assets/elan-crystal-blue-1.jpg';
+import elanCrystalBlue2 from '@/assets/elan-crystal-blue-2.jpg';
+import elanCrystalBlue3 from '@/assets/elan-crystal-blue-3.jpg';
+import elanCrystalBlue4 from '@/assets/elan-crystal-blue-4.jpg';
 
 export interface Product {
   id: string;
@@ -107,7 +111,7 @@ export const PRODUCTS: Product[] = [
     code: 'SP-EL-006',
     name: 'Deep Magenta Sequin Fringe Dress',
     description: 'Deep Magenta rich aunty outfit with sequin fringe detail. Available in different colours.',
-    price: '₦19,999',
+    price: '₦24,999',
     images: [elanMagentaSequin1, elanMagentaSequin2],
     fabric: 'Premium fabric with Sequin & Fringe Embellishment',
     sizes: '6–22',
@@ -167,9 +171,19 @@ export const PRODUCTS: Product[] = [
     code: 'SP-EL-012',
     name: 'Creative Ankara Patch Design',
     description: 'Elegant Classy Outfit for every wear. Available in different prints.',
-    price: '₦21,999',
+    price: '₦24,999',
     images: [elanAnkaraPatch1, elanAnkaraPatch2, elanAnkaraPatch3],
     fabric: 'Premium Texture Ankara',
+    sizes: '6–22',
+  },
+  {
+    id: '13',
+    code: 'SP-EL-013',
+    name: 'Luxury Crystal Blue Dress',
+    description: 'Elegant luxury ware with rhinestones and stylish arm. Available in different prints.',
+    price: '₦26,999',
+    images: [elanCrystalBlue1, elanCrystalBlue2, elanCrystalBlue3, elanCrystalBlue4],
+    fabric: 'Premium Texture with Rhinestones',
     sizes: '6–22',
   },
 ];
