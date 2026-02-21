@@ -30,14 +30,14 @@ export default function SemperaNav({ onRequestPiece }: SemperaNavProps) {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border/40">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="flex items-center justify-between h-32">
+        <div className="flex items-center justify-between h-20">
 
-          {/* Logo — bigger to fill nav height */}
-          <Link to="/" className="flex-shrink-0 py-2">
+          {/* Logo — large image, matches original HTML nav presence */}
+          <Link to="/" className="flex-shrink-0">
             <img
               src={semperaLogo}
               alt="Sempera Fashion"
-              className="h-28 w-auto object-contain"
+              style={{ height: '160px', width: 'auto', objectFit: 'contain' }}
             />
           </Link>
 
@@ -67,7 +67,7 @@ export default function SemperaNav({ onRequestPiece }: SemperaNavProps) {
             </button>
           </div>
 
-          {/* Mobile menu toggle */}
+          {/* Mobile toggle */}
           <button
             className="lg:hidden p-2 text-foreground"
             onClick={() => setMenuOpen(!menuOpen)}
@@ -103,7 +103,10 @@ export default function SemperaNav({ onRequestPiece }: SemperaNavProps) {
               )
             )}
             <button
-              onClick={() => { setMenuOpen(false); onRequestPiece?.(); }}
+              onClick={() => {
+                setMenuOpen(false);
+                onRequestPiece?.();
+              }}
               className="btn-gold w-full mt-2"
             >
               Request a Piece
@@ -113,5 +116,4 @@ export default function SemperaNav({ onRequestPiece }: SemperaNavProps) {
       )}
     </header>
   );
-}// Content of SemperaNav.tsx
-// Adjust the code to increase logo size and nav height...
+}
