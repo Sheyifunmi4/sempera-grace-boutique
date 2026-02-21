@@ -39,14 +39,12 @@ export default function SemperaNav({ onRequestPiece }: SemperaNavProps) {
 
   const handleAnchorClick = (href: string) => {
     setMenuOpen(false);
-    if (href.startsWith('/#')) {
-      const id = href.slice(2);
-      if (location.pathname === '/') {
-        const el = document.getElementById(id);
-        el?.scrollIntoView({ behavior: 'smooth' });
-      } else {
-        window.location.href = href;
-      }
+    const id = href.slice(2);
+    if (location.pathname === '/') {
+      const el = document.getElementById(id);
+      el?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      window.location.href = href;
     }
   };
 
