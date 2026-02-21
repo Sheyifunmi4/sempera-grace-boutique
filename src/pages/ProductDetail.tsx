@@ -55,9 +55,9 @@ export default function ProductDetail() {
         {/* Product Detail */}
         <div className="max-w-7xl mx-auto px-6 lg:px-8 pb-24">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
-
             {/* Image Gallery */}
             <div className="space-y-4">
+              {/* Main Image with Arrows */}
               <div className="aspect-[3/4] overflow-hidden bg-cream relative group">
                 <img
                   src={images[activeImg].src}
@@ -124,6 +124,41 @@ export default function ProductDetail() {
                 >
                   {product.price}
                 </p>
+
+                {/* ── Delivery Info ── */}
+                <div
+                  style={{
+                    marginTop: '16px',
+                    padding: '14px 18px',
+                    background: 'hsl(var(--muted)/0.4)',
+                    borderLeft: '3px solid #b8965a',
+                  }}
+                >
+                  <p
+                    style={{
+                      fontFamily: 'Jost, sans-serif',
+                      fontSize: '0.62rem',
+                      letterSpacing: '0.2em',
+                      textTransform: 'uppercase',
+                      color: '#b8965a',
+                      marginBottom: '10px',
+                      fontWeight: 400,
+                    }}
+                  >
+                    Delivery
+                  </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.82rem', color: 'hsl(var(--muted-foreground))', fontWeight: 300 }}>
+                      📍 <strong style={{ fontWeight: 400, color: 'hsl(var(--foreground))' }}>Lagos:</strong> 3–5 working days
+                    </p>
+                    <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.82rem', color: 'hsl(var(--muted-foreground))', fontWeight: 300 }}>
+                      🇳🇬 <strong style={{ fontWeight: 400, color: 'hsl(var(--foreground))' }}>Outside Lagos:</strong> 5–7 working days
+                    </p>
+                    <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.82rem', color: 'hsl(var(--muted-foreground))', fontWeight: 300 }}>
+                      🌍 <strong style={{ fontWeight: 400, color: 'hsl(var(--foreground))' }}>International:</strong> timeline advised on request
+                    </p>
+                  </div>
+                </div>
               </div>
 
               <span className="gold-divider" />
@@ -141,7 +176,7 @@ export default function ProductDetail() {
                 </p>
               </div>
 
-              {/* Fabric */}
+              {/* Fabric Details */}
               <div>
                 <h3
                   className="font-sans text-foreground mb-3"
@@ -154,7 +189,7 @@ export default function ProductDetail() {
                 </p>
               </div>
 
-              {/* Care */}
+              {/* Care Instructions */}
               <div>
                 <h3
                   className="font-sans text-foreground mb-3"
