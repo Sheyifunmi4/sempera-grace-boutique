@@ -1,5 +1,3 @@
-import heroImage from '@/assets/hero-image.jpg';
-
 interface HeroSectionProps {
   onExplore: () => void;
   onRequest: () => void;
@@ -8,28 +6,39 @@ interface HeroSectionProps {
 export default function HeroSection({ onExplore, onRequest }: HeroSectionProps) {
   return (
     <section className="relative h-screen min-h-[680px] flex items-end overflow-hidden">
-      {/* Background image */}
+      {/* Background video */}
       <div className="absolute inset-0">
-        <img
-          src={heroImage}
-          alt="Sempera Fashion — Designed with Grace"
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
           className="w-full h-full object-cover object-top"
-        />
+          poster=""
+        >
+          <source src="/hero-video.mov" type="video/quicktime" />
+          <source src="/hero-video.mov" type="video/mp4" />
+        </video>
         <div
           className="absolute inset-0"
-          style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.55) 100%)' }}
+          style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.60) 100%)' }}
         />
       </div>
 
       {/* Content */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-8 pb-20 lg:pb-28">
         <div className="max-w-2xl animate-fade-in-up">
-          <p className="section-eyebrow text-white/80 mb-4 delay-100">
-            The Grace Collection
+          <p className="section-eyebrow text-white/80 mb-4 delay-100" style={{ fontFamily: "'Playfair Display', serif" }}>
+            The ELÁN Collection
           </p>
           <h1
-            className="font-serif text-white mb-6"
-            style={{ fontSize: 'clamp(3rem, 8vw, 6rem)', lineHeight: 1.0, fontWeight: 300 }}
+            className="text-white mb-6"
+            style={{
+              fontSize: 'clamp(3rem, 8vw, 6rem)',
+              lineHeight: 1.0,
+              fontWeight: 300,
+              fontFamily: "'Playfair Display', serif",
+            }}
           >
             Designed<br />
             <em style={{ fontStyle: 'italic', fontWeight: 300 }}>with Grace.</em>

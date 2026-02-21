@@ -8,7 +8,7 @@ export default function SemperaFooter() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 mb-14">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <img src={semperaLogo} alt="Sempera Fashion" className="h-14 w-auto mb-5" />
+            <img src={semperaLogo} alt="Sempera Fashion" className="h-24 w-auto mb-5" />
             <p
               className="font-sans text-muted-foreground max-w-xs"
               style={{ fontSize: '0.9rem', lineHeight: 1.8, fontWeight: 300 }}
@@ -60,7 +60,7 @@ export default function SemperaFooter() {
               </li>
               <li>
                 <a
-                  href="https://instagram.com/semperafashion"
+                  href="https://instagram.com/sempera_fashion"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-sans text-muted-foreground hover:text-primary transition-colors duration-300"
@@ -71,7 +71,7 @@ export default function SemperaFooter() {
               </li>
               <li>
                 <a
-                  href="https://wa.me/447000000000"
+                  href="https://wa.me/2347032715508"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-sans text-muted-foreground hover:text-primary transition-colors duration-300"
