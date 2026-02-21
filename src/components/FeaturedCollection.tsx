@@ -5,6 +5,9 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import elanBlueRhinestone1 from '@/assets/elan-blue-rhinestone-1.jpg';
 import elanBlueRhinestone2 from '@/assets/elan-blue-rhinestone-2.jpg';
 import elanBlueRhinestone3 from '@/assets/elan-blue-rhinestone-3.jpg';
+import elanBlueRhinestone4 from '@/assets/elan-blue-rhinestone-4.jpg';
+import elanBlueRhinestone5 from '@/assets/elan-blue-rhinestone-5.jpg';
+import elanBlueRhinestone6 from '@/assets/elan-blue-rhinestone-6.jpg';
 import elanBrownKaftan1 from '@/assets/elan-brown-kaftan-1.jpg';
 import elanBrownKaftan2 from '@/assets/elan-brown-kaftan-2.jpg';
 import elanRoyalBlue1 from '@/assets/elan-royal-blue-1.jpg';
@@ -40,8 +43,8 @@ export const PRODUCTS: Product[] = [
     code: 'SP-EL-001',
     name: 'Metallic Blue Rhinestone Kaftan',
     description: 'Metallic Blue rich aunty outfit. Available in different colours.',
-    price: '₦29,999',
-    images: [elanBlueRhinestone1, elanBlueRhinestone2, elanBlueRhinestone3],
+    price: '₦34,999',
+    images: [elanBlueRhinestone1, elanBlueRhinestone2, elanBlueRhinestone3, elanBlueRhinestone4, elanBlueRhinestone5, elanBlueRhinestone6],
     fabric: 'Premium Embellished Fabric',
     sizes: '6–22',
   },
@@ -60,7 +63,7 @@ export const PRODUCTS: Product[] = [
     code: 'SP-EL-003',
     name: 'The Royal Blue Aso-Oke Dress (Limited)',
     description: 'Royal Blue rich aunty outfit with headwrap. Available in different colours.',
-    price: '₦59,999',
+    price: '₦60,000',
     images: [elanRoyalBlue1, elanRoyalBlue2, elanRoyalBlue3, elanRoyalBlue4],
     fabric: 'Premium Aso-Oke with Rhinestones',
     sizes: '6–22',
@@ -70,7 +73,7 @@ export const PRODUCTS: Product[] = [
     code: 'SP-EL-004',
     name: 'Olive Green Crystal Kaftan',
     description: 'Olive Green rich aunty outfit. Available in different colours.',
-    price: '₦24,999',
+    price: '₦34,999',
     images: [elanOliveGreen1],
     fabric: 'Premium Satin with Crystal Detailing',
     sizes: '6–22',
@@ -80,7 +83,7 @@ export const PRODUCTS: Product[] = [
     code: 'SP-EL-005',
     name: 'Blue & Pink Batik Lace Kaftan',
     description: 'Blue & Pink Batik rich aunty outfit with lace trim. Available in different colours.',
-    price: '₦24,999',
+    price: '₦34,999',
     images: [elanBatikLace1, elanBatikLace2],
     fabric: 'Batik Print with Crochet Lace',
     sizes: '6–22',
