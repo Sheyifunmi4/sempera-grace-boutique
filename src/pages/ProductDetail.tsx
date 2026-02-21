@@ -216,7 +216,7 @@ export default function ProductDetail() {
                   Request This Piece
                 </button>
                 <a
-                  href={`https://wa.me/2347032715508?text=${whatsappMessage}`}
+                  href={`https://wa.me/2348027825606?text=${whatsappMessage}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-outline-gold w-full"
