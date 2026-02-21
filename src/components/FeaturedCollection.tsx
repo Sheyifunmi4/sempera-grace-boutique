@@ -19,6 +19,7 @@ import elanBatikLace1 from '@/assets/elan-batik-lace-1.jpg';
 import elanBatikLace2 from '@/assets/elan-batik-lace-2.jpg';
 import elanMagentaSequin1 from '@/assets/elan-magenta-sequin-1.jpg';
 import elanMagentaSequin2 from '@/assets/elan-magenta-sequin-2.jpg';
+import elanMagentaSequin3 from '@/assets/elan-magenta-sequin-3.jpg';
 import elanRedTribal1 from '@/assets/elan-red-tribal-1.jpg';
 import elanRedTribal2 from '@/assets/elan-red-tribal-2.jpg';
 import elanRedTribal3 from '@/assets/elan-red-tribal-3.jpg';
@@ -112,7 +113,7 @@ export const PRODUCTS: Product[] = [
     name: 'Deep Magenta Sequin Fringe Dress',
     description: 'Deep Magenta rich aunty outfit with sequin fringe detail. Available in different colours.',
     price: '₦24,999',
-    images: [elanMagentaSequin1, elanMagentaSequin2],
+    images: [elanMagentaSequin3, elanMagentaSequin1, elanMagentaSequin2],
     fabric: 'Premium fabric with Sequin & Fringe Embellishment',
     sizes: '6–22',
   },
