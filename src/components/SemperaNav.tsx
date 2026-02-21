@@ -33,7 +33,7 @@ export default function SemperaNav({ onRequestPiece }: SemperaNavProps) {
         <div className="flex items-center justify-between h-24">
           {/* Logo */}
           <Link to="/" className="flex-shrink-0">
-            <img src={semperaLogo} alt="Sempera Fashion" className="h-28 w-auto" />
+            <img src={semperaLogo} alt="Sempera Fashion" className="h-44 w-auto" />
           </Link>
 
           {/* Desktop Nav */}
