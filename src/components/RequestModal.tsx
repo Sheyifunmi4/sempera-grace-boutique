@@ -6,7 +6,7 @@ import type { Product } from './FeaturedCollection';
 // ─── EmailJS Config ────────────────────────────────────────────────
 // Replace these 3 values with your own from emailjs.com dashboard
 const EMAILJS_SERVICE_ID  = 'service_hvb7ck2';
-const EMAILJS_TEMPLATE_ID = 'template_rfca346';
+const EMAILJS_TEMPLATE_ID = 'template_xr9txax';
 const EMAILJS_PUBLIC_KEY  = '441l47N72miy9mYmB';
 // ───────────────────────────────────────────────────────────────────
 
