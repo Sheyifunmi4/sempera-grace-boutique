@@ -25,6 +25,10 @@ import elanRedTribal3 from '@/assets/elan-red-tribal-3.jpg';
 import elanPurpleRhinestone1 from '@/assets/elan-purple-rhinestone-1.jpg';
 import elanPurpleRhinestone2 from '@/assets/elan-purple-rhinestone-2.jpg';
 import elanPlaidBurgundy1 from '@/assets/elan-plaid-burgundy-1.jpg';
+import elanPlaidBurgundy2 from '@/assets/elan-plaid-burgundy-2.jpg';
+import elanPlaidBurgundy3 from '@/assets/elan-plaid-burgundy-3.jpg';
+import elanPlaidBurgundy4 from '@/assets/elan-plaid-burgundy-4.jpg';
+import elanPlaidBurgundy5 from '@/assets/elan-plaid-burgundy-5.jpg';
 
 export interface Product {
   id: string;
@@ -102,9 +106,9 @@ export const PRODUCTS: Product[] = [
     id: '7',
     code: 'SP-EL-007',
     name: 'Red & Navy Tribal Print Dress',
-    description: 'Red & Navy tribal print rich aunty everyday outfit with. Available in different prints.',
+    description: 'Red & Navy tribal print rich aunty everyday outfit. Available in different prints.',
     price: '₦14,999',
-    images: [elanRedTribal1, elanRedTribal2],
+    images: [elanRedTribal1, elanRedTribal2, elanRedTribal3],
     fabric: 'Tribal Print with Crochet Lace Trim',
     sizes: '6–22',
   },
@@ -124,7 +128,7 @@ export const PRODUCTS: Product[] = [
     name: 'Premium Aso-Oke mixed with Satin & Rhinestone',
     description: 'Plaid & Burgundy rich aunty outfit with rhinestone accents. Available in different colours.',
     price: '₦62,999',
-    images: [elan-plaid-burgundy-1.jpg, elan-plaid-burgundy-2.jpg, elan-plaid-burgundy-3.jpg, elan-plaid-burgundy-4.jpg, elan-plaid-burgundy-5.jpg],
+    images: [elanPlaidBurgundy1, elanPlaidBurgundy2, elanPlaidBurgundy3, elanPlaidBurgundy4, elanPlaidBurgundy5],
     fabric: 'Aso-Oke, Satin and Rhinestone Detail',
     sizes: '6–22',
   },
