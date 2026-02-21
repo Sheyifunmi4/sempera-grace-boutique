@@ -12,6 +12,16 @@ import elanRoyalBlue2 from '@/assets/elan-royal-blue-2.jpg';
 import elanRoyalBlue3 from '@/assets/elan-royal-blue-3.jpg';
 import elanRoyalBlue4 from '@/assets/elan-royal-blue-4.jpg';
 import elanOliveGreen1 from '@/assets/elan-olive-green-1.jpg';
+import elanBatikLace1 from '@/assets/elan-batik-lace-1.jpg';
+import elanBatikLace2 from '@/assets/elan-batik-lace-2.jpg';
+import elanMagentaSequin1 from '@/assets/elan-magenta-sequin-1.jpg';
+import elanMagentaSequin2 from '@/assets/elan-magenta-sequin-2.jpg';
+import elanRedTribal1 from '@/assets/elan-red-tribal-1.jpg';
+import elanRedTribal2 from '@/assets/elan-red-tribal-2.jpg';
+import elanRedTribal3 from '@/assets/elan-red-tribal-3.jpg';
+import elanPurpleRhinestone1 from '@/assets/elan-purple-rhinestone-1.jpg';
+import elanPurpleRhinestone2 from '@/assets/elan-purple-rhinestone-2.jpg';
+import elanPlaidBurgundy1 from '@/assets/elan-plaid-burgundy-1.jpg';
 
 export interface Product {
   id: string;
@@ -65,6 +75,56 @@ export const PRODUCTS: Product[] = [
     fabric: 'Premium Satin with Crystal Detailing',
     sizes: '6–22',
   },
+  {
+    id: '5',
+    code: 'SP-EL-005',
+    name: 'Blue & Pink Batik Lace Kaftan',
+    description: 'Blue & Pink Batik rich aunty outfit with lace trim. Available in different colours.',
+    price: '₦34,999',
+    images: [elanBatikLace1, elanBatikLace2],
+    fabric: 'Batik Print with Crochet Lace',
+    sizes: '6–22',
+  },
+  {
+    id: '6',
+    code: 'SP-EL-006',
+    name: 'Deep Magenta Sequin Fringe Kaftan',
+    description: 'Deep Magenta rich aunty outfit with sequin fringe detail. Available in different colours.',
+    price: '₦49,999',
+    images: [elanMagentaSequin1, elanMagentaSequin2],
+    fabric: 'Premium Satin with Sequin & Fringe Embellishment',
+    sizes: '6–22',
+  },
+  {
+    id: '7',
+    code: 'SP-EL-007',
+    name: 'Red & Navy Tribal Print Kaftan',
+    description: 'Red & Navy tribal print rich aunty outfit with lace detail. Available in different colours.',
+    price: '₦34,999',
+    images: [elanRedTribal1, elanRedTribal2, elanRedTribal3],
+    fabric: 'Tribal Print with Crochet Lace Trim',
+    sizes: '6–22',
+  },
+  {
+    id: '8',
+    code: 'SP-EL-008',
+    name: 'Purple & Black Rhinestone Kaftan',
+    description: 'Purple & Black rich aunty outfit with rhinestone detailing. Available in different colours.',
+    price: '₦49,999',
+    images: [elanPurpleRhinestone1, elanPurpleRhinestone2],
+    fabric: 'Premium Fabric with Rhinestone Embellishment',
+    sizes: '6–22',
+  },
+  {
+    id: '9',
+    code: 'SP-EL-009',
+    name: 'Plaid & Burgundy Rhinestone Kaftan',
+    description: 'Plaid & Burgundy rich aunty outfit with rhinestone accents. Available in different colours.',
+    price: '₦34,999',
+    images: [elanPlaidBurgundy1],
+    fabric: 'Plaid Weave with Rhinestone Detail',
+    sizes: '6–22',
+  },
 ];
 
 interface ProductCardProps {
@@ -89,15 +149,12 @@ export function ProductCard({ product, onRequest }: ProductCardProps) {
 
   return (
     <div className="product-card group">
-      {/* Image Container with Slideshow */}
       <div className="aspect-[3/4] bg-cream relative overflow-hidden mb-5">
         <img
           src={product.images[currentImg]}
           alt={`${product.name} — view ${currentImg + 1}`}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
         />
-
-        {/* Navigation Arrows */}
         {product.images.length > 1 && (
           <>
             <button
@@ -116,8 +173,6 @@ export function ProductCard({ product, onRequest }: ProductCardProps) {
             </button>
           </>
         )}
-
-        {/* Dot Indicators */}
         {product.images.length > 1 && (
           <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5">
             {product.images.map((_, i) => (
@@ -135,8 +190,6 @@ export function ProductCard({ product, onRequest }: ProductCardProps) {
           </div>
         )}
       </div>
-
-      {/* Product Info */}
       <div className="space-y-2">
         <p className="section-eyebrow text-muted-foreground">{product.code}</p>
         <Link to={`/product/${product.id}`}>
@@ -183,7 +236,6 @@ export default function FeaturedCollection({ onRequest }: FeaturedCollectionProp
   return (
     <section id="collection" className="py-24 lg:py-32 bg-background">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        {/* Header */}
         <div className="text-center mb-16 reveal">
           <p className="section-eyebrow mb-4">Sempera Fashion</p>
           <h2
@@ -200,8 +252,6 @@ export default function FeaturedCollection({ onRequest }: FeaturedCollectionProp
             Timeless silhouettes. Refined tailoring. Effortless elegance.
           </p>
         </div>
-
-        {/* Product Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 lg:gap-14">
           {PRODUCTS.map((product, i) => (
             <div key={product.id} className={`reveal delay-${(i + 1) * 100}`}>
