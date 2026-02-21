@@ -4,10 +4,10 @@ import emailjs from '@emailjs/browser';
 import type { Product } from './FeaturedCollection';
 
 // ─── EmailJS Config ────────────────────────────────────────────────
-// Replace these 3 values with your own from emailjs.com dashboard
-const EMAILJS_SERVICE_ID  = 'service_hvb7ck2';
-const EMAILJS_TEMPLATE_ID = 'template_xr9txax';
-const EMAILJS_PUBLIC_KEY  = '441l47N72miy9mYmB';
+const EMAILJS_SERVICE_ID           = 'service_hvb7ck2';
+const EMAILJS_ADMIN_TEMPLATE_ID    = 'template_rfca346'; // → order details to you (admin)
+const EMAILJS_CUSTOMER_TEMPLATE_ID = 'template_xr9txax'; // → confirmation to customer
+const EMAILJS_PUBLIC_KEY           = '441l47N72miy9mYmB';
 // ───────────────────────────────────────────────────────────────────
 
 interface RequestModalProps {
@@ -55,26 +55,48 @@ export default function RequestModal({ product, onClose }: RequestModalProps) {
     setSending(true);
     setSendError('');
 
-    const templateParams = {
-      to_email:       'olalekanoluwaseyifunmi17@gmail.com',
-      from_name:      form.name,
-      from_email:     form.email,
-      phone:          form.phone,
-      product_name:   product.name,
-      product_code:   product.code,
-      product_price:  product.price,
-      size:           form.size,
-      quantity:       form.quantity,
-      notes:          form.notes || 'None',
+    const adminParams = {
+      to_email:      'olalekanoluwaseyifunmi17@gmail.com',
+      from_name:     form.name,
+      from_email:    form.email,
+      phone:         form.phone,
+      product_name:  product.name,
+      product_code:  product.code,
+      product_price: product.price,
+      size:          form.size,
+      quantity:      form.quantity,
+      notes:         form.notes || 'None',
+    };
+
+    const customerParams = {
+      from_name:     form.name,
+      from_email:    form.email,
+      phone:         form.phone,
+      product_name:  product.name,
+      product_code:  product.code,
+      product_price: product.price,
+      size:          form.size,
+      quantity:      form.quantity,
+      notes:         form.notes || 'None',
     };
 
     try {
+      // 1. Send order details to admin
       await emailjs.send(
         EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        templateParams,
+        EMAILJS_ADMIN_TEMPLATE_ID,
+        adminParams,
         EMAILJS_PUBLIC_KEY
       );
+
+      // 2. Send confirmation to customer
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_CUSTOMER_TEMPLATE_ID,
+        customerParams,
+        EMAILJS_PUBLIC_KEY
+      );
+
       setSubmitted(true);
     } catch (err) {
       console.error('EmailJS error:', err);
@@ -126,6 +148,10 @@ export default function RequestModal({ product, onClose }: RequestModalProps) {
                 style={{ fontSize: '0.95rem', lineHeight: 1.8, fontWeight: 300 }}
               >
                 Thank you for choosing Sempéra. Our stylist will contact you shortly.
+                <br />
+                <span style={{ fontSize: '0.85rem', opacity: 0.7 }}>
+                  A confirmation has been sent to {form.email}
+                </span>
               </p>
             </div>
           ) : (
