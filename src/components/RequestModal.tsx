@@ -1,6 +1,14 @@
 import { useState } from 'react';
-import { X } from 'lucide-react';
+import { X, Loader2 } from 'lucide-react';
+import emailjs from '@emailjs/browser';
 import type { Product } from './FeaturedCollection';
+
+// ─── EmailJS Config ────────────────────────────────────────────────
+// Replace these 3 values with your own from emailjs.com dashboard
+const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';
+const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
+const EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';
+// ───────────────────────────────────────────────────────────────────
 
 interface RequestModalProps {
   product: Product | null;
@@ -19,6 +27,8 @@ export default function RequestModal({ product, onClose }: RequestModalProps) {
     notes: '',
   });
   const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   if (!product) return null;
@@ -34,19 +44,50 @@ export default function RequestModal({ product, onClose }: RequestModalProps) {
     return newErrors;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
-    setSubmitted(true);
+
+    setSending(true);
+    setSendError('');
+
+    const templateParams = {
+      to_email:       'olalekanoluwaseyifunmi17@gmail.com',
+      from_name:      form.name,
+      from_email:     form.email,
+      phone:          form.phone,
+      product_name:   product.name,
+      product_code:   product.code,
+      product_price:  product.price,
+      size:           form.size,
+      quantity:       form.quantity,
+      notes:          form.notes || 'None',
+    };
+
+    try {
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        templateParams,
+        EMAILJS_PUBLIC_KEY
+      );
+      setSubmitted(true);
+    } catch (err) {
+      console.error('EmailJS error:', err);
+      setSendError('Something went wrong. Please try again or contact us via WhatsApp.');
+    } finally {
+      setSending(false);
+    }
   };
 
   const handleChange = (field: string, value: string | number) => {
     setForm((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => ({ ...prev, [field]: '' }));
+    setSendError('');
   };
 
   return (
@@ -70,6 +111,7 @@ export default function RequestModal({ product, onClose }: RequestModalProps) {
 
         <div className="p-8 lg:p-10">
           {submitted ? (
+            /* ── Success State ── */
             <div className="text-center py-10">
               <div className="font-serif text-primary text-4xl mb-3">✦</div>
               <h3
@@ -83,12 +125,12 @@ export default function RequestModal({ product, onClose }: RequestModalProps) {
                 className="font-sans text-muted-foreground"
                 style={{ fontSize: '0.95rem', lineHeight: 1.8, fontWeight: 300 }}
               >
-                Thank you for choosing Sempera. Our stylist will contact you shortly.
+                Thank you for choosing Sempéra. Our stylist will contact you shortly.
               </p>
             </div>
           ) : (
             <>
-              {/* Header */}
+              {/* Product Preview */}
               <div className="flex gap-4 mb-8">
                 <img
                   src={product.images[0]}
@@ -158,7 +200,7 @@ export default function RequestModal({ product, onClose }: RequestModalProps) {
                     maxLength={30}
                     className="w-full px-4 py-3 border font-sans text-sm outline-none transition-colors duration-300 focus:border-primary bg-background text-foreground"
                     style={{ borderColor: errors.phone ? 'hsl(0 84% 60%)' : 'hsl(var(--border))' }}
-                    placeholder="+44 000 000 0000"
+                    placeholder="+234 000 000 0000"
                   />
                   {errors.phone && <p className="text-xs text-destructive mt-1">{errors.phone}</p>}
                 </div>
@@ -208,8 +250,26 @@ export default function RequestModal({ product, onClose }: RequestModalProps) {
                   />
                 </div>
 
-                <button type="submit" className="btn-gold w-full mt-2">
-                  Submit Request
+                {/* Send Error */}
+                {sendError && (
+                  <p className="text-sm text-destructive text-center">{sendError}</p>
+                )}
+
+                {/* Submit */}
+                <button
+                  type="submit"
+                  className="btn-gold w-full mt-2 flex items-center justify-center gap-2"
+                  disabled={sending}
+                  style={{ opacity: sending ? 0.7 : 1, cursor: sending ? 'not-allowed' : 'pointer' }}
+                >
+                  {sending ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    'Submit Request'
+                  )}
                 </button>
               </form>
             </>
