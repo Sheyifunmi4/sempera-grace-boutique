@@ -29,6 +29,9 @@ import elanPlaidBurgundy2 from '@/assets/elan-plaid-burgundy-2.jpg';
 import elanPlaidBurgundy3 from '@/assets/elan-plaid-burgundy-3.jpg';
 import elanPlaidBurgundy4 from '@/assets/elan-plaid-burgundy-4.jpg';
 import elanPlaidBurgundy5 from '@/assets/elan-plaid-burgundy-5.jpg';
+import elanMulticolourAnkara1 from '@/assets/elan-multicolour-ankara-1.jpg';
+import elanMulticolourAnkara2 from '@/assets/elan-multicolour-ankara-2.jpg';
+import elanMulticolourAnkara3 from '@/assets/elan-multicolour-ankara-3.jpg';
 
 export interface Product {
   id: string;
@@ -130,6 +133,16 @@ export const PRODUCTS: Product[] = [
     price: '₦62,999',
     images: [elanPlaidBurgundy1, elanPlaidBurgundy2, elanPlaidBurgundy3, elanPlaidBurgundy4, elanPlaidBurgundy5],
     fabric: 'Aso-Oke, Satin and Rhinestone Detail',
+    sizes: '6–22',
+  },
+  {
+    id: '10',
+    code: 'SP-EL-010',
+    name: 'Elegant Multicoloured Ankara',
+    description: 'Elegant outfit for weekend with silver embroidery. Available in different prints.',
+    price: '₦14,999',
+    images: [elanMulticolourAnkara1, elanMulticolourAnkara2, elanMulticolourAnkara3],
+    fabric: 'High Quality Ankara',
     sizes: '6–22',
   },
 ];
