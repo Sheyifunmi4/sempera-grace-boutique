@@ -4,11 +4,11 @@ import { Menu, X } from 'lucide-react';
 import semperaLogo from '@/assets/sempera-logo.png';
 
 const navItems = [
-  { label: 'Shop', href: '/shop' },
-  { label: 'Collection', href: '/collection' },
-  { label: 'About', href: '/#about' },
-  { label: 'Contact', href: '/#contact' },
-];
+{ label: 'Shop', href: '/shop' },
+{ label: 'Collection', href: '/collection' },
+{ label: 'About', href: '/#about' },
+{ label: 'Contact', href: '/#contact' }];
+
 
 interface SemperaNavProps {
   onRequestPiece?: () => void;
@@ -33,25 +33,25 @@ export default function SemperaNav({ onRequestPiece }: SemperaNavProps) {
         <div className="flex items-center justify-between h-24">
           {/* Logo */}
           <Link to="/" className="flex-shrink-0">
-            <img src={semperaLogo} alt="Sempera Fashion" className="h-44 w-auto" />
+            <img src={semperaLogo} alt="Sempera Fashion" className="h-44 w-auto object-contain" />
           </Link>
 
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-10">
             {navItems.map((item) =>
-              item.href.startsWith('/#') ? (
-                <button
-                  key={item.label}
-                  onClick={() => handleAnchorClick(item.href)}
-                  className="nav-link bg-transparent border-none p-0"
-                >
+            item.href.startsWith('/#') ?
+            <button
+              key={item.label}
+              onClick={() => handleAnchorClick(item.href)}
+              className="nav-link bg-transparent border-none p-0">
+
                   {item.label}
-                </button>
-              ) : (
-                <Link key={item.label} to={item.href} className="nav-link">
+                </button> :
+
+            <Link key={item.label} to={item.href} className="nav-link">
                   {item.label}
                 </Link>
-              )
+
             )}
           </nav>
 
@@ -66,46 +66,46 @@ export default function SemperaNav({ onRequestPiece }: SemperaNavProps) {
           <button
             className="lg:hidden p-2 text-foreground"
             onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle menu"
-          >
+            aria-label="Toggle menu">
+
             {menuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
       </div>
 
       {/* Mobile Menu */}
-      {menuOpen && (
-        <div className="lg:hidden bg-background border-t border-border/40 py-6 px-6">
+      {menuOpen &&
+      <div className="lg:hidden bg-background border-t border-border/40 py-6 px-6">
           <nav className="flex flex-col gap-5">
             {navItems.map((item) =>
-              item.href.startsWith('/#') ? (
-                <button
-                  key={item.label}
-                  onClick={() => handleAnchorClick(item.href)}
-                  className="nav-link text-left bg-transparent border-none p-0 text-base"
-                >
+          item.href.startsWith('/#') ?
+          <button
+            key={item.label}
+            onClick={() => handleAnchorClick(item.href)}
+            className="nav-link text-left bg-transparent border-none p-0 text-base">
+
                   {item.label}
-                </button>
-              ) : (
-                <Link
-                  key={item.label}
-                  to={item.href}
-                  className="nav-link text-base"
-                  onClick={() => setMenuOpen(false)}
-                >
+                </button> :
+
+          <Link
+            key={item.label}
+            to={item.href}
+            className="nav-link text-base"
+            onClick={() => setMenuOpen(false)}>
+
                   {item.label}
                 </Link>
-              )
-            )}
+
+          )}
             <button
-              onClick={() => { setMenuOpen(false); onRequestPiece?.(); }}
-              className="btn-gold w-full mt-2"
-            >
+            onClick={() => {setMenuOpen(false);onRequestPiece?.();}}
+            className="btn-gold w-full mt-2">
+
               Request a Piece
             </button>
           </nav>
         </div>
-      )}
-    </header>
-  );
+      }
+    </header>);
+
 }
