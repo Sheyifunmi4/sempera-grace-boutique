@@ -30,10 +30,10 @@ export default function SemperaNav({ onRequestPiece }: SemperaNavProps) {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border/40">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="flex items-center justify-between h-32">
+        <div className="flex items-center justify-between h-24">
           {/* Logo */}
           <Link to="/" className="flex-shrink-0">
-            <img src={semperaLogo} alt="Sempera Fashion" className="h-[28rem] w-auto object-contain max-h-[8rem]" />
+            <img src={semperaLogo} alt="Sempera Fashion" className="h-44 w-auto object-fill" />
           </Link>
 
           {/* Desktop Nav */}
