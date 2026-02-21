@@ -1,11 +1,11 @@
-import aboutImage from '@/assets/about-image.jpg';
+import aboutImage from '@/assets/elan-batik-lace-2.jpg';
 
 export default function AboutSection() {
   return (
     <section id="about" className="py-24 lg:py-36 bg-background">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
-          {/* Editorial Image */}
+          {/* Editorial Image — full length */}
           <div className="reveal order-2 lg:order-1">
             <div className="relative">
               <div
@@ -16,7 +16,7 @@ export default function AboutSection() {
                 src={aboutImage}
                 alt="The Sempera Woman"
                 className="relative z-10 w-full object-cover"
-                style={{ maxHeight: '680px', objectPosition: 'top' }}
+                style={{ objectPosition: 'top' }}
               />
             </div>
           </div>
