@@ -32,6 +32,10 @@ import elanPlaidBurgundy5 from '@/assets/elan-plaid-burgundy-5.jpg';
 import elanMulticolourAnkara1 from '@/assets/elan-multicolour-ankara-1.jpg';
 import elanMulticolourAnkara2 from '@/assets/elan-multicolour-ankara-2.jpg';
 import elanMulticolourAnkara3 from '@/assets/elan-multicolour-ankara-3.jpg';
+import elanGracefulShort1 from '@/assets/elan-graceful-short-1.jpg';
+import elanGracefulShort2 from '@/assets/elan-graceful-short-2.jpg';
+import elanGracefulShort3 from '@/assets/elan-graceful-short-3.jpg';
+import elanGracefulShort4 from '@/assets/elan-graceful-short-4.jpg';
 
 export interface Product {
   id: string;
@@ -143,6 +147,16 @@ export const PRODUCTS: Product[] = [
     price: '₦14,999',
     images: [elanMulticolourAnkara1, elanMulticolourAnkara2, elanMulticolourAnkara3],
     fabric: 'High Quality Ankara',
+    sizes: '6–22',
+  },
+  {
+    id: '11',
+    code: 'SP-EL-011',
+    name: 'The Graceful Short Dress',
+    description: 'Beautiful Outfit with butterfly back details. Available in different prints.',
+    price: '₦17,999',
+    images: [elanGracefulShort1, elanGracefulShort2, elanGracefulShort3, elanGracefulShort4],
+    fabric: '100% Cotton Ankara',
     sizes: '6–22',
   },
 ];
