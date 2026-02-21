@@ -36,6 +36,9 @@ import elanGracefulShort1 from '@/assets/elan-graceful-short-1.jpg';
 import elanGracefulShort2 from '@/assets/elan-graceful-short-2.jpg';
 import elanGracefulShort3 from '@/assets/elan-graceful-short-3.jpg';
 import elanGracefulShort4 from '@/assets/elan-graceful-short-4.jpg';
+import elanAnkaraPatch1 from '@/assets/elan-ankara-patch-1.jpg';
+import elanAnkaraPatch2 from '@/assets/elan-ankara-patch-2.jpg';
+import elanAnkaraPatch3 from '@/assets/elan-ankara-patch-3.jpg';
 
 export interface Product {
   id: string;
@@ -157,6 +160,16 @@ export const PRODUCTS: Product[] = [
     price: '₦17,999',
     images: [elanGracefulShort1, elanGracefulShort2, elanGracefulShort3, elanGracefulShort4],
     fabric: '100% Cotton Ankara',
+    sizes: '6–22',
+  },
+  {
+    id: '12',
+    code: 'SP-EL-012',
+    name: 'Creative Ankara Patch Design',
+    description: 'Elegant Classy Outfit for every wear. Available in different prints.',
+    price: '₦21,999',
+    images: [elanAnkaraPatch1, elanAnkaraPatch2, elanAnkaraPatch3],
+    fabric: 'Premium Texture Ankara',
     sizes: '6–22',
   },
 ];
