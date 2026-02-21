@@ -62,7 +62,7 @@ export const PRODUCTS: Product[] = [
     code: 'SP-EL-001',
     name: 'Metallic Blue Rhinestone Dress',
     description: 'Metallic Blue premium woman outfit. Available in different colours.',
-    price: '₦29,999',
+    price: '₦34,999',
     images: [elanBlueRhinestone1, elanBlueRhinestone2, elanBlueRhinestone3, elanBlueRhinestone4, elanBlueRhinestone5, elanBlueRhinestone6],
     fabric: 'Premium Embellished Fabric',
     sizes: '6–22',
