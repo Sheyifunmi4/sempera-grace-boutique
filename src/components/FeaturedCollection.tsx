@@ -124,7 +124,7 @@ export const PRODUCTS: Product[] = [
     name: 'Premium Aso-Oke mixed with Satin & Rhinestone',
     description: 'Plaid & Burgundy rich aunty outfit with rhinestone accents. Available in different colours.',
     price: '₦62,999',
-    images: [elanPlaidBurgundy1],
+    images: [elan-plaid-burgundy-1.jpg, elan-plaid-burgundy-2.jpg, elan-plaid-burgundy-3.jpg, elan-plaid-burgundy-4.jpg, elan-plaid-burgundy-5.jpg],
     fabric: 'Aso-Oke, Satin and Rhinestone Detail',
     sizes: '6–22',
   },
