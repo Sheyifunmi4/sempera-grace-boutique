@@ -15,6 +15,10 @@ import elanRoyalBlue2 from '@/assets/elan-royal-blue-2.jpg';
 import elanRoyalBlue3 from '@/assets/elan-royal-blue-3.jpg';
 import elanRoyalBlue4 from '@/assets/elan-royal-blue-4.jpg';
 import elanOliveGreen1 from '@/assets/elan-olive-green-1.jpg';
+import elanOliveGreen2 from '@/assets/elan-olive-green-2.jpg';
+import elanOliveGreen3 from '@/assets/elan-olive-green-3.jpg';
+import elanOliveGreen4 from '@/assets/elan-olive-green-4.jpg';
+import elanOliveGreen5 from '@/assets/elan-olive-green-5.jpg';
 import elanBatikLace1 from '@/assets/elan-batik-lace-1.jpg';
 import elanBatikLace2 from '@/assets/elan-batik-lace-2.jpg';
 import elanMagentaSequin1 from '@/assets/elan-magenta-sequin-1.jpg';
@@ -93,7 +97,7 @@ export const PRODUCTS: Product[] = [
     name: 'Olive Green Crystal Dress',
     description: 'Olive Green graced aunty outfit. Available in different colours.',
     price: '₦24,999',
-    images: [elanOliveGreen1],
+    images: [elanOliveGreen2, elanOliveGreen3, elanOliveGreen4, elanOliveGreen5, elanOliveGreen1],
     fabric: 'Premium Satin with Crystal Detailing',
     sizes: '6–22',
   },
