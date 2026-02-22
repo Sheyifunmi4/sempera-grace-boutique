@@ -63,19 +63,14 @@ export interface Product {
   code: string;
   name: string;
   description: string;
-  price: string;          // ← sale/current price (gold, bold)
-  originalPrice: string;  // ← slashed price (grey, strikethrough) — change anytime
+  price: string;
+  originalPrice: string;
   images: string[];
   fabric: string;
   sizes: string;
 }
 
 export const PRODUCTS: Product[] = [
-  // ─────────────────────────────────────────────────────────────
-  // To update any price: just change 'price' and/or 'originalPrice'
-  // price        = what customer pays (shown in gold)
-  // originalPrice = the crossed-out price above it (shown in grey)
-  // ─────────────────────────────────────────────────────────────
   {
     id: '1',
     code: 'SP-EL-001',
@@ -363,7 +358,9 @@ export default function FeaturedCollection({ onRequest }: FeaturedCollectionProp
   return (
     <section id="collection" className="py-24 lg:py-32 bg-background">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="text-center mb-16 reveal">
+
+        {/* ── Section Header ── */}
+        <div className="text-center mb-10 reveal">
           <p className="section-eyebrow mb-4">Sempera Fashion</p>
           <h2
             className="font-serif text-foreground mb-5"
@@ -379,6 +376,61 @@ export default function FeaturedCollection({ onRequest }: FeaturedCollectionProp
             Timeless silhouettes. Refined tailoring. Effortless elegance.
           </p>
         </div>
+
+        {/* ── Launch Discount Banner ── */}
+        <div
+          className="reveal mb-14"
+          style={{
+            background: 'linear-gradient(135deg, #1a1208 0%, #2d1f0a 50%, #1a1208 100%)',
+            border: '1px solid #b8965a',
+            borderRadius: '2px',
+            padding: '20px 32px',
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '12px',
+            textAlign: 'center',
+          }}
+        >
+          <span style={{ fontSize: '1.1rem' }}>🎉</span>
+          <p
+            style={{
+              fontFamily: 'Cormorant Garamond, serif',
+              fontSize: 'clamp(1rem, 2.5vw, 1.25rem)',
+              fontWeight: 500,
+              color: '#b8965a',
+              letterSpacing: '0.04em',
+              margin: 0,
+            }}
+          >
+            Launch Discount — Now Live
+          </p>
+          <span
+            style={{
+              width: '1px',
+              height: '18px',
+              background: '#b8965a',
+              opacity: 0.5,
+              display: 'inline-block',
+            }}
+          />
+          <p
+            style={{
+              fontFamily: 'Jost, sans-serif',
+              fontSize: 'clamp(0.8rem, 2vw, 0.95rem)',
+              fontWeight: 300,
+              color: '#e8d5b0',
+              letterSpacing: '0.06em',
+              margin: 0,
+            }}
+          >
+            Enjoy introductory pricing on every piece in the ELÁN Collection.
+            <span style={{ color: '#b8965a', fontWeight: 400 }}> Limited time only.</span>
+          </p>
+        </div>
+
+        {/* ── Product Grid ── */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 lg:gap-14">
           {PRODUCTS.map((product, i) => (
             <div key={product.id} className={`reveal delay-${(i + 1) * 100}`}>
@@ -386,6 +438,7 @@ export default function FeaturedCollection({ onRequest }: FeaturedCollectionProp
             </div>
           ))}
         </div>
+
       </div>
     </section>
   );
