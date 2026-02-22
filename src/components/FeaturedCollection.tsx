@@ -234,7 +234,7 @@ export const PRODUCTS: Product[] = [
     price: '₦17,999',
     originalPrice: '₦22,999',
     images: [elanMixedPattern1, elanMixedPattern2, elanMixedPattern3, elanMixedPattern4],
-    fabric: 'Quality Mixed Ankara with Lace',
+    fabric: 'Premium Quality Mixed Ankara with Lace',
     sizes: '6–22',
   },
 ];
