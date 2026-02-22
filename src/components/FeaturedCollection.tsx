@@ -63,19 +63,26 @@ export interface Product {
   code: string;
   name: string;
   description: string;
-  price: string;
+  price: string;          // ← sale/current price (gold, bold)
+  originalPrice: string;  // ← slashed price (grey, strikethrough) — change anytime
   images: string[];
   fabric: string;
   sizes: string;
 }
 
 export const PRODUCTS: Product[] = [
+  // ─────────────────────────────────────────────────────────────
+  // To update any price: just change 'price' and/or 'originalPrice'
+  // price        = what customer pays (shown in gold)
+  // originalPrice = the crossed-out price above it (shown in grey)
+  // ─────────────────────────────────────────────────────────────
   {
     id: '1',
     code: 'SP-EL-001',
     name: 'Metallic Blue Rhinestone Dress',
     description: 'Metallic Blue premium woman outfit. Available in different colours.',
     price: '₦34,999',
+    originalPrice: '₦39,999',
     images: [elanBlueRhinestone1, elanBlueRhinestone2, elanBlueRhinestone3, elanBlueRhinestone4, elanBlueRhinestone5, elanBlueRhinestone6],
     fabric: 'Premium Embellished Fabric',
     sizes: '6–22',
@@ -86,6 +93,7 @@ export const PRODUCTS: Product[] = [
     name: 'Chocolate Sequin-Neck Dress with Aso-Oke sleeves',
     description: 'Chocolate Brown rich aunty outfit. Available in different colours.',
     price: '₦34,999',
+    originalPrice: '₦39,999',
     images: [elanBrownKaftan1, elanBrownKaftan2],
     fabric: 'Premium Satin with Sequin Embellishment',
     sizes: '6–22',
@@ -96,6 +104,7 @@ export const PRODUCTS: Product[] = [
     name: 'The Royal Blue Aso-Oke Dress (Limited)',
     description: 'Royal Blue rich aunty outfit with headwrap. Available in different colours.',
     price: '₦59,999',
+    originalPrice: '₦64,999',
     images: [elanRoyalBlue1, elanRoyalBlue2, elanRoyalBlue3, elanRoyalBlue4],
     fabric: 'Premium Aso-Oke with Rhinestones',
     sizes: '6–22',
@@ -106,6 +115,7 @@ export const PRODUCTS: Product[] = [
     name: 'Olive Green Crystal Dress',
     description: 'Olive Green graced aunty outfit. Available in different colours.',
     price: '₦29,999',
+    originalPrice: '₦34,999',
     images: [elanOliveGreen2, elanOliveGreen3, elanOliveGreen4, elanOliveGreen5, elanOliveGreen1],
     fabric: 'Premium Satin with Crystal Detailing',
     sizes: '6–22',
@@ -116,6 +126,7 @@ export const PRODUCTS: Product[] = [
     name: 'Luxury Ankara mixed with Lace',
     description: 'Blue & Pink Batik rich aunty outfit with lace trim. Available in different colours.',
     price: '₦24,999',
+    originalPrice: '₦29,999',
     images: [elanBatikLace1, elanBatikLace2],
     fabric: '100% Cotton with Crochet Lace',
     sizes: '6–22',
@@ -126,6 +137,7 @@ export const PRODUCTS: Product[] = [
     name: 'Deep Magenta Sequin Fringe Dress',
     description: 'Deep Magenta rich aunty outfit with sequin fringe detail. Available in different colours.',
     price: '₦24,999',
+    originalPrice: '₦29,999',
     images: [elanMagentaSequin3, elanMagentaSequin1, elanMagentaSequin2],
     fabric: 'Premium fabric with Sequin & Fringe Embellishment',
     sizes: '6–22',
@@ -136,6 +148,7 @@ export const PRODUCTS: Product[] = [
     name: 'Red & Navy Tribal Print Dress',
     description: 'Red & Navy tribal print rich aunty everyday outfit. Available in different prints.',
     price: '₦14,999',
+    originalPrice: '₦19,999',
     images: [elanRedTribal1, elanRedTribal2, elanRedTribal3],
     fabric: 'Tribal Print with Crochet Lace Trim',
     sizes: '6–22',
@@ -146,6 +159,7 @@ export const PRODUCTS: Product[] = [
     name: 'Purple & Black Rhinestone Kaftan',
     description: 'Purple & Black rich aunty outfit with rhinestone detailing. Available in different colours.',
     price: '₦34,999',
+    originalPrice: '₦39,999',
     images: [elanPurpleRhinestone1, elanPurpleRhinestone2],
     fabric: 'Premium Fabric with Rhinestone Embellishment',
     sizes: '6–22',
@@ -156,6 +170,7 @@ export const PRODUCTS: Product[] = [
     name: 'Premium Aso-Oke mixed with Satin & Rhinestone',
     description: 'Plaid & Burgundy rich aunty outfit with rhinestone accents. Available in different colours.',
     price: '₦64,999',
+    originalPrice: '₦69,999',
     images: [elanPlaidBurgundy1, elanPlaidBurgundy2, elanPlaidBurgundy3, elanPlaidBurgundy4, elanPlaidBurgundy5],
     fabric: 'Aso-Oke, Satin and Rhinestone Detail',
     sizes: '6–22',
@@ -166,6 +181,7 @@ export const PRODUCTS: Product[] = [
     name: 'Elegant Multicoloured Ankara',
     description: 'Elegant outfit for weekend with silver embroidery. Available in different prints.',
     price: '₦14,999',
+    originalPrice: '₦19,999',
     images: [elanMulticolourAnkara1, elanMulticolourAnkara2, elanMulticolourAnkara3],
     fabric: 'High Quality Ankara',
     sizes: '6–22',
@@ -176,6 +192,7 @@ export const PRODUCTS: Product[] = [
     name: 'The Graceful Short Dress',
     description: 'Beautiful Outfit with butterfly back details. Available in different prints.',
     price: '₦17,999',
+    originalPrice: '₦22,999',
     images: [elanGracefulShort1, elanGracefulShort2, elanGracefulShort3, elanGracefulShort4],
     fabric: '100% Cotton Ankara',
     sizes: '6–22',
@@ -186,6 +203,7 @@ export const PRODUCTS: Product[] = [
     name: 'Creative Ankara Patch Design',
     description: 'Elegant Classy Outfit for every wear. Available in different prints.',
     price: '₦24,999',
+    originalPrice: '₦29,999',
     images: [elanAnkaraPatch1, elanAnkaraPatch2, elanAnkaraPatch3],
     fabric: 'Premium Texture Ankara',
     sizes: '6–22',
@@ -196,6 +214,7 @@ export const PRODUCTS: Product[] = [
     name: 'Luxury Crystal Blue Dress',
     description: 'Elegant luxury ware with rhinestones and stylish arm. Available in different prints.',
     price: '₦26,999',
+    originalPrice: '₦31,999',
     images: [elanCrystalBlue1, elanCrystalBlue2, elanCrystalBlue3, elanCrystalBlue4],
     fabric: 'Premium Texture with Rhinestones',
     sizes: '6–22',
@@ -206,6 +225,7 @@ export const PRODUCTS: Product[] = [
     name: 'The Exquisite Bubu with Rhinestone and Lace Embellishments',
     description: 'Elegant dress with lace embellishments. Available in different prints.',
     price: '₦29,999',
+    originalPrice: '₦34,999',
     images: [elanBubuRhinestone5, elanBubuRhinestone2, elanBubuRhinestone3, elanBubuRhinestone4, elanBubuRhinestone1],
     fabric: 'Quality Ankara with Lace',
     sizes: '6–22',
@@ -216,6 +236,7 @@ export const PRODUCTS: Product[] = [
     name: 'The Mixed Patterned Short Dress',
     description: 'Everyday dress with lace embellishments. Available in different prints.',
     price: '₦17,999',
+    originalPrice: '₦22,999',
     images: [elanMixedPattern1, elanMixedPattern2, elanMixedPattern3, elanMixedPattern4],
     fabric: 'Quality Mixed Ankara with Lace',
     sizes: '6–22',
@@ -304,12 +325,23 @@ export function ProductCard({ product, onRequest }: ProductCardProps) {
         <p className="font-sans text-muted-foreground" style={{ fontSize: '0.78rem', letterSpacing: '0.08em' }}>
           Sizes: {product.sizes}
         </p>
-        <p
-          className="font-sans text-foreground"
-          style={{ fontSize: '1rem', fontWeight: 400, letterSpacing: '0.04em' }}
-        >
-          {product.price}
-        </p>
+
+        {/* ── Price: slashed original + sale price ── */}
+        <div className="flex items-center gap-3 pt-1">
+          <span
+            className="font-sans text-muted-foreground line-through"
+            style={{ fontSize: '0.88rem', fontWeight: 300 }}
+          >
+            {product.originalPrice}
+          </span>
+          <span
+            className="font-sans"
+            style={{ fontSize: '1rem', fontWeight: 500, letterSpacing: '0.04em', color: '#b8965a' }}
+          >
+            {product.price}
+          </span>
+        </div>
+
         <div className="flex flex-col sm:flex-row gap-3 pt-2">
           <Link to={`/product/${product.id}`} className="btn-outline-gold flex-1 text-center">
             View Details
