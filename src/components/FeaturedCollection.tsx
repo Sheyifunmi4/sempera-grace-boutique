@@ -48,6 +48,15 @@ import elanCrystalBlue1 from '@/assets/elan-crystal-blue-1.jpg';
 import elanCrystalBlue2 from '@/assets/elan-crystal-blue-2.jpg';
 import elanCrystalBlue3 from '@/assets/elan-crystal-blue-3.jpg';
 import elanCrystalBlue4 from '@/assets/elan-crystal-blue-4.jpg';
+import elanBubuRhinestone1 from '@/assets/elan-bubu-rhinestone-1.jpg';
+import elanBubuRhinestone2 from '@/assets/elan-bubu-rhinestone-2.jpg';
+import elanBubuRhinestone3 from '@/assets/elan-bubu-rhinestone-3.jpg';
+import elanBubuRhinestone4 from '@/assets/elan-bubu-rhinestone-4.jpg';
+import elanBubuRhinestone5 from '@/assets/elan-bubu-rhinestone-5.jpg';
+import elanMixedPattern1 from '@/assets/elan-mixed-pattern-1.jpg';
+import elanMixedPattern2 from '@/assets/elan-mixed-pattern-2.jpg';
+import elanMixedPattern3 from '@/assets/elan-mixed-pattern-3.jpg';
+import elanMixedPattern4 from '@/assets/elan-mixed-pattern-4.jpg';
 
 export interface Product {
   id: string;
@@ -96,7 +105,7 @@ export const PRODUCTS: Product[] = [
     code: 'SP-EL-004',
     name: 'Olive Green Crystal Dress',
     description: 'Olive Green graced aunty outfit. Available in different colours.',
-    price: '₦24,999',
+    price: '₦29,999',
     images: [elanOliveGreen2, elanOliveGreen3, elanOliveGreen4, elanOliveGreen5, elanOliveGreen1],
     fabric: 'Premium Satin with Crystal Detailing',
     sizes: '6–22',
@@ -146,7 +155,7 @@ export const PRODUCTS: Product[] = [
     code: 'SP-EL-009',
     name: 'Premium Aso-Oke mixed with Satin & Rhinestone',
     description: 'Plaid & Burgundy rich aunty outfit with rhinestone accents. Available in different colours.',
-    price: '₦62,999',
+    price: '₦64,999',
     images: [elanPlaidBurgundy1, elanPlaidBurgundy2, elanPlaidBurgundy3, elanPlaidBurgundy4, elanPlaidBurgundy5],
     fabric: 'Aso-Oke, Satin and Rhinestone Detail',
     sizes: '6–22',
@@ -189,6 +198,26 @@ export const PRODUCTS: Product[] = [
     price: '₦26,999',
     images: [elanCrystalBlue1, elanCrystalBlue2, elanCrystalBlue3, elanCrystalBlue4],
     fabric: 'Premium Texture with Rhinestones',
+    sizes: '6–22',
+  },
+  {
+    id: '14',
+    code: 'SP-EL-014',
+    name: 'The Exquisite Bubu with Rhinestone and Lace Embellishments',
+    description: 'Elegant dress with lace embellishments. Available in different prints.',
+    price: '₦29,999',
+    images: [elanBubuRhinestone5, elanBubuRhinestone2, elanBubuRhinestone3, elanBubuRhinestone4, elanBubuRhinestone1],
+    fabric: 'Quality Ankara with Lace',
+    sizes: '6–22',
+  },
+  {
+    id: '15',
+    code: 'SP-EL-015',
+    name: 'The Mixed Patterned Short Dress',
+    description: 'Everyday dress with lace embellishments. Available in different prints.',
+    price: '₦17,999',
+    images: [elanMixedPattern1, elanMixedPattern2, elanMixedPattern3, elanMixedPattern4],
+    fabric: 'Quality Mixed Ankara with Lace',
     sizes: '6–22',
   },
 ];
