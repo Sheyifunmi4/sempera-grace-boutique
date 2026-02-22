@@ -73,19 +73,18 @@ export default function SemperaNav({ onRequestPiece }: SemperaNavProps) {
       {/* ── Main Nav ── */}
       <div className="bg-background/95 backdrop-blur-sm border-b border-border/40">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex items-center justify-between" style={{ height: '160px' }}>
+          <div className="flex items-center justify-between" style={{ height: '90px' }}>
 
-            {/* Logo — VERY BIG */}
-            <Link to="/" className="flex-shrink-0 flex items-center" style={{ height: '160px', overflow: 'visible' }}>
+            {/* Logo */}
+            <Link to="/" className="flex-shrink-0 flex items-center">
               <img
                 src={semperaLogo}
                 alt="Sempera Fashion"
                 style={{
-                  height: '200px',
+                  height: '300px',
                   width: 'auto',
                   objectFit: 'contain',
                   display: 'block',
-                  marginTop: '20px',
                 }}
               />
             </Link>
