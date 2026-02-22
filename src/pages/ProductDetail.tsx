@@ -113,17 +113,27 @@ export default function ProductDetail() {
                   {product.name}
                 </h1>
                 <p
-                  className="font-sans text-muted-foreground mb-3"
+                  className="font-sans text-muted-foreground mb-4"
                   style={{ fontSize: '0.95rem', lineHeight: 1.7, fontWeight: 300 }}
                 >
                   {product.description}
                 </p>
-                <p
-                  className="font-sans text-foreground"
-                  style={{ fontSize: '1.3rem', fontWeight: 400, letterSpacing: '0.03em' }}
-                >
-                  {product.price}
-                </p>
+
+                {/* ── Price: slashed original + sale price ── */}
+                <div className="flex items-center gap-4">
+                  <span
+                    className="font-sans text-muted-foreground line-through"
+                    style={{ fontSize: '1rem', fontWeight: 300 }}
+                  >
+                    {product.originalPrice}
+                  </span>
+                  <span
+                    className="font-sans"
+                    style={{ fontSize: '1.5rem', fontWeight: 500, letterSpacing: '0.03em', color: '#b8965a' }}
+                  >
+                    {product.price}
+                  </span>
+                </div>
 
                 {/* ── Delivery Info ── */}
                 <div
