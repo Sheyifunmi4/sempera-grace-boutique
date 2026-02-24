@@ -121,7 +121,7 @@ export const PRODUCTS: Product[] = [
     name: 'Luxury Ankara mixed with Lace',
     description: 'Blue & Pink Batik rich aunty outfit with lace trim. Available in different colours.',
     price: '₦24,999',
-    originalPrice: '₦29,999',
+    originalPrice: '₦34,999',
     images: [elanBatikLace1, elanBatikLace2],
     fabric: '100% Cotton with Crochet Lace',
     sizes: '6–22',
@@ -166,7 +166,6 @@ export const PRODUCTS: Product[] = [
     description: 'Plaid & Burgundy rich aunty outfit with rhinestone accents. Available in different colours.',
     price: '₦64,999',
     originalPrice: '₦72,999',
-    // originalPrice: '₦69,999',
     images: [elanPlaidBurgundy1, elanPlaidBurgundy2, elanPlaidBurgundy3, elanPlaidBurgundy4, elanPlaidBurgundy5],
     fabric: 'Aso-Oke, Satin and Rhinestone Detail',
     sizes: '6–22',
@@ -260,8 +259,11 @@ export function ProductCard({ product, onRequest }: ProductCardProps) {
   };
 
   return (
-    <div className="product-card group">
-      <div className="aspect-[3/4] bg-cream relative overflow-hidden mb-5">
+    // ── h-full + flex-col makes every card stretch to the same row height ──
+    <div className="product-card group h-full flex flex-col">
+
+      {/* Image — fixed ratio, never grows/shrinks */}
+      <div className="aspect-[3/4] bg-cream relative overflow-hidden mb-5 flex-shrink-0">
         <img
           src={product.images[currentImg]}
           alt={`${product.name} — view ${currentImg + 1}`}
@@ -302,27 +304,51 @@ export function ProductCard({ product, onRequest }: ProductCardProps) {
           </div>
         )}
       </div>
-      <div className="space-y-2">
+
+      {/* Text content — flex-col + flex-1 so it fills remaining height */}
+      <div className="flex flex-col flex-1 space-y-2">
         <p className="section-eyebrow text-muted-foreground">{product.code}</p>
+
+        {/* Name — fixed to 2 lines max so heights stay consistent */}
         <Link to={`/product/${product.id}`}>
           <h3
             className="font-serif text-foreground hover:text-primary transition-colors duration-300 cursor-pointer"
-            style={{ fontSize: '1.35rem', fontWeight: 400 }}
+            style={{
+              fontSize: '1.35rem',
+              fontWeight: 400,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              minHeight: '2.8rem',
+            }}
           >
             {product.name}
           </h3>
         </Link>
+
+        {/* Description — fixed to 2 lines max */}
         <p
           className="font-sans text-muted-foreground"
-          style={{ fontSize: '0.85rem', lineHeight: 1.6, fontWeight: 300 }}
+          style={{
+            fontSize: '0.85rem',
+            lineHeight: 1.6,
+            fontWeight: 300,
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            minHeight: '2.72rem',
+          }}
         >
           {product.description}
         </p>
+
         <p className="font-sans text-muted-foreground" style={{ fontSize: '0.78rem', letterSpacing: '0.08em' }}>
           Sizes: {product.sizes}
         </p>
 
-        {/* ── Price: slashed original + sale price ── */}
+        {/* Price */}
         <div className="flex items-center gap-3 pt-1">
           <span
             className="font-sans text-muted-foreground line-through"
@@ -338,7 +364,8 @@ export function ProductCard({ product, onRequest }: ProductCardProps) {
           </span>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 pt-2">
+        {/* Buttons — pushed to bottom with mt-auto */}
+        <div className="flex flex-col sm:flex-row gap-3 pt-2 mt-auto">
           <Link to={`/product/${product.id}`} className="btn-outline-gold flex-1 text-center">
             View Details
           </Link>
@@ -431,10 +458,10 @@ export default function FeaturedCollection({ onRequest }: FeaturedCollectionProp
           </p>
         </div>
 
-        {/* ── Product Grid ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 lg:gap-14">
+        {/* ── Product Grid — items-stretch ensures all cards in a row match height ── */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 lg:gap-14 items-stretch">
           {PRODUCTS.map((product, i) => (
-            <div key={product.id} className={`reveal delay-${(i + 1) * 100}`}>
+            <div key={product.id} className={`reveal delay-${(i + 1) * 100} flex`}>
               <ProductCard product={product} onRequest={onRequest} />
             </div>
           ))}
