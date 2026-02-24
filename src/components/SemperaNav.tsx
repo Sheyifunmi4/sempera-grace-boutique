@@ -85,7 +85,6 @@ export default function SemperaNav({ onRequestPiece }: SemperaNavProps) {
                   width: 'auto',
                   objectFit: 'contain',
                   display: 'block',
-                  marginLeft: '-50px',
                 }}
               />
             </Link>
