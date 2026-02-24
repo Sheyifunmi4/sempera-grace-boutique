@@ -166,6 +166,7 @@ export const PRODUCTS: Product[] = [
     description: 'Plaid & Burgundy rich aunty outfit with rhinestone accents. Available in different colours.',
     price: '₦64,999',
     originalPrice: '₦72,999',
+    // originalPrice: '₦69,999',
     images: [elanPlaidBurgundy1, elanPlaidBurgundy2, elanPlaidBurgundy3, elanPlaidBurgundy4, elanPlaidBurgundy5],
     fabric: 'Aso-Oke, Satin and Rhinestone Detail',
     sizes: '6–22',
