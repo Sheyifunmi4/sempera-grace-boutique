@@ -48,6 +48,15 @@ import elanCrystalBlue1 from '@/assets/elan-crystal-blue-1.jpg';
 import elanCrystalBlue2 from '@/assets/elan-crystal-blue-2.jpg';
 import elanCrystalBlue3 from '@/assets/elan-crystal-blue-3.jpg';
 import elanCrystalBlue4 from '@/assets/elan-crystal-blue-4.jpg';
+import elanBubuRhinestone1 from '@/assets/elan-bubu-rhinestone-1.jpg';
+import elanBubuRhinestone2 from '@/assets/elan-bubu-rhinestone-2.jpg';
+import elanBubuRhinestone3 from '@/assets/elan-bubu-rhinestone-3.jpg';
+import elanBubuRhinestone4 from '@/assets/elan-bubu-rhinestone-4.jpg';
+import elanBubuRhinestone5 from '@/assets/elan-bubu-rhinestone-5.jpg';
+import elanMixedPattern1 from '@/assets/elan-mixed-pattern-1.jpg';
+import elanMixedPattern2 from '@/assets/elan-mixed-pattern-2.jpg';
+import elanMixedPattern3 from '@/assets/elan-mixed-pattern-3.jpg';
+import elanMixedPattern4 from '@/assets/elan-mixed-pattern-4.jpg';
 
 export interface Product {
   id: string;
@@ -55,6 +64,7 @@ export interface Product {
   name: string;
   description: string;
   price: string;
+  originalPrice: string;
   images: string[];
   fabric: string;
   sizes: string;
@@ -67,6 +77,7 @@ export const PRODUCTS: Product[] = [
     name: 'Metallic Blue Rhinestone Dress',
     description: 'Metallic Blue premium woman outfit. Available in different colours.',
     price: '₦34,999',
+    originalPrice: '₦39,999',
     images: [elanBlueRhinestone1, elanBlueRhinestone2, elanBlueRhinestone3, elanBlueRhinestone4, elanBlueRhinestone5, elanBlueRhinestone6],
     fabric: 'Premium Embellished Fabric',
     sizes: '6–22',
@@ -77,6 +88,7 @@ export const PRODUCTS: Product[] = [
     name: 'Chocolate Sequin-Neck Dress with Aso-Oke sleeves',
     description: 'Chocolate Brown rich aunty outfit. Available in different colours.',
     price: '₦34,999',
+    originalPrice: '₦39,999',
     images: [elanBrownKaftan1, elanBrownKaftan2],
     fabric: 'Premium Satin with Sequin Embellishment',
     sizes: '6–22',
@@ -87,6 +99,7 @@ export const PRODUCTS: Product[] = [
     name: 'The Royal Blue Aso-Oke Dress (Limited)',
     description: 'Royal Blue rich aunty outfit with headwrap. Available in different colours.',
     price: '₦59,999',
+    originalPrice: '₦64,999',
     images: [elanRoyalBlue1, elanRoyalBlue2, elanRoyalBlue3, elanRoyalBlue4],
     fabric: 'Premium Aso-Oke with Rhinestones',
     sizes: '6–22',
@@ -96,7 +109,8 @@ export const PRODUCTS: Product[] = [
     code: 'SP-EL-004',
     name: 'Olive Green Crystal Dress',
     description: 'Olive Green graced aunty outfit. Available in different colours.',
-    price: '₦24,999',
+    price: '₦29,999',
+    originalPrice: '₦34,999',
     images: [elanOliveGreen2, elanOliveGreen3, elanOliveGreen4, elanOliveGreen5, elanOliveGreen1],
     fabric: 'Premium Satin with Crystal Detailing',
     sizes: '6–22',
@@ -107,6 +121,7 @@ export const PRODUCTS: Product[] = [
     name: 'Luxury Ankara mixed with Lace',
     description: 'Blue & Pink Batik rich aunty outfit with lace trim. Available in different colours.',
     price: '₦24,999',
+    originalPrice: '₦29,999',
     images: [elanBatikLace1, elanBatikLace2],
     fabric: '100% Cotton with Crochet Lace',
     sizes: '6–22',
@@ -117,6 +132,7 @@ export const PRODUCTS: Product[] = [
     name: 'Deep Magenta Sequin Fringe Dress',
     description: 'Deep Magenta rich aunty outfit with sequin fringe detail. Available in different colours.',
     price: '₦24,999',
+    originalPrice: '₦29,999',
     images: [elanMagentaSequin3, elanMagentaSequin1, elanMagentaSequin2],
     fabric: 'Premium fabric with Sequin & Fringe Embellishment',
     sizes: '6–22',
@@ -127,6 +143,7 @@ export const PRODUCTS: Product[] = [
     name: 'Red & Navy Tribal Print Dress',
     description: 'Red & Navy tribal print rich aunty everyday outfit. Available in different prints.',
     price: '₦14,999',
+    originalPrice: '₦19,999',
     images: [elanRedTribal1, elanRedTribal2, elanRedTribal3],
     fabric: 'Tribal Print with Crochet Lace Trim',
     sizes: '6–22',
@@ -137,6 +154,7 @@ export const PRODUCTS: Product[] = [
     name: 'Purple & Black Rhinestone Kaftan',
     description: 'Purple & Black rich aunty outfit with rhinestone detailing. Available in different colours.',
     price: '₦34,999',
+    originalPrice: '₦39,999',
     images: [elanPurpleRhinestone1, elanPurpleRhinestone2],
     fabric: 'Premium Fabric with Rhinestone Embellishment',
     sizes: '6–22',
@@ -146,7 +164,8 @@ export const PRODUCTS: Product[] = [
     code: 'SP-EL-009',
     name: 'Premium Aso-Oke mixed with Satin & Rhinestone',
     description: 'Plaid & Burgundy rich aunty outfit with rhinestone accents. Available in different colours.',
-    price: '₦62,999',
+    price: '₦64,999',
+    originalPrice: '₦72,999',
     images: [elanPlaidBurgundy1, elanPlaidBurgundy2, elanPlaidBurgundy3, elanPlaidBurgundy4, elanPlaidBurgundy5],
     fabric: 'Aso-Oke, Satin and Rhinestone Detail',
     sizes: '6–22',
@@ -157,6 +176,7 @@ export const PRODUCTS: Product[] = [
     name: 'Elegant Multicoloured Ankara',
     description: 'Elegant outfit for weekend with silver embroidery. Available in different prints.',
     price: '₦14,999',
+    originalPrice: '₦19,999',
     images: [elanMulticolourAnkara1, elanMulticolourAnkara2, elanMulticolourAnkara3],
     fabric: 'High Quality Ankara',
     sizes: '6–22',
@@ -167,6 +187,7 @@ export const PRODUCTS: Product[] = [
     name: 'The Graceful Short Dress',
     description: 'Beautiful Outfit with butterfly back details. Available in different prints.',
     price: '₦17,999',
+    originalPrice: '₦22,999',
     images: [elanGracefulShort1, elanGracefulShort2, elanGracefulShort3, elanGracefulShort4],
     fabric: '100% Cotton Ankara',
     sizes: '6–22',
@@ -177,6 +198,7 @@ export const PRODUCTS: Product[] = [
     name: 'Creative Ankara Patch Design',
     description: 'Elegant Classy Outfit for every wear. Available in different prints.',
     price: '₦24,999',
+    originalPrice: '₦29,999',
     images: [elanAnkaraPatch1, elanAnkaraPatch2, elanAnkaraPatch3],
     fabric: 'Premium Texture Ankara',
     sizes: '6–22',
@@ -187,8 +209,31 @@ export const PRODUCTS: Product[] = [
     name: 'Luxury Crystal Blue Dress',
     description: 'Elegant luxury ware with rhinestones and stylish arm. Available in different prints.',
     price: '₦26,999',
+    originalPrice: '₦31,999',
     images: [elanCrystalBlue1, elanCrystalBlue2, elanCrystalBlue3, elanCrystalBlue4],
     fabric: 'Premium Texture with Rhinestones',
+    sizes: '6–22',
+  },
+  {
+    id: '14',
+    code: 'SP-EL-014',
+    name: 'The Exquisite Bubu with Rhinestone and Lace Embellishments',
+    description: 'Elegant dress with lace embellishments. Available in different prints.',
+    price: '₦29,999',
+    originalPrice: '₦34,999',
+    images: [elanBubuRhinestone5, elanBubuRhinestone2, elanBubuRhinestone3, elanBubuRhinestone4, elanBubuRhinestone1],
+    fabric: 'Quality Ankara with Lace',
+    sizes: '6–22',
+  },
+  {
+    id: '15',
+    code: 'SP-EL-015',
+    name: 'The Mixed Patterned Short Dress',
+    description: 'Everyday dress with lace embellishments. Available in different prints.',
+    price: '₦17,999',
+    originalPrice: '₦22,999',
+    images: [elanMixedPattern1, elanMixedPattern2, elanMixedPattern3, elanMixedPattern4],
+    fabric: 'Quality Mixed Ankara with Lace',
     sizes: '6–22',
   },
 ];
@@ -275,12 +320,23 @@ export function ProductCard({ product, onRequest }: ProductCardProps) {
         <p className="font-sans text-muted-foreground" style={{ fontSize: '0.78rem', letterSpacing: '0.08em' }}>
           Sizes: {product.sizes}
         </p>
-        <p
-          className="font-sans text-foreground"
-          style={{ fontSize: '1rem', fontWeight: 400, letterSpacing: '0.04em' }}
-        >
-          {product.price}
-        </p>
+
+        {/* ── Price: slashed original + sale price ── */}
+        <div className="flex items-center gap-3 pt-1">
+          <span
+            className="font-sans text-muted-foreground line-through"
+            style={{ fontSize: '0.88rem', fontWeight: 300 }}
+          >
+            {product.originalPrice}
+          </span>
+          <span
+            className="font-sans"
+            style={{ fontSize: '1rem', fontWeight: 500, letterSpacing: '0.04em', color: '#b8965a' }}
+          >
+            {product.price}
+          </span>
+        </div>
+
         <div className="flex flex-col sm:flex-row gap-3 pt-2">
           <Link to={`/product/${product.id}`} className="btn-outline-gold flex-1 text-center">
             View Details
@@ -302,7 +358,9 @@ export default function FeaturedCollection({ onRequest }: FeaturedCollectionProp
   return (
     <section id="collection" className="py-24 lg:py-32 bg-background">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="text-center mb-16 reveal">
+
+        {/* ── Section Header ── */}
+        <div className="text-center mb-10 reveal">
           <p className="section-eyebrow mb-4">Sempera Fashion</p>
           <h2
             className="font-serif text-foreground mb-5"
@@ -318,6 +376,61 @@ export default function FeaturedCollection({ onRequest }: FeaturedCollectionProp
             Timeless silhouettes. Refined tailoring. Effortless elegance.
           </p>
         </div>
+
+        {/* ── Launch Discount Banner ── */}
+        <div
+          className="reveal mb-14"
+          style={{
+            background: 'linear-gradient(135deg, #1a1208 0%, #2d1f0a 50%, #1a1208 100%)',
+            border: '1px solid #b8965a',
+            borderRadius: '2px',
+            padding: '20px 32px',
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '12px',
+            textAlign: 'center',
+          }}
+        >
+          <span style={{ fontSize: '1.1rem' }}>🎉</span>
+          <p
+            style={{
+              fontFamily: 'Cormorant Garamond, serif',
+              fontSize: 'clamp(1rem, 2.5vw, 1.25rem)',
+              fontWeight: 500,
+              color: '#b8965a',
+              letterSpacing: '0.04em',
+              margin: 0,
+            }}
+          >
+            Launch Discount — Now Live
+          </p>
+          <span
+            style={{
+              width: '1px',
+              height: '18px',
+              background: '#b8965a',
+              opacity: 0.5,
+              display: 'inline-block',
+            }}
+          />
+          <p
+            style={{
+              fontFamily: 'Jost, sans-serif',
+              fontSize: 'clamp(0.8rem, 2vw, 0.95rem)',
+              fontWeight: 300,
+              color: '#e8d5b0',
+              letterSpacing: '0.06em',
+              margin: 0,
+            }}
+          >
+            Enjoy introductory pricing on every piece in the ELÁN Collection.
+            <span style={{ color: '#b8965a', fontWeight: 400 }}> Limited time only.</span>
+          </p>
+        </div>
+
+        {/* ── Product Grid ── */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 lg:gap-14">
           {PRODUCTS.map((product, i) => (
             <div key={product.id} className={`reveal delay-${(i + 1) * 100}`}>
@@ -325,6 +438,7 @@ export default function FeaturedCollection({ onRequest }: FeaturedCollectionProp
             </div>
           ))}
         </div>
+
       </div>
     </section>
   );
