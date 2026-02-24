@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import semperaLogo from '@/assets/sempera-logo.png';
@@ -24,8 +24,14 @@ export default function SemperaNav({ onRequestPiece }: SemperaNavProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [announcementIndex, setAnnouncementIndex] = useState(0);
   const [fade, setFade] = useState(true);
+
+  // ── Hide / show on scroll ──
+  const [visible, setVisible] = useState(true);
+  const lastScrollY = useRef(0);
+
   const location = useLocation();
 
+  // Announcement cycling
   useEffect(() => {
     const interval = setInterval(() => {
       setFade(false);
@@ -35,6 +41,30 @@ export default function SemperaNav({ onRequestPiece }: SemperaNavProps) {
       }, 400);
     }, 3500);
     return () => clearInterval(interval);
+  }, []);
+
+  // Scroll listener — hide when scrolling DOWN, show when scrolling UP
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentY = window.scrollY;
+
+      if (currentY <= 10) {
+        // Always show at very top of page
+        setVisible(true);
+      } else if (currentY > lastScrollY.current + 8) {
+        // Scrolling DOWN — hide nav
+        setVisible(false);
+        setMenuOpen(false); // close mobile menu when hiding
+      } else if (currentY < lastScrollY.current - 8) {
+        // Scrolling UP — show nav
+        setVisible(true);
+      }
+
+      lastScrollY.current = currentY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const handleAnchorClick = (href: string) => {
@@ -49,8 +79,13 @@ export default function SemperaNav({ onRequestPiece }: SemperaNavProps) {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50">
-
+    <header
+      className="fixed top-0 left-0 right-0 z-50"
+      style={{
+        transform: visible ? 'translateY(0)' : 'translateY(-100%)',
+        transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+      }}
+    >
       {/* ── Announcement Bar ── */}
       <div
         style={{
