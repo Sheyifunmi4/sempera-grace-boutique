@@ -499,13 +499,22 @@ let currentChartDays = 7;
 // SUPABASE API
 // ═══════════════════════════════════════
 async function sb(path, options = {}) {
+  // Always build fresh headers using the latest auth token
+  const freshHeaders = {
+    'apikey': SUPABASE_KEY,
+    'Authorization': HEADERS['Authorization'],
+    'Content-Type': 'application/json',
+    'Prefer': (options.method === 'POST') ? 'return=representation' : 'return=minimal',
+  };
+  const { headers: _h, ...restOptions } = options;
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
-    headers: HEADERS,
-    ...options
+    headers: freshHeaders,
+    ...restOptions
   });
   if (!res.ok) {
     const err = await res.text();
-    throw new Error(err);
+    console.error('Supabase error:', res.status, err);
+    throw new Error(`${res.status}: ${err}`);
   }
   const text = await res.text();
   return text ? JSON.parse(text) : null;
