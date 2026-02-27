@@ -5,9 +5,13 @@ import type { Product } from './FeaturedCollection';
 
 // ─── EmailJS Config ────────────────────────────────────────────────
 const EMAILJS_SERVICE_ID           = 'service_hvb7ck2';
-const EMAILJS_ADMIN_TEMPLATE_ID    = 'template_rfca346'; // → order details to you (admin)
-const EMAILJS_CUSTOMER_TEMPLATE_ID = 'template_xr9txax'; // → confirmation to customer
+const EMAILJS_ADMIN_TEMPLATE_ID    = 'template_rfca346';
+const EMAILJS_CUSTOMER_TEMPLATE_ID = 'template_xr9txax';
 const EMAILJS_PUBLIC_KEY           = '441l47N72miy9mYmB';
+
+// ─── Supabase Config ───────────────────────────────────────────────
+const SUPABASE_URL = 'https://sieqvcjiqdjhjnxaslrd.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpZXF2Y2ppcWRqaGpueGFzbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4Nzk4NjIsImV4cCI6MjA4NzQ1NTg2Mn0.E1VkbPUJ9_u_pyhIXMZb5WWrXYQvIdEY-z3dIqZp7Mc';
 // ───────────────────────────────────────────────────────────────────
 
 interface RequestModalProps {
@@ -16,6 +20,72 @@ interface RequestModalProps {
 }
 
 const SIZES = ['6', '8', '10', '12', '14', '16', '18', '20', '22'];
+
+// ─── Save order to Supabase ────────────────────────────────────────
+async function saveOrderToSupabase(orderData: {
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string;
+  product_name: string;
+  product_code: string;
+  product_price: string;
+  size: string;
+  quantity: number;
+  notes: string;
+}) {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/orders`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal',
+      },
+      body: JSON.stringify({ ...orderData, status: 'new' }),
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      console.error('Supabase save failed:', err);
+    }
+  } catch (err) {
+    // Supabase failure is silent — email still went through
+    console.error('Supabase error:', err);
+  }
+}
+
+// ─── Update product request count ─────────────────────────────────
+async function incrementProductRequests(productCode: string) {
+  try {
+    // First get current count
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/products?code=eq.${productCode}&select=id,total_requests`,
+      {
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+        },
+      }
+    );
+    const data = await res.json();
+    if (!data || !data[0]) return;
+
+    const { id, total_requests } = data[0];
+
+    // Increment
+    await fetch(`${SUPABASE_URL}/rest/v1/products?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ total_requests: (total_requests || 0) + 1 }),
+    });
+  } catch (err) {
+    console.error('Failed to increment product requests:', err);
+  }
+}
 
 export default function RequestModal({ product, onClose }: RequestModalProps) {
   const [form, setForm] = useState({
@@ -81,7 +151,7 @@ export default function RequestModal({ product, onClose }: RequestModalProps) {
     };
 
     try {
-      // 1. Send order details to admin
+      // 1. Send order details to admin via email
       await emailjs.send(
         EMAILJS_SERVICE_ID,
         EMAILJS_ADMIN_TEMPLATE_ID,
@@ -89,7 +159,7 @@ export default function RequestModal({ product, onClose }: RequestModalProps) {
         EMAILJS_PUBLIC_KEY
       );
 
-      // 2. Send confirmation to customer
+      // 2. Send confirmation to customer via email
       await emailjs.send(
         EMAILJS_SERVICE_ID,
         EMAILJS_CUSTOMER_TEMPLATE_ID,
@@ -97,9 +167,25 @@ export default function RequestModal({ product, onClose }: RequestModalProps) {
         EMAILJS_PUBLIC_KEY
       );
 
+      // 3. Save order to Supabase (admin dashboard)
+      await saveOrderToSupabase({
+        customer_name:  form.name,
+        customer_email: form.email,
+        customer_phone: form.phone,
+        product_name:   product.name,
+        product_code:   product.code,
+        product_price:  product.price,
+        size:           form.size,
+        quantity:       form.quantity,
+        notes:          form.notes || '',
+      });
+
+      // 4. Increment product request count
+      incrementProductRequests(product.code);
+
       setSubmitted(true);
     } catch (err) {
-      console.error('EmailJS error:', err);
+      console.error('Submission error:', err);
       setSendError('Something went wrong. Please try again or contact us via WhatsApp.');
     } finally {
       setSending(false);
