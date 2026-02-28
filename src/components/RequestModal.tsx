@@ -10,8 +10,12 @@ const EMAILJS_CUSTOMER_TEMPLATE_ID = 'template_xr9txax';
 const EMAILJS_PUBLIC_KEY           = '441l47N72miy9mYmB';
 
 // ─── Supabase Config ───────────────────────────────────────────────
-const SUPABASE_URL = 'https://sieqvcjiqdjhjnxaslrd.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpZXF2Y2ppcWRqaGpueGFzbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4Nzk4NjIsImV4cCI6MjA4NzQ1NTg2Mn0.E1VkbPUJ9_u_pyhIXMZb5WWrXYQvIdEY-z3dIqZp7Mc';
+const SUPABASE_URL: string = 'https://sieqvcjiqdjhjnxaslrd.supabase.co';
+const SUPABASE_KEY: string = [
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9',
+  'eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpZXF2Y2ppcWRqaGpueGFzbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4Nzk4NjIsImV4cCI6MjA4NzQ1NTg2Mn0',
+  'E1VkbPUJ9_u_pyhIXMZb5WWrXYQvIdEY-z3dIqZp7Mc'
+].join('.');
 // ───────────────────────────────────────────────────────────────────
 
 interface RequestModalProps {

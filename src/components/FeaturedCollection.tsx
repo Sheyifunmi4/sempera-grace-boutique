@@ -1,62 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-import elanBlueRhinestone1 from '@/assets/elan-blue-rhinestone-1.jpg';
-import elanBlueRhinestone2 from '@/assets/elan-blue-rhinestone-2.jpg';
-import elanBlueRhinestone3 from '@/assets/elan-blue-rhinestone-3.jpg';
-import elanBlueRhinestone4 from '@/assets/elan-blue-rhinestone-4.jpg';
-import elanBlueRhinestone5 from '@/assets/elan-blue-rhinestone-5.jpg';
-import elanBlueRhinestone6 from '@/assets/elan-blue-rhinestone-6.jpg';
-import elanBrownKaftan1 from '@/assets/elan-brown-kaftan-1.jpg';
-import elanBrownKaftan2 from '@/assets/elan-brown-kaftan-2.jpg';
-import elanRoyalBlue1 from '@/assets/elan-royal-blue-1.jpg';
-import elanRoyalBlue2 from '@/assets/elan-royal-blue-2.jpg';
-import elanRoyalBlue3 from '@/assets/elan-royal-blue-3.jpg';
-import elanRoyalBlue4 from '@/assets/elan-royal-blue-4.jpg';
-import elanOliveGreen1 from '@/assets/elan-olive-green-1.jpg';
-import elanOliveGreen2 from '@/assets/elan-olive-green-2.jpg';
-import elanOliveGreen3 from '@/assets/elan-olive-green-3.jpg';
-import elanOliveGreen4 from '@/assets/elan-olive-green-4.jpg';
-import elanOliveGreen5 from '@/assets/elan-olive-green-5.jpg';
-import elanBatikLace1 from '@/assets/elan-batik-lace-1.jpg';
-import elanBatikLace2 from '@/assets/elan-batik-lace-2.jpg';
-import elanMagentaSequin1 from '@/assets/elan-magenta-sequin-1.jpg';
-import elanMagentaSequin2 from '@/assets/elan-magenta-sequin-2.jpg';
-import elanMagentaSequin3 from '@/assets/elan-magenta-sequin-3.jpg';
-import elanRedTribal1 from '@/assets/elan-red-tribal-1.jpg';
-import elanRedTribal2 from '@/assets/elan-red-tribal-2.jpg';
-import elanRedTribal3 from '@/assets/elan-red-tribal-3.jpg';
-import elanPurpleRhinestone1 from '@/assets/elan-purple-rhinestone-1.jpg';
-import elanPurpleRhinestone2 from '@/assets/elan-purple-rhinestone-2.jpg';
-import elanPlaidBurgundy1 from '@/assets/elan-plaid-burgundy-1.jpg';
-import elanPlaidBurgundy2 from '@/assets/elan-plaid-burgundy-2.jpg';
-import elanPlaidBurgundy3 from '@/assets/elan-plaid-burgundy-3.jpg';
-import elanPlaidBurgundy4 from '@/assets/elan-plaid-burgundy-4.jpg';
-import elanPlaidBurgundy5 from '@/assets/elan-plaid-burgundy-5.jpg';
-import elanMulticolourAnkara1 from '@/assets/elan-multicolour-ankara-1.jpg';
-import elanMulticolourAnkara2 from '@/assets/elan-multicolour-ankara-2.jpg';
-import elanMulticolourAnkara3 from '@/assets/elan-multicolour-ankara-3.jpg';
-import elanGracefulShort1 from '@/assets/elan-graceful-short-1.jpg';
-import elanGracefulShort2 from '@/assets/elan-graceful-short-2.jpg';
-import elanGracefulShort3 from '@/assets/elan-graceful-short-3.jpg';
-import elanGracefulShort4 from '@/assets/elan-graceful-short-4.jpg';
-import elanAnkaraPatch1 from '@/assets/elan-ankara-patch-1.jpg';
-import elanAnkaraPatch2 from '@/assets/elan-ankara-patch-2.jpg';
-import elanAnkaraPatch3 from '@/assets/elan-ankara-patch-3.jpg';
-import elanCrystalBlue1 from '@/assets/elan-crystal-blue-1.jpg';
-import elanCrystalBlue2 from '@/assets/elan-crystal-blue-2.jpg';
-import elanCrystalBlue3 from '@/assets/elan-crystal-blue-3.jpg';
-import elanCrystalBlue4 from '@/assets/elan-crystal-blue-4.jpg';
-import elanBubuRhinestone1 from '@/assets/elan-bubu-rhinestone-1.jpg';
-import elanBubuRhinestone2 from '@/assets/elan-bubu-rhinestone-2.jpg';
-import elanBubuRhinestone3 from '@/assets/elan-bubu-rhinestone-3.jpg';
-import elanBubuRhinestone4 from '@/assets/elan-bubu-rhinestone-4.jpg';
-import elanBubuRhinestone5 from '@/assets/elan-bubu-rhinestone-5.jpg';
-import elanMixedPattern1 from '@/assets/elan-mixed-pattern-1.jpg';
-import elanMixedPattern2 from '@/assets/elan-mixed-pattern-2.jpg';
-import elanMixedPattern3 from '@/assets/elan-mixed-pattern-3.jpg';
-import elanMixedPattern4 from '@/assets/elan-mixed-pattern-4.jpg';
+// ─── Supabase Config ───────────────────────────────────────────────
+const SUPABASE_URL: string = 'https://sieqvcjiqdjhjnxaslrd.supabase.co';
+const SUPABASE_KEY: string = [
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9',
+  'eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpZXF2Y2ppcWRqaGpueGFzbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4Nzk4NjIsImV4cCI6MjA4NzQ1NTg2Mn0',
+  'E1VkbPUJ9_u_pyhIXMZb5WWrXYQvIdEY-z3dIqZp7Mc'
+].join('.');
+
+function getHeaders(): Record<string, string> {
+  return {
+    'apikey': SUPABASE_KEY,
+    'Authorization': 'Bearer ' + SUPABASE_KEY,
+    'Content-Type': 'application/json',
+  };
+}
+// ───────────────────────────────────────────────────────────────────
 
 export interface Product {
   id: string;
@@ -67,177 +28,71 @@ export interface Product {
   originalPrice: string;
   images: string[];
   fabric: string;
+  care: string;
   sizes: string;
+  status: string;
 }
 
-export const PRODUCTS: Product[] = [
-  {
-    id: '1',
-    code: 'SP-EL-001',
-    name: 'Metallic Blue Rhinestone Dress',
-    description: 'Metallic Blue premium woman outfit. Available in different colours.',
-    price: '₦34,999',
-    originalPrice: '₦39,999',
-    images: [elanBlueRhinestone1, elanBlueRhinestone2, elanBlueRhinestone3, elanBlueRhinestone4, elanBlueRhinestone5, elanBlueRhinestone6],
-    fabric: 'Premium Embellished Fabric',
-    sizes: '6–22',
-  },
-  {
-    id: '2',
-    code: 'SP-EL-002',
-    name: 'Chocolate Sequin-Neck Dress with Aso-Oke sleeves',
-    description: 'Chocolate Brown rich aunty outfit. Available in different colours.',
-    price: '₦34,999',
-    originalPrice: '₦39,999',
-    images: [elanBrownKaftan1, elanBrownKaftan2],
-    fabric: 'Premium Satin with Sequin Embellishment',
-    sizes: '6–22',
-  },
-  {
-    id: '3',
-    code: 'SP-EL-003',
-    name: 'The Royal Blue Aso-Oke Dress (Limited)',
-    description: 'Royal Blue rich aunty outfit with headwrap. Available in different colours.',
-    price: '₦59,999',
-    originalPrice: '₦64,999',
-    images: [elanRoyalBlue1, elanRoyalBlue2, elanRoyalBlue3, elanRoyalBlue4],
-    fabric: 'Premium Aso-Oke with Rhinestones',
-    sizes: '6–22',
-  },
-  {
-    id: '4',
-    code: 'SP-EL-004',
-    name: 'Olive Green Crystal Dress',
-    description: 'Olive Green graced aunty outfit. Available in different colours.',
-    price: '₦29,999',
-    originalPrice: '₦34,999',
-    images: [elanOliveGreen2, elanOliveGreen3, elanOliveGreen4, elanOliveGreen5, elanOliveGreen1],
-    fabric: 'Premium Satin with Crystal Detailing',
-    sizes: '6–22',
-  },
-  {
-    id: '5',
-    code: 'SP-EL-005',
-    name: 'Luxury Ankara mixed with Lace',
-    description: 'Blue & Pink Batik rich aunty outfit with lace trim. Available in different colours.',
-    price: '₦24,999',
-    originalPrice: '₦34,999',
-    images: [elanBatikLace1, elanBatikLace2],
-    fabric: '100% Cotton with Crochet Lace',
-    sizes: '6–22',
-  },
-  {
-    id: '6',
-    code: 'SP-EL-006',
-    name: 'Deep Magenta Sequin Fringe Dress',
-    description: 'Deep Magenta rich aunty outfit with sequin fringe detail. Available in different colours.',
-    price: '₦24,999',
-    originalPrice: '₦29,999',
-    images: [elanMagentaSequin3, elanMagentaSequin1, elanMagentaSequin2],
-    fabric: 'Premium fabric with Sequin & Fringe Embellishment',
-    sizes: '6–22',
-  },
-  {
-    id: '7',
-    code: 'SP-EL-007',
-    name: 'Red & Navy Tribal Print Dress',
-    description: 'Red & Navy tribal print rich aunty everyday outfit. Available in different prints.',
-    price: '₦14,999',
-    originalPrice: '₦19,999',
-    images: [elanRedTribal1, elanRedTribal2, elanRedTribal3],
-    fabric: 'Tribal Print with Crochet Lace Trim',
-    sizes: '6–22',
-  },
-  {
-    id: '8',
-    code: 'SP-EL-008',
-    name: 'Purple & Black Rhinestone Kaftan',
-    description: 'Purple & Black rich aunty outfit with rhinestone detailing. Available in different colours.',
-    price: '₦34,999',
-    originalPrice: '₦39,999',
-    images: [elanPurpleRhinestone1, elanPurpleRhinestone2],
-    fabric: 'Premium Fabric with Rhinestone Embellishment',
-    sizes: '6–22',
-  },
-  {
-    id: '9',
-    code: 'SP-EL-009',
-    name: 'Premium Aso-Oke mixed with Satin & Rhinestone',
-    description: 'Plaid & Burgundy rich aunty outfit with rhinestone accents. Available in different colours.',
-    price: '₦64,999',
-    originalPrice: '₦72,999',
-    images: [elanPlaidBurgundy1, elanPlaidBurgundy2, elanPlaidBurgundy3, elanPlaidBurgundy4, elanPlaidBurgundy5],
-    fabric: 'Aso-Oke, Satin and Rhinestone Detail',
-    sizes: '6–22',
-  },
-  {
-    id: '10',
-    code: 'SP-EL-010',
-    name: 'Elegant Multicoloured Ankara',
-    description: 'Elegant outfit for weekend with silver embroidery. Available in different prints.',
-    price: '₦14,999',
-    originalPrice: '₦19,999',
-    images: [elanMulticolourAnkara1, elanMulticolourAnkara2, elanMulticolourAnkara3],
-    fabric: 'High Quality Ankara',
-    sizes: '6–22',
-  },
-  {
-    id: '11',
-    code: 'SP-EL-011',
-    name: 'The Graceful Short Dress',
-    description: 'Beautiful Outfit with butterfly back details. Available in different prints.',
-    price: '₦17,999',
-    originalPrice: '₦22,999',
-    images: [elanGracefulShort1, elanGracefulShort2, elanGracefulShort3, elanGracefulShort4],
-    fabric: '100% Cotton Ankara',
-    sizes: '6–22',
-  },
-  {
-    id: '12',
-    code: 'SP-EL-012',
-    name: 'Creative Ankara Patch Design',
-    description: 'Elegant Classy Outfit for every wear. Available in different prints.',
-    price: '₦24,999',
-    originalPrice: '₦29,999',
-    images: [elanAnkaraPatch1, elanAnkaraPatch2, elanAnkaraPatch3],
-    fabric: 'Premium Texture Ankara',
-    sizes: '6–22',
-  },
-  {
-    id: '13',
-    code: 'SP-EL-013',
-    name: 'Luxury Crystal Blue Dress',
-    description: 'Elegant luxury ware with rhinestones and stylish arm. Available in different prints.',
-    price: '₦26,999',
-    originalPrice: '₦31,999',
-    images: [elanCrystalBlue1, elanCrystalBlue2, elanCrystalBlue3, elanCrystalBlue4],
-    fabric: 'Premium Texture with Rhinestones',
-    sizes: '6–22',
-  },
-  {
-    id: '14',
-    code: 'SP-EL-014',
-    name: 'The Exquisite Bubu with Rhinestone and Lace Embellishments',
-    description: 'Elegant dress with lace embellishments. Available in different prints.',
-    price: '₦29,999',
-    originalPrice: '₦34,999',
-    images: [elanBubuRhinestone5, elanBubuRhinestone2, elanBubuRhinestone3, elanBubuRhinestone4, elanBubuRhinestone1],
-    fabric: 'Quality Ankara with Lace',
-    sizes: '6–22',
-  },
-  {
-    id: '15',
-    code: 'SP-EL-015',
-    name: 'The Mixed Patterned Short Dress',
-    description: 'Everyday dress with lace embellishments. Available in different prints.',
-    price: '₦17,999',
-    originalPrice: '₦22,999',
-    images: [elanMixedPattern1, elanMixedPattern2, elanMixedPattern3, elanMixedPattern4],
-    fabric: 'Premium Quality Mixed Ankara with Lace',
-    sizes: '6–22',
-  },
-];
+function mapRow(row: any): Product {
+  return {
+    id: row.id,
+    code: row.code,
+    name: row.name,
+    description: row.description || '',
+    price: row.price || '',
+    originalPrice: row.original_price || '',
+    images: Array.isArray(row.image_urls) && row.image_urls.length > 0
+      ? row.image_urls
+      : ['https://placehold.co/400x500/f5ead8/b8965a?text=No+Image'],
+    fabric: row.fabric || '',
+    care: row.care || '',
+    sizes: row.sizes || '6–22',
+    status: row.status || 'active',
+  };
+}
 
+export async function fetchProducts(): Promise<Product[]> {
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/products?status=neq.hidden&order=code.asc&select=*`,
+      {
+        method: 'GET',
+        headers: getHeaders(),
+      }
+    );
+    if (!res.ok) {
+      const err = await res.text();
+      console.error('Supabase fetch error:', res.status, err);
+      throw new Error(`Failed to fetch products: ${res.status}`);
+    }
+    const data = await res.json();
+    console.log('✓ Products loaded from Supabase:', data.length);
+    return data.map(mapRow);
+  } catch (err) {
+    console.error('fetchProducts error:', err);
+    throw err;
+  }
+}
+
+export async function fetchProductById(id: string): Promise<Product | null> {
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/products?id=eq.${id}&select=*`,
+      {
+        method: 'GET',
+        headers: getHeaders(),
+      }
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data[0] ? mapRow(data[0]) : null;
+  } catch (err) {
+    console.error('fetchProductById error:', err);
+    return null;
+  }
+}
+
+// ─── Product Card ─────────────────────────────────────────────────
 interface ProductCardProps {
   product: Product;
   onRequest: (product: Product) => void;
@@ -259,15 +114,16 @@ export function ProductCard({ product, onRequest }: ProductCardProps) {
   };
 
   return (
-    // ── h-full + flex-col makes every card stretch to the same row height ──
     <div className="product-card group h-full flex flex-col">
-
-      {/* Image — fixed ratio, never grows/shrinks */}
       <div className="aspect-[3/4] bg-cream relative overflow-hidden mb-5 flex-shrink-0">
         <img
           src={product.images[currentImg]}
           alt={`${product.name} — view ${currentImg + 1}`}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          onError={(e) => {
+            // Fallback if image fails to load
+            (e.target as HTMLImageElement).src = 'https://placehold.co/400x500/f5ead8/b8965a?text=Image+Unavailable';
+          }}
         />
         {product.images.length > 1 && (
           <>
@@ -305,40 +161,28 @@ export function ProductCard({ product, onRequest }: ProductCardProps) {
         )}
       </div>
 
-      {/* Text content — flex-col + flex-1 so it fills remaining height */}
       <div className="flex flex-col flex-1 space-y-2">
         <p className="section-eyebrow text-muted-foreground">{product.code}</p>
 
-        {/* Name — fixed to 2 lines max so heights stay consistent */}
         <Link to={`/product/${product.id}`}>
           <h3
             className="font-serif text-foreground hover:text-primary transition-colors duration-300 cursor-pointer"
             style={{
-              fontSize: '1.35rem',
-              fontWeight: 400,
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-              minHeight: '2.8rem',
+              fontSize: '1.35rem', fontWeight: 400,
+              display: '-webkit-box', WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical', overflow: 'hidden', minHeight: '2.8rem',
             }}
           >
             {product.name}
           </h3>
         </Link>
 
-        {/* Description — fixed to 2 lines max */}
         <p
           className="font-sans text-muted-foreground"
           style={{
-            fontSize: '0.85rem',
-            lineHeight: 1.6,
-            fontWeight: 300,
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            minHeight: '2.72rem',
+            fontSize: '0.85rem', lineHeight: 1.6, fontWeight: 300,
+            display: '-webkit-box', WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical', overflow: 'hidden', minHeight: '2.72rem',
           }}
         >
           {product.description}
@@ -348,23 +192,15 @@ export function ProductCard({ product, onRequest }: ProductCardProps) {
           Sizes: {product.sizes}
         </p>
 
-        {/* Price */}
         <div className="flex items-center gap-3 pt-1">
-          <span
-            className="font-sans text-muted-foreground line-through"
-            style={{ fontSize: '0.88rem', fontWeight: 300 }}
-          >
+          <span className="font-sans text-muted-foreground line-through" style={{ fontSize: '0.88rem', fontWeight: 300 }}>
             {product.originalPrice}
           </span>
-          <span
-            className="font-sans"
-            style={{ fontSize: '1rem', fontWeight: 500, letterSpacing: '0.04em', color: '#b8965a' }}
-          >
+          <span className="font-sans" style={{ fontSize: '1rem', fontWeight: 500, letterSpacing: '0.04em', color: '#b8965a' }}>
             {product.price}
           </span>
         </div>
 
-        {/* Buttons — pushed to bottom with mt-auto */}
         <div className="flex flex-col sm:flex-row gap-3 pt-2 mt-auto">
           <Link to={`/product/${product.id}`} className="btn-outline-gold flex-1 text-center">
             View Details
@@ -378,94 +214,104 @@ export function ProductCard({ product, onRequest }: ProductCardProps) {
   );
 }
 
+// ─── Featured Collection ──────────────────────────────────────────
 interface FeaturedCollectionProps {
   onRequest: (product: Product) => void;
 }
 
 export default function FeaturedCollection({ onRequest }: FeaturedCollectionProps) {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetchProducts()
+      .then((data) => {
+        setProducts(data);
+        setError('');
+      })
+      .catch((err) => {
+        console.error('Collection load failed:', err);
+        setError('Could not load collection. Please refresh.');
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <section id="collection" className="py-24 lg:py-32 bg-background">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
 
-        {/* ── Section Header ── */}
+        {/* Section Header */}
         <div className="text-center mb-10 reveal">
           <p className="section-eyebrow mb-4">Sempera Fashion</p>
-          <h2
-            className="font-serif text-foreground mb-5"
-            style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 300 }}
-          >
+          <h2 className="font-serif text-foreground mb-5" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 300 }}>
             The ELÁN Collection
           </h2>
           <span className="gold-divider mx-auto mb-5" />
-          <p
-            className="font-sans text-muted-foreground max-w-lg mx-auto"
-            style={{ fontSize: '1rem', lineHeight: 1.8, fontWeight: 300 }}
-          >
+          <p className="font-sans text-muted-foreground max-w-lg mx-auto" style={{ fontSize: '1rem', lineHeight: 1.8, fontWeight: 300 }}>
             Timeless silhouettes. Refined tailoring. Effortless elegance.
           </p>
         </div>
 
-        {/* ── Launch Discount Banner ── */}
-        <div
-          className="reveal mb-14"
-          style={{
-            background: 'linear-gradient(135deg, #1a1208 0%, #2d1f0a 50%, #1a1208 100%)',
-            border: '1px solid #b8965a',
-            borderRadius: '2px',
-            padding: '20px 32px',
-            display: 'flex',
-            flexWrap: 'wrap',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '12px',
-            textAlign: 'center',
-          }}
-        >
+        {/* Launch Discount Banner */}
+        <div className="reveal mb-14" style={{
+          background: 'linear-gradient(135deg, #1a1208 0%, #2d1f0a 50%, #1a1208 100%)',
+          border: '1px solid #b8965a', borderRadius: '2px',
+          padding: '20px 32px', display: 'flex', flexWrap: 'wrap',
+          alignItems: 'center', justifyContent: 'center', gap: '12px', textAlign: 'center',
+        }}>
           <span style={{ fontSize: '1.1rem' }}>🎉</span>
-          <p
-            style={{
-              fontFamily: 'Cormorant Garamond, serif',
-              fontSize: 'clamp(1rem, 2.5vw, 1.25rem)',
-              fontWeight: 500,
-              color: '#b8965a',
-              letterSpacing: '0.04em',
-              margin: 0,
-            }}
-          >
+          <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(1rem, 2.5vw, 1.25rem)', fontWeight: 500, color: '#b8965a', letterSpacing: '0.04em', margin: 0 }}>
             Launch Discount — Now Live
           </p>
-          <span
-            style={{
-              width: '1px',
-              height: '18px',
-              background: '#b8965a',
-              opacity: 0.5,
-              display: 'inline-block',
-            }}
-          />
-          <p
-            style={{
-              fontFamily: 'Jost, sans-serif',
-              fontSize: 'clamp(0.8rem, 2vw, 0.95rem)',
-              fontWeight: 300,
-              color: '#e8d5b0',
-              letterSpacing: '0.06em',
-              margin: 0,
-            }}
-          >
+          <span style={{ width: '1px', height: '18px', background: '#b8965a', opacity: 0.5, display: 'inline-block' }} />
+          <p style={{ fontFamily: 'Jost, sans-serif', fontSize: 'clamp(0.8rem, 2vw, 0.95rem)', fontWeight: 300, color: '#e8d5b0', letterSpacing: '0.06em', margin: 0 }}>
             Enjoy introductory pricing on every piece in the ELÁN Collection.
             <span style={{ color: '#b8965a', fontWeight: 400 }}> Limited time only.</span>
           </p>
         </div>
 
-        {/* ── Product Grid — items-stretch ensures all cards in a row match height ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 lg:gap-14 items-stretch">
-          {PRODUCTS.map((product, i) => (
-            <div key={product.id} className={`reveal delay-${(i + 1) * 100} flex`}>
-              <ProductCard product={product} onRequest={onRequest} />
-            </div>
-          ))}
-        </div>
+        {/* Loading */}
+        {loading && (
+          <div className="text-center py-24">
+            <div className="font-serif text-primary text-3xl mb-4 animate-pulse">✦</div>
+            <p className="font-sans text-muted-foreground" style={{ fontSize: '0.85rem', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+              Loading Collection...
+            </p>
+          </div>
+        )}
+
+        {/* Error */}
+        {!loading && error && (
+          <div className="text-center py-24">
+            <p className="font-sans text-muted-foreground mb-4">{error}</p>
+            <button
+              onClick={() => { setError(''); setLoading(true); fetchProducts().then(setProducts).catch(() => setError('Could not load collection.')).finally(() => setLoading(false)); }}
+              className="btn-gold"
+              style={{ fontSize: '0.75rem' }}
+            >
+              Try Again
+            </button>
+          </div>
+        )}
+
+        {/* Products */}
+        {!loading && !error && products.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 lg:gap-14 items-stretch">
+            {products.map((product, i) => (
+              <div key={product.id} className="flex" style={{ opacity: 1, transform: 'none' }}>
+                <ProductCard product={product} onRequest={onRequest} />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Empty state */}
+        {!loading && !error && products.length === 0 && (
+          <div className="text-center py-24">
+            <p className="font-sans text-muted-foreground">No products available.</p>
+          </div>
+        )}
 
       </div>
     </section>

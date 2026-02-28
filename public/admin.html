@@ -192,6 +192,12 @@ textarea.form-input{resize:vertical;min-height:80px;}
 }
 
 .section-stripe{height:3px;background:linear-gradient(90deg,var(--dark),var(--gold),var(--dark));margin-bottom:28px;}
+
+/* ── IMAGE UPLOAD ── */
+.img-preview-item{position:relative;width:80px;height:80px;flex-shrink:0;}
+.img-preview-item img{width:100%;height:100%;object-fit:cover;border:1px solid var(--border);}
+.img-preview-item .img-remove{position:absolute;top:-6px;right:-6px;width:18px;height:18px;background:#ef4444;color:white;border:none;border-radius:50%;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
+.img-preview-item .img-badge{position:absolute;bottom:0;left:0;right:0;background:rgba(184,150,90,0.9);color:white;font-size:0.5rem;text-align:center;padding:2px;letter-spacing:0.1em;}
 </style>
 </head>
 <body>
@@ -433,7 +439,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
 
 <!-- ═══ PRODUCT FORM MODAL ═══ -->
 <div class="modal-overlay" id="product-modal">
-  <div class="modal" style="max-width:720px;">
+  <div class="modal" style="max-width:760px;">
     <div class="modal-header">
       <h3 id="modal-product-title">Add Product</h3>
       <button class="modal-close" onclick="closeModal('product-modal')">✕</button>
@@ -460,9 +466,29 @@ textarea.form-input{resize:vertical;min-height:80px;}
           <div class="form-group full"><label class="form-label">Care Instructions</label><textarea class="form-input" id="pf-care" placeholder="Care instructions..."></textarea></div>
         </div>
       </div>
-      <div style="display:flex;gap:10px;justify-content:flex-end;">
+
+      <div class="form-section">
+        <div class="form-section-title">Product Images</div>
+        <div id="image-upload-area" style="border:2px dashed var(--border);padding:24px;text-align:center;cursor:pointer;transition:border-color 0.2s;background:var(--bg);" onclick="document.getElementById('pf-images').click()" ondragover="event.preventDefault();this.style.borderColor='var(--gold)'" ondragleave="this.style.borderColor='var(--border)'" ondrop="handleImageDrop(event)">
+          <div style="font-size:1.8rem;margin-bottom:8px;">🖼️</div>
+          <div style="font-size:0.82rem;color:var(--muted);">Click to upload or drag & drop images here</div>
+          <div style="font-size:0.7rem;color:var(--muted);margin-top:4px;">First image = main display. JPG, PNG up to 5MB each.</div>
+          <input type="file" id="pf-images" multiple accept="image/*" style="display:none" onchange="handleImageSelect(this.files)"/>
+        </div>
+        <div id="image-previews" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;"></div>
+        <div id="existing-images" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:4px;"></div>
+        <div id="upload-progress" style="display:none;margin-top:10px;">
+          <div style="background:var(--border);height:4px;border-radius:2px;overflow:hidden;">
+            <div id="progress-bar" style="height:100%;background:var(--gold);width:0%;transition:width 0.3s;"></div>
+          </div>
+          <div id="progress-text" style="font-size:0.72rem;color:var(--muted);margin-top:4px;">Uploading...</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:flex-end;align-items:center;">
+        <div id="save-status" style="font-size:0.75rem;color:var(--muted);"></div>
         <button class="btn-sm" onclick="closeModal('product-modal')">Cancel</button>
-        <button class="btn-gold-sm" onclick="saveProduct()" style="padding:10px 24px;">Save Product</button>
+        <button class="btn-gold-sm" id="save-product-btn" onclick="saveProduct()" style="padding:10px 28px;">Save Product</button>
       </div>
     </div>
   </div>
@@ -901,8 +927,125 @@ function filterProducts() {
   ));
 }
 
+// ── Image state ──
+let pendingImageFiles = []; // new files to upload
+let existingImageUrls = []; // already uploaded URLs (for edit mode)
+
+function handleImageSelect(files) {
+  Array.from(files).forEach(f => {
+    if (f.size > 5 * 1024 * 1024) { showToast(`${f.name} is too large (max 5MB)`, 'error'); return; }
+    pendingImageFiles.push(f);
+    renderImagePreviews();
+  });
+  document.getElementById('pf-images').value = '';
+}
+
+function handleImageDrop(e) {
+  e.preventDefault();
+  document.getElementById('image-upload-area').style.borderColor = 'var(--border)';
+  handleImageSelect(e.dataTransfer.files);
+}
+
+function renderImagePreviews() {
+  const container = document.getElementById('image-previews');
+  container.innerHTML = pendingImageFiles.map((f, i) => {
+    const url = URL.createObjectURL(f);
+    return `<div class="img-preview-item">
+      <img src="${url}" alt="preview"/>
+      <button class="img-remove" onclick="removePendingImage(${i})">✕</button>
+      ${i === 0 && existingImageUrls.length === 0 ? '<div class="img-badge">MAIN</div>' : ''}
+    </div>`;
+  }).join('');
+}
+
+function renderExistingImages() {
+  const container = document.getElementById('existing-images');
+  container.innerHTML = existingImageUrls.map((url, i) => `
+    <div class="img-preview-item">
+      <img src="${url}" alt="existing"/>
+      <button class="img-remove" onclick="removeExistingImage(${i})">✕</button>
+      ${i === 0 ? '<div class="img-badge">MAIN</div>' : ''}
+    </div>
+  `).join('');
+}
+
+function removePendingImage(i) {
+  pendingImageFiles.splice(i, 1);
+  renderImagePreviews();
+}
+
+function removeExistingImage(i) {
+  existingImageUrls.splice(i, 1);
+  renderExistingImages();
+}
+
+async function uploadImages(productCode) {
+  if (pendingImageFiles.length === 0) return [];
+  const uploadedUrls = [];
+  const total = pendingImageFiles.length;
+
+  document.getElementById('upload-progress').style.display = 'block';
+
+  for (let i = 0; i < pendingImageFiles.length; i++) {
+    const file = pendingImageFiles[i];
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    // Clean filename: code-timestamp-index.ext (no subfolders)
+    const filename = `${productCode}-${Date.now()}-${i}.${ext}`;
+
+    document.getElementById('progress-text').textContent = `Uploading image ${i+1} of ${total}...`;
+    document.getElementById('progress-bar').style.width = `${((i+1)/total)*100}%`;
+
+    try {
+      // Try POST first, fall back to PUT
+      let res = await fetch(`${SUPABASE_URL}/storage/v1/object/Product%20-%20images/${filename}`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': HEADERS['Authorization'],
+          'Content-Type': file.type || 'image/jpeg',
+          'x-upsert': 'true',
+        },
+        body: file,
+      });
+
+      // If POST fails try PUT
+      if (!res.ok) {
+        res = await fetch(`${SUPABASE_URL}/storage/v1/object/Product%20-%20images/${filename}`, {
+          method: 'PUT',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': HEADERS['Authorization'],
+            'Content-Type': file.type || 'image/jpeg',
+            'x-upsert': 'true',
+          },
+          body: file,
+        });
+      }
+
+      if (!res.ok) {
+        const err = await res.text();
+        console.error('Upload failed:', res.status, err);
+        showToast(`Image upload failed (${res.status}): ${err.slice(0,80)}`, 'error');
+        continue;
+      }
+
+      const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/Product%20-%20images/${filename}`;
+      uploadedUrls.push(publicUrl);
+    } catch(uploadErr) {
+      console.error('Upload exception:', uploadErr);
+      showToast(`Upload error: ${uploadErr.message}`, 'error');
+    }
+  }
+
+  document.getElementById('upload-progress').style.display = 'none';
+  return uploadedUrls;
+}
+
 function openProductForm(id) {
   editingProductId = id;
+  pendingImageFiles = [];
+  existingImageUrls = [];
+
   const p = id ? allProducts.find(x => x.id === id) : null;
   document.getElementById('modal-product-title').textContent = p ? `Edit — ${p.code}` : 'Add Product';
   document.getElementById('pf-name').value = p?.name || '';
@@ -914,6 +1057,17 @@ function openProductForm(id) {
   document.getElementById('pf-description').value = p?.description || '';
   document.getElementById('pf-fabric').value = p?.fabric || '';
   document.getElementById('pf-care').value = p?.care || '';
+  document.getElementById('image-previews').innerHTML = '';
+  document.getElementById('save-status').textContent = '';
+
+  // Load existing images for edit mode
+  if (p?.image_urls?.length) {
+    existingImageUrls = [...p.image_urls];
+    renderExistingImages();
+  } else {
+    document.getElementById('existing-images').innerHTML = '';
+  }
+
   document.getElementById('product-modal').classList.add('open');
 }
 
@@ -922,30 +1076,53 @@ async function saveProduct() {
   const code = document.getElementById('pf-code').value.trim();
   if (!name || !code) { showToast('Name and code are required', 'error'); return; }
 
-  const payload = {
-    name, code,
-    price: document.getElementById('pf-price').value.trim(),
-    original_price: document.getElementById('pf-original').value.trim(),
-    sizes: document.getElementById('pf-sizes').value.trim(),
-    status: document.getElementById('pf-status').value,
-    description: document.getElementById('pf-description').value.trim(),
-    fabric: document.getElementById('pf-fabric').value.trim(),
-    care: document.getElementById('pf-care').value.trim(),
-  };
+  const btn = document.getElementById('save-product-btn');
+  const status = document.getElementById('save-status');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+  status.textContent = '';
 
   try {
+    // 1. Upload any new images
+    status.textContent = pendingImageFiles.length > 0 ? 'Uploading images...' : '';
+    const newUrls = await uploadImages(code);
+
+    // 2. Combine existing + new image URLs
+    const allImageUrls = [...existingImageUrls, ...newUrls];
+
+    const payload = {
+      name, code,
+      price: document.getElementById('pf-price').value.trim(),
+      original_price: document.getElementById('pf-original').value.trim(),
+      sizes: document.getElementById('pf-sizes').value.trim(),
+      status: document.getElementById('pf-status').value,
+      description: document.getElementById('pf-description').value.trim(),
+      fabric: document.getElementById('pf-fabric').value.trim(),
+      care: document.getElementById('pf-care').value.trim(),
+      image_urls: allImageUrls,
+    };
+
+    status.textContent = 'Saving product...';
+
     if (editingProductId) {
       await sb(`products?id=eq.${editingProductId}`, { method:'PATCH', body: JSON.stringify(payload) });
       const idx = allProducts.findIndex(p => p.id === editingProductId);
       if (idx > -1) allProducts[idx] = { ...allProducts[idx], ...payload };
     } else {
       const result = await sb('products', { method:'POST', body: JSON.stringify(payload) });
-      if (result) allProducts.unshift(result[0]);
+      if (result?.[0]) allProducts.unshift(result[0]);
     }
+
     closeModal('product-modal');
     renderProducts();
-    showToast(editingProductId ? 'Product updated ✓' : 'Product added ✓');
-  } catch(e) { showToast('Failed to save product', 'error'); }
+    showToast(editingProductId ? 'Product updated ✓' : 'Product added & live on website ✓');
+  } catch(e) {
+    console.error(e);
+    showToast('Failed to save product: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save Product';
+  }
 }
 
 async function toggleProductStatus(id, currentStatus) {

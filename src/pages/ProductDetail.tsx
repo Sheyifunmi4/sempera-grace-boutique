@@ -1,23 +1,52 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import SemperaNav from '@/components/SemperaNav';
 import SemperaFooter from '@/components/SemperaFooter';
 import RequestModal from '@/components/RequestModal';
-import { PRODUCTS, type Product } from '@/components/FeaturedCollection';
+import { fetchProductById, type Product } from '@/components/FeaturedCollection';
 
 export default function ProductDetail() {
   const { id } = useParams();
-  const product = PRODUCTS.find((p) => p.id === id);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
   const [activeImg, setActiveImg] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
 
+  useEffect(() => {
+    if (!id) return;
+    setLoading(true);
+    setActiveImg(0);
+    fetchProductById(id)
+      .then(setProduct)
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <SemperaNav />
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="font-serif text-primary text-3xl mb-4 animate-pulse">✦</div>
+            <p className="font-sans text-muted-foreground" style={{ fontSize: '0.85rem', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+              Loading...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!product) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="font-serif text-2xl mb-4">Product not found</h2>
-          <Link to="/" className="btn-gold">Return Home</Link>
+      <div className="min-h-screen bg-background">
+        <SemperaNav />
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <h2 className="font-serif text-2xl mb-4">Product not found</h2>
+            <Link to="/" className="btn-gold">Return Home</Link>
+          </div>
         </div>
       </div>
     );
@@ -55,9 +84,9 @@ export default function ProductDetail() {
         {/* Product Detail */}
         <div className="max-w-7xl mx-auto px-6 lg:px-8 pb-24">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
+
             {/* Image Gallery */}
             <div className="space-y-4">
-              {/* Main Image with Arrows */}
               <div className="aspect-[3/4] overflow-hidden bg-cream relative group">
                 <img
                   src={images[activeImg].src}
@@ -81,6 +110,7 @@ export default function ProductDetail() {
                   </>
                 )}
               </div>
+
               {/* Thumbnails */}
               <div className="flex gap-3 overflow-x-auto">
                 {images.map((img, i) => (
@@ -88,15 +118,9 @@ export default function ProductDetail() {
                     key={i}
                     onClick={() => setActiveImg(i)}
                     className="w-20 aspect-square overflow-hidden border-2 transition-all duration-300 flex-shrink-0"
-                    style={{
-                      borderColor: activeImg === i ? 'hsl(var(--primary))' : 'transparent',
-                    }}
+                    style={{ borderColor: activeImg === i ? 'hsl(var(--primary))' : 'transparent' }}
                   >
-                    <img
-                      src={img.src}
-                      alt={img.label}
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={img.src} alt={img.label} className="w-full h-full object-cover" />
                   </button>
                 ))}
               </div>
@@ -119,42 +143,19 @@ export default function ProductDetail() {
                   {product.description}
                 </p>
 
-                {/* ── Price: slashed original + sale price ── */}
+                {/* Price */}
                 <div className="flex items-center gap-4">
-                  <span
-                    className="font-sans text-muted-foreground line-through"
-                    style={{ fontSize: '1rem', fontWeight: 300 }}
-                  >
+                  <span className="font-sans text-muted-foreground line-through" style={{ fontSize: '1rem', fontWeight: 300 }}>
                     {product.originalPrice}
                   </span>
-                  <span
-                    className="font-sans"
-                    style={{ fontSize: '1.5rem', fontWeight: 500, letterSpacing: '0.03em', color: '#b8965a' }}
-                  >
+                  <span className="font-sans" style={{ fontSize: '1.5rem', fontWeight: 500, letterSpacing: '0.03em', color: '#b8965a' }}>
                     {product.price}
                   </span>
                 </div>
 
-                {/* ── Delivery Info ── */}
-                <div
-                  style={{
-                    marginTop: '16px',
-                    padding: '14px 18px',
-                    background: 'hsl(var(--muted)/0.4)',
-                    borderLeft: '3px solid #b8965a',
-                  }}
-                >
-                  <p
-                    style={{
-                      fontFamily: 'Jost, sans-serif',
-                      fontSize: '0.62rem',
-                      letterSpacing: '0.2em',
-                      textTransform: 'uppercase',
-                      color: '#b8965a',
-                      marginBottom: '10px',
-                      fontWeight: 400,
-                    }}
-                  >
+                {/* Delivery Info */}
+                <div style={{ marginTop: '16px', padding: '14px 18px', background: 'hsl(var(--muted)/0.4)', borderLeft: '3px solid #b8965a' }}>
+                  <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.62rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#b8965a', marginBottom: '10px', fontWeight: 400 }}>
                     Delivery
                   </p>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -175,10 +176,7 @@ export default function ProductDetail() {
 
               {/* Sizes */}
               <div>
-                <h3
-                  className="font-sans text-foreground mb-3"
-                  style={{ fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 400 }}
-                >
+                <h3 className="font-sans text-foreground mb-3" style={{ fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 400 }}>
                   Available Sizes
                 </h3>
                 <p className="font-sans text-muted-foreground" style={{ fontSize: '0.95rem', lineHeight: 1.8, fontWeight: 300 }}>
@@ -187,36 +185,28 @@ export default function ProductDetail() {
               </div>
 
               {/* Fabric Details */}
-              <div>
-                <h3
-                  className="font-sans text-foreground mb-3"
-                  style={{ fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 400 }}
-                >
-                  Fabric Details
-                </h3>
-                <p className="font-sans text-muted-foreground" style={{ fontSize: '0.95rem', lineHeight: 1.8, fontWeight: 300 }}>
-                  {product.fabric}
-                </p>
-              </div>
+              {product.fabric && (
+                <div>
+                  <h3 className="font-sans text-foreground mb-3" style={{ fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 400 }}>
+                    Fabric Details
+                  </h3>
+                  <p className="font-sans text-muted-foreground" style={{ fontSize: '0.95rem', lineHeight: 1.8, fontWeight: 300 }}>
+                    {product.fabric}
+                  </p>
+                </div>
+              )}
 
               {/* Care Instructions */}
-              <div>
-                <h3
-                  className="font-sans text-foreground mb-3"
-                  style={{ fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 400 }}
-                >
-                  Care Instructions
-                </h3>
-                <ul
-                  className="font-sans text-muted-foreground space-y-1"
-                  style={{ fontSize: '0.9rem', lineHeight: 1.8, fontWeight: 300 }}
-                >
-                  <li>— Dry clean recommended</li>
-                  <li>— Hand wash cold if applicable</li>
-                  <li>— Do not tumble dry</li>
-                  <li>— Iron on low heat with care</li>
-                </ul>
-              </div>
+              {product.care && (
+                <div>
+                  <h3 className="font-sans text-foreground mb-3" style={{ fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 400 }}>
+                    Care Instructions
+                  </h3>
+                  <p className="font-sans text-muted-foreground" style={{ fontSize: '0.95rem', lineHeight: 1.8, fontWeight: 300 }}>
+                    {product.care}
+                  </p>
+                </div>
+              )}
 
               <span className="gold-divider" />
 
@@ -234,10 +224,7 @@ export default function ProductDetail() {
                 >
                   Enquire via WhatsApp
                 </a>
-                <p
-                  className="text-center font-sans text-muted-foreground"
-                  style={{ fontSize: '0.78rem', letterSpacing: '0.05em', fontWeight: 300 }}
-                >
+                <p className="text-center font-sans text-muted-foreground" style={{ fontSize: '0.78rem', letterSpacing: '0.05em', fontWeight: 300 }}>
                   Our stylist will respond within 24 hours
                 </p>
               </div>
