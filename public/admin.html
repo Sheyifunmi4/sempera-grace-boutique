@@ -182,13 +182,50 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .tag-regular{background:#f1f5f9;color:#475569;}
 
 /* ── RESPONSIVE ── */
+/* ── MOBILE TOP BAR ── */
+.mobile-topbar{display:none;align-items:center;justify-content:space-between;background:var(--dark);padding:0 20px;height:56px;position:fixed;top:0;left:0;right:0;z-index:200;}
+.mobile-logo{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:300;color:white;letter-spacing:0.08em;}
+.mobile-logo span{color:var(--gold);}
+.mobile-user{font-size:0.62rem;color:rgba(184,150,90,0.8);letter-spacing:0.1em;text-transform:uppercase;}
+
+/* ── MOBILE BOTTOM NAV ── */
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--dark);border-top:1px solid rgba(184,150,90,0.25);z-index:200;padding:0;height:64px;}
+.mobile-nav-items{display:flex;height:100%;}
+.mobile-nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;border:none;background:none;color:rgba(255,255,255,0.45);transition:all 0.2s;padding:8px 4px;border-top:2px solid transparent;}
+.mobile-nav-item.active{color:var(--gold);border-top-color:var(--gold);}
+.mobile-nav-item:hover{color:rgba(255,255,255,0.8);}
+.mobile-nav-icon{font-size:1.2rem;line-height:1;}
+.mobile-nav-label{font-size:0.52rem;letter-spacing:0.12em;text-transform:uppercase;font-family:'Jost',sans-serif;font-weight:400;}
+
+/* ── OVERLAY ── */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:150;}
+.sidebar-overlay.open{display:block;}
+
 @media(max-width:768px){
-  .sidebar{transform:translateX(-100%);}
-  .sidebar.open{transform:translateX(0);}
-  .main{margin-left:0;}
+  .sidebar{display:none;}
+  .main{margin-left:0;padding-top:56px;padding-bottom:72px;}
+  .topbar{display:none;}
+  .mobile-topbar{display:flex;}
+  .mobile-bottom-nav{display:block;}
   .charts-row{grid-template-columns:1fr;}
   .modal-grid,.form-grid{grid-template-columns:1fr;}
   .stats-grid{grid-template-columns:repeat(2,1fr);}
+  .page-content{padding:20px 16px;}
+  .table-wrap{overflow-x:auto;}
+  .table-header{flex-direction:column;align-items:stretch;}
+  .search-box{width:100%;}
+  .modal{max-width:calc(100vw - 32px);margin:16px;}
+  .modal-overlay{align-items:flex-end;padding:0;}
+  .modal-overlay .modal{border-radius:0;max-height:90vh;overflow-y:auto;width:100%;margin:0;}
+  .btn-gold-sm,.btn-sm{padding:10px 16px;font-size:0.68rem;}
+  .conversion-box{flex-wrap:wrap;gap:12px;}
+  .summary-grid{grid-template-columns:repeat(3,1fr);}
+  th,td{padding:10px 12px;font-size:0.75rem;}
+  th{font-size:0.54rem;}
+}
+@media(max-width:480px){
+  .stats-grid{grid-template-columns:repeat(2,1fr);}
+  .page-content{padding:16px 12px;}
 }
 
 .section-stripe{height:3px;background:linear-gradient(90deg,var(--dark),var(--gold),var(--dark));margin-bottom:28px;}
@@ -216,6 +253,39 @@ textarea.form-input{resize:vertical;min-height:80px;}
 
 <!-- ═══ MAIN APP ═══ -->
 <div id="app">
+
+<!-- MOBILE TOP BAR -->
+<div class="mobile-topbar">
+  <div class="mobile-logo">semp<span>é</span>ra</div>
+  <div class="mobile-user" id="mobile-user-label"></div>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-bottom-nav">
+  <div class="mobile-nav-items">
+    <button class="mobile-nav-item active" onclick="showPageMobile('dashboard', this)">
+      <span class="mobile-nav-icon">📊</span>
+      <span class="mobile-nav-label">Dashboard</span>
+    </button>
+    <button class="mobile-nav-item" onclick="showPageMobile('orders', this)">
+      <span class="mobile-nav-icon">📋</span>
+      <span class="mobile-nav-label">Orders</span>
+    </button>
+    <button class="mobile-nav-item" onclick="showPageMobile('products', this)">
+      <span class="mobile-nav-icon">👗</span>
+      <span class="mobile-nav-label">Products</span>
+    </button>
+    <button class="mobile-nav-item" onclick="showPageMobile('customers', this)">
+      <span class="mobile-nav-icon">👥</span>
+      <span class="mobile-nav-label">Customers</span>
+    </button>
+    <button class="mobile-nav-item" onclick="handleLogout()">
+      <span class="mobile-nav-icon">🚪</span>
+      <span class="mobile-nav-label">Logout</span>
+    </button>
+  </div>
+</nav>
+
   <div class="layout">
 
     <!-- SIDEBAR -->
@@ -580,6 +650,10 @@ async function handleLogin() {
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
   document.getElementById('topbar-user').textContent = email;
+  // Set mobile user label (show name before @)
+  const shortName = email.split('@')[0];
+  const mobileLabel = document.getElementById('mobile-user-label');
+  if (mobileLabel) mobileLabel.textContent = shortName;
   await initApp();
 }
 
@@ -605,6 +679,26 @@ function showPage(page) {
   event.currentTarget.classList.add('active');
   const titles = { dashboard:'Dashboard', orders:'Orders & Requests', products:'Product Management', customers:'Customer Management' };
   document.getElementById('page-title').textContent = titles[page];
+  if (page === 'orders') renderOrders();
+  if (page === 'products') renderProducts();
+  if (page === 'customers') renderCustomers();
+}
+
+function showPageMobile(page, btn) {
+  // Hide all pages, show selected
+  document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+  document.getElementById(`page-${page}`).classList.add('active');
+
+  // Update desktop sidebar active state too
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+  // Update mobile bottom nav active state
+  document.querySelectorAll('.mobile-nav-item').forEach(n => n.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  // Scroll to top
+  window.scrollTo(0, 0);
+
   if (page === 'orders') renderOrders();
   if (page === 'products') renderProducts();
   if (page === 'customers') renderCustomers();
