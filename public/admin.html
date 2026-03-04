@@ -572,6 +572,10 @@ textarea.form-input{resize:vertical;min-height:80px;}
 // CONFIG
 // ═══════════════════════════════════════
 const SUPABASE_URL = 'https://sieqvcjiqdjhjnxaslrd.supabase.co';
+
+// ── Cloudinary Config ──
+const CLOUDINARY_CLOUD = 'dljtqpiuh';
+const CLOUDINARY_PRESET = 'sempera_products';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpZXF2Y2ppcWRqaGpueGFzbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4Nzk4NjIsImV4cCI6MjA4NzQ1NTg2Mn0.E1VkbPUJ9_u_pyhIXMZb5WWrXYQvIdEY-z3dIqZp7Mc';
 
 const HEADERS = {
@@ -1082,49 +1086,32 @@ async function uploadImages(productCode) {
 
   for (let i = 0; i < pendingImageFiles.length; i++) {
     const file = pendingImageFiles[i];
-    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
-    // Clean filename: code-timestamp-index.ext (no subfolders)
-    const filename = `${productCode}-${Date.now()}-${i}.${ext}`;
+    const publicId = `${productCode}-${i + 1}`;
 
     document.getElementById('progress-text').textContent = `Uploading image ${i+1} of ${total}...`;
     document.getElementById('progress-bar').style.width = `${((i+1)/total)*100}%`;
 
     try {
-      // Try POST first, fall back to PUT
-      let res = await fetch(`${SUPABASE_URL}/storage/v1/object/Product%20-%20images/${filename}`, {
-        method: 'POST',
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': HEADERS['Authorization'],
-          'Content-Type': file.type || 'image/jpeg',
-          'x-upsert': 'true',
-        },
-        body: file,
-      });
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', CLOUDINARY_PRESET);
+      formData.append('public_id', publicId);
+      formData.append('folder', 'sempera/products');
 
-      // If POST fails try PUT
-      if (!res.ok) {
-        res = await fetch(`${SUPABASE_URL}/storage/v1/object/Product%20-%20images/${filename}`, {
-          method: 'PUT',
-          headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': HEADERS['Authorization'],
-            'Content-Type': file.type || 'image/jpeg',
-            'x-upsert': 'true',
-          },
-          body: file,
-        });
-      }
+      const res = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`,
+        { method: 'POST', body: formData }
+      );
 
       if (!res.ok) {
         const err = await res.text();
-        console.error('Upload failed:', res.status, err);
-        showToast(`Image upload failed (${res.status}): ${err.slice(0,80)}`, 'error');
+        console.error('Cloudinary upload failed:', res.status, err);
+        showToast(`Upload failed (${res.status}) — check Cloudinary preset is Unsigned`, 'error');
         continue;
       }
 
-      const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/Product%20-%20images/${filename}`;
-      uploadedUrls.push(publicUrl);
+      const data = await res.json();
+      uploadedUrls.push(data.secure_url);
     } catch(uploadErr) {
       console.error('Upload exception:', uploadErr);
       showToast(`Upload error: ${uploadErr.message}`, 'error');
