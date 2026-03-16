@@ -736,7 +736,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
               <option value="partial">Partial</option>
               <option value="paid">Paid</option>
             </select>
-            <button class="btn-gold-sm" onclick="openInvoiceBuilder()">+ Generate Invoice</button>
+            <button class="btn-gold-sm" onclick="safeOpenInvoiceBuilder()">+ Generate Invoice</button>
           </div>
         </div>
 
@@ -2246,30 +2246,61 @@ async function updateInvoiceStatus(id, status) {
 
 // ══ INVOICE BUILDER ══════════════════════════════
 
-function openInvoiceBuilder() {
+function safeOpenInvoiceBuilder() {
+  // Step by step with error reporting
+  const steps = [
+    ['inv-builder-title', 'textContent', 'Generate Invoice'],
+    ['inv-customer-search', 'value', ''],
+    ['inv-cname', 'value', ''],
+    ['inv-cphone', 'value', ''],
+    ['inv-cemail', 'value', ''],
+    ['inv-date', 'value', new Date().toISOString().split('T')[0]],
+    ['inv-status', 'value', 'unpaid'],
+    ['inv-delivery', 'value', '0'],
+    ['inv-discount', 'value', '0'],
+    ['inv-notes', 'value', ''],
+  ];
+
+  for (const [id, prop, val] of steps) {
+    const el = document.getElementById(id);
+    if (!el) {
+      showToast('Missing element: ' + id, 'error');
+      console.error('openInvoiceBuilder: missing element', id);
+      return;
+    }
+    el[prop] = val;
+  }
+
+  const due = new Date(); due.setDate(due.getDate() + 7);
+  document.getElementById('inv-builder-num').textContent = '#SP-2026-' + String(invNextNum).padStart(4,'0');
+
+  const dueDateEl = document.getElementById('inv-due');
+  if (dueDateEl) dueDateEl.value = due.toISOString().split('T')[0];
+
+  const catSearch = document.getElementById('inv-catalog-search');
+  if (catSearch) catSearch.value = '';
+  const catResults = document.getElementById('inv-catalog-results');
+  if (catResults) catResults.style.display = 'none';
+
   editingInvoiceId = null;
   invLineItems = [];
-  const today = new Date().toISOString().split('T')[0];
-  const due = new Date(); due.setDate(due.getDate() + 7);
-  document.getElementById('inv-builder-title').textContent = 'Generate Invoice';
-  document.getElementById('inv-builder-num').textContent = `#SP-2026-${String(invNextNum).padStart(4,'0')}`;
-  document.getElementById('inv-customer-search').value = '';
-  document.getElementById('inv-cname').value = '';
-  document.getElementById('inv-cphone').value = '';
-  document.getElementById('inv-cemail').value = '';
-  document.getElementById('inv-date').value = today;
-  document.getElementById('inv-due').value = due.toISOString().split('T')[0];
-  document.getElementById('inv-status').value = 'unpaid';
-  document.getElementById('inv-delivery').value = '0';
-  document.getElementById('inv-discount').value = '0';
-  document.getElementById('inv-notes').value = '';
-  document.getElementById('inv-catalog-search').value = '';
-  document.getElementById('inv-catalog-results').style.display = 'none';
-  document.getElementById('inv-orders-list').innerHTML = '<div style="padding:20px;text-align:center;font-size:0.8rem;color:var(--muted);">Search a customer above to load their orders.</div>';
+
+  const ordersList = document.getElementById('inv-orders-list');
+  if (ordersList) ordersList.innerHTML = '<div style="padding:20px;text-align:center;font-size:0.8rem;color:var(--muted);">Search a customer above to load their orders.</div>';
+
   renderInvLineItems();
   showInvTab('orders');
-  document.getElementById('invoice-builder-modal').classList.add('open');
+
+  const modal = document.getElementById('invoice-builder-modal');
+  if (!modal) {
+    showToast('Invoice builder modal not found in page!', 'error');
+    console.error('invoice-builder-modal element not found');
+    return;
+  }
+  modal.classList.add('open');
 }
+
+function openInvoiceBuilder() { safeOpenInvoiceBuilder(); }
 
 async function editInvoice(id) {
   await loadInvoices();
