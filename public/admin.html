@@ -1741,8 +1741,11 @@ function showToast(msg, type='success') {
 }
 
 // Close modals on overlay click
-document.querySelectorAll('.modal-overlay').forEach(m => {
-  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+// Delegated modal close — works for all modals including dynamically referenced ones
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('modal-overlay')) {
+    e.target.classList.remove('open');
+  }
 });
 
 // ══════════════════════════════════════════════════
@@ -2316,20 +2319,41 @@ function showInvTab(tab) {
 function searchInvCustomer(q) {
   const box = document.getElementById('inv-customer-suggestions');
   if (!q || q.length < 2) { box.style.display = 'none'; return; }
-  const matches = allOrders
-    .filter(o => (o.customer_name||'').toLowerCase().includes(q.toLowerCase()))
-    .reduce((acc, o) => {
-      const key = (o.customer_phone || o.customer_name);
-      if (!acc[key]) acc[key] = o;
-      return acc;
-    }, {});
-  const results = Object.values(matches).slice(0, 8);
-  if (!results.length) { box.style.display = 'none'; return; }
-  box.innerHTML = results.map(o => `
-    <div class="catalog-suggestion" onclick="selectInvCustomer(${JSON.stringify(o.customer_name).replace(/"/g,'&quot;')}, ${JSON.stringify(o.customer_phone||'').replace(/"/g,'&quot;')}, ${JSON.stringify(o.customer_email||'').replace(/"/g,'&quot;')})">
-      <strong>${esc(o.customer_name)}</strong> · ${esc(o.customer_phone||'')}
+  const seen = {};
+  const matches = allOrders.filter(o => {
+    const key = o.customer_phone || o.customer_name;
+    if (seen[key]) return false;
+    seen[key] = true;
+    return (o.customer_name||'').toLowerCase().includes(q.toLowerCase()) ||
+           (o.customer_phone||'').includes(q);
+  }).slice(0, 8);
+  if (!matches.length) { box.style.display = 'none'; return; }
+  box.innerHTML = matches.map(o => `
+    <div class="catalog-suggestion"
+      data-name="${(o.customer_name||'').replace(/"/g,'&quot;')}"
+      data-phone="${(o.customer_phone||'').replace(/"/g,'&quot;')}"
+      data-email="${(o.customer_email||'').replace(/"/g,'&quot;')}"
+      onclick="selectInvCustomerEl(this)">
+      <strong>${esc(o.customer_name)}</strong>
+      <span style="color:var(--muted);font-size:0.72rem;display:block;margin-top:2px;">${esc(o.customer_phone||'')}${o.customer_email?' · '+esc(o.customer_email):''}</span>
     </div>`).join('');
   box.style.display = 'block';
+}
+
+function selectInvCustomerEl(el) {
+  const name = el.dataset.name;
+  const phone = el.dataset.phone;
+  const email = el.dataset.email;
+  document.getElementById('inv-cname').value = name;
+  document.getElementById('inv-cphone').value = phone;
+  document.getElementById('inv-cemail').value = email;
+  document.getElementById('inv-customer-search').value = name;
+  document.getElementById('inv-customer-suggestions').style.display = 'none';
+  loadCustomerOrders(name);
+}
+
+function selectInvCustomer(name, phone, email) {
+  selectInvCustomerEl({ dataset: { name, phone, email } });
 }
 
 function selectInvCustomer(name, phone, email) {
@@ -2912,20 +2936,33 @@ function searchMoCustomer(q) {
   }).slice(0, 8);
   if (!matches.length) { box.style.display = 'none'; return; }
   box.style.display = 'block';
-  box.innerHTML = matches.map(o => `
-    <div class="catalog-suggestion" onclick="selectMoCustomer(${JSON.stringify({name:o.customer_name,phone:o.customer_phone||'',email:o.customer_email||''})})">
+  box.innerHTML = matches.map((o, i) => {
+    const safeId = 'mo-cust-' + i;
+    return `<div class="catalog-suggestion" id="${safeId}"
+      data-name="${(o.customer_name||'').replace(/"/g,'&quot;')}"
+      data-phone="${(o.customer_phone||'').replace(/"/g,'&quot;')}"
+      data-email="${(o.customer_email||'').replace(/"/g,'&quot;')}"
+      onclick="selectMoCustomerEl(this)">
       <strong>${esc(o.customer_name)}</strong>
-      <span style="color:var(--muted);font-size:0.72rem;"> · ${esc(o.customer_phone||'')} ${o.customer_email?'· '+esc(o.customer_email):''}</span>
-    </div>`).join('');
+      <span style="color:var(--muted);font-size:0.72rem;display:block;margin-top:2px;">${esc(o.customer_phone||'')}${o.customer_email?' · '+esc(o.customer_email):''}</span>
+    </div>`;
+  }).join('');
+}
+
+function selectMoCustomerEl(el) {
+  const name = el.dataset.name;
+  const phone = el.dataset.phone;
+  const email = el.dataset.email;
+  moCustomerData = { name, phone, email };
+  document.getElementById('mo-customer-search').value = name;
+  document.getElementById('mo-customer-suggestions').style.display = 'none';
+  document.getElementById('mo-selected-customer').style.display = 'block';
+  document.getElementById('mo-selected-name').textContent = name;
+  document.getElementById('mo-selected-detail').textContent = [phone, email].filter(Boolean).join(' · ');
 }
 
 function selectMoCustomer(data) {
-  moCustomerData = data;
-  document.getElementById('mo-customer-search').value = data.name;
-  document.getElementById('mo-customer-suggestions').style.display = 'none';
-  document.getElementById('mo-selected-customer').style.display = 'block';
-  document.getElementById('mo-selected-name').textContent = data.name;
-  document.getElementById('mo-selected-detail').textContent = [data.phone, data.email].filter(Boolean).join(' · ');
+  selectMoCustomerEl({ dataset: data });
 }
 
 function searchMoProduct(q) {
