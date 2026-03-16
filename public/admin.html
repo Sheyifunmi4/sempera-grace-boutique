@@ -15,7 +15,7 @@
   --sidebar:220px;
   --status-new:#3b82f6;--status-contacted:#f97316;--status-confirmed:#8b5cf6;
   --status-payment:#06b6d4;--status-production:#eab308;--status-ready:#10b981;
-  --status-delivered:#16a34a;--status-cancelled:#ef4444;
+  --status-delivered:#16a34a;--status-cancelled:#ef4444;--status-invoiced:#7c3aed;
 }
 body{font-family:'Jost',sans-serif;background:#f4f0eb;color:var(--ink);min-height:100vh;}
 
@@ -295,6 +295,36 @@ textarea.form-input{resize:vertical;min-height:80px;}
   .expense-form-grid{grid-template-columns:1fr;}
   .inv-list-card{flex-direction:column;align-items:flex-start;}
 }
+
+/* ══ INVOICE BUILDER CSS ══ */
+.inv-builder{display:flex;flex-direction:column;gap:0;height:100%;}
+.inv-builder-cols{display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start;}
+.inv-section{background:white;border:1px solid var(--border);padding:20px;margin-bottom:14px;}
+.inv-section-title{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
+.inv-line-item{display:grid;grid-template-columns:2fr 80px 80px 100px 36px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #f5ead8;}
+.inv-line-item:last-child{border-bottom:none;}
+.inv-line-input{padding:6px 10px;border:1px solid var(--border);font-family:'Jost',sans-serif;font-size:0.78rem;outline:none;width:100%;background:var(--bg);}
+.inv-line-input:focus{border-color:var(--gold);}
+.inv-line-header{display:grid;grid-template-columns:2fr 80px 80px 100px 36px;gap:8px;padding:6px 0;border-bottom:2px solid var(--gold);}
+.inv-line-header span{font-size:0.54rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);}
+.inv-total-row{display:flex;justify-content:space-between;padding:5px 0;font-size:0.78rem;border-bottom:1px solid #f5ead8;color:var(--muted);}
+.inv-total-row.grand{background:var(--dark);color:var(--gold-light);padding:9px 14px;margin-top:6px;font-size:0.9rem;}
+.inv-total-row.grand strong{color:white;font-family:'Cormorant Garamond',serif;font-size:1.1rem;}
+.order-select-item{padding:10px 14px;border-bottom:1px solid #f5ead8;cursor:pointer;transition:background 0.15s;display:flex;align-items:center;gap:10px;}
+.order-select-item:hover{background:#fdfaf5;}
+.order-select-item.selected{background:#f5ead8;}
+.order-select-check{width:18px;height:18px;accent-color:var(--gold);flex-shrink:0;}
+.catalog-suggestion{padding:8px 14px;cursor:pointer;font-size:0.8rem;border-bottom:1px solid #f5ead8;}
+.catalog-suggestion:hover{background:#fdfaf5;color:var(--gold);}
+.status-pill{padding:3px 10px;border-radius:2px;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:500;}
+.status-unpaid{background:#fef2f2;color:#dc2626;}
+.status-partial{background:#fff7ed;color:#ea580c;}
+.status-paid{background:#f0fdf4;color:#16a34a;}
+@media(max-width:768px){
+  .inv-builder-cols{grid-template-columns:1fr;}
+  .inv-line-item{grid-template-columns:1fr 60px 60px 80px 30px;}
+  .inv-line-header{grid-template-columns:1fr 60px 60px 80px 30px;}
+}
 </style>
 </head>
 <body>
@@ -384,6 +414,9 @@ textarea.form-input{resize:vertical;min-height:80px;}
         </div>
         <div class="nav-item" onclick="showPage('invoices')">
           <span class="nav-icon">🧾</span> Invoices
+        </div>
+        <div class="nav-item" onclick="showPage('manual-order')">
+          <span class="nav-icon">✏️</span> Manual Order
         </div>
         <div class="nav-item" onclick="showPage('ledger')">
           <span class="nav-icon">📒</span> Ledger
@@ -695,11 +728,75 @@ textarea.form-input{resize:vertical;min-height:80px;}
         <div class="section-stripe"></div>
         <div class="table-header" style="margin-bottom:8px;">
           <h2>Invoices</h2>
-          <input class="search-box" placeholder="Search by customer or product..." id="inv-search" oninput="filterInvoices()"/>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <input class="search-box" placeholder="Search customer..." id="inv-search" oninput="filterInvoices()" style="width:200px;"/>
+            <select class="fin-select" id="inv-status-filter" onchange="filterInvoices()" style="width:140px;">
+              <option value="">All Statuses</option>
+              <option value="unpaid">Unpaid</option>
+              <option value="partial">Partial</option>
+              <option value="paid">Paid</option>
+            </select>
+            <button class="btn-gold-sm" onclick="openInvoiceBuilder()">+ Generate Invoice</button>
+          </div>
         </div>
-        <p style="font-size:0.75rem;color:var(--muted);margin-bottom:20px;">Auto-generated from confirmed orders. Preview, download or send to customer.</p>
-        <div id="invoices-list">
-          <div class="table-empty">Loading invoices...</div>
+
+        <!-- Invoice Summary Cards -->
+        <div class="finance-grid" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr));margin-bottom:20px;">
+          <div class="fin-card revenue"><div class="fin-label">Total Invoiced</div><div class="fin-value green" id="inv-total-amount">₦0</div></div>
+          <div class="fin-card pending"><div class="fin-label">Unpaid</div><div class="fin-value" id="inv-unpaid">₦0</div></div>
+          <div class="fin-card profit"><div class="fin-label">Paid</div><div class="fin-value gold" id="inv-paid">₦0</div></div>
+          <div class="fin-card orders"><div class="fin-label">Total Invoices</div><div class="fin-value" id="inv-count">0</div></div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Invoice #</th><th>Date</th><th>Customer</th>
+              <th>Items</th><th>Total</th><th>Status</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="invoices-tbody">
+              <tr><td colspan="7" class="table-empty">No invoices yet. Click + Generate Invoice to create one.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══ MANUAL ORDER PAGE ═══ -->
+      <div class="page-content" id="page-manual-order">
+        <div class="section-stripe"></div>
+        <div class="table-header" style="margin-bottom:20px;">
+          <h2>Create Manual Order</h2>
+        </div>
+        <p style="font-size:0.78rem;color:var(--muted);margin-bottom:20px;">For orders received via WhatsApp, Instagram, phone or walk-in. These appear in the Orders table alongside website orders.</p>
+        <div style="max-width:640px;">
+          <div class="form-section">
+            <div class="form-section-title">Customer Details</div>
+            <div class="form-grid">
+              <div class="form-group"><label class="form-label">Full Name *</label><input class="form-input" id="mo-name" placeholder="Customer name"/></div>
+              <div class="form-group"><label class="form-label">Phone *</label><input class="form-input" id="mo-phone" placeholder="+234..."/></div>
+              <div class="form-group full"><label class="form-label">Email</label><input class="form-input" id="mo-email" placeholder="customer@email.com"/></div>
+            </div>
+          </div>
+          <div class="form-section" style="margin-top:16px;">
+            <div class="form-section-title">Order Details</div>
+            <div class="form-grid">
+              <div class="form-group full">
+                <label class="form-label">Product</label>
+                <input class="form-input" id="mo-product" placeholder="Type to search catalog..." oninput="searchCatalogForOrder(this.value)" autocomplete="off"/>
+                <div id="mo-catalog-suggestions" style="background:white;border:1px solid var(--border);display:none;max-height:160px;overflow-y:auto;"></div>
+              </div>
+              <div class="form-group"><label class="form-label">Product Code</label><input class="form-input" id="mo-code" placeholder="SP-EL-001"/></div>
+              <div class="form-group"><label class="form-label">Size</label><input class="form-input" id="mo-size" placeholder="e.g. 12"/></div>
+              <div class="form-group"><label class="form-label">Quantity</label><input class="form-input" id="mo-qty" type="number" value="1" min="1"/></div>
+              <div class="form-group"><label class="form-label">Unit Price (₦)</label><input class="form-input" id="mo-price" placeholder="35000" oninput="calcManualTotal()"/></div>
+              <div class="form-group"><label class="form-label">Total</label><input class="form-input" id="mo-total" readonly style="background:#f5ead8;font-weight:500;color:var(--gold);"/></div>
+              <div class="form-group full"><label class="form-label">Notes</label><textarea class="form-input" id="mo-notes" rows="2" placeholder="Any special instructions..."></textarea></div>
+            </div>
+          </div>
+          <div style="margin-top:16px;display:flex;gap:10px;">
+            <button class="btn-gold-sm" onclick="saveManualOrder()" style="padding:11px 28px;">Save Order</button>
+            <button class="btn-sm" onclick="clearManualOrder()">Clear</button>
+          </div>
         </div>
       </div>
 
@@ -947,6 +1044,7 @@ function showPage(page) {
   if (page === 'finance') renderFinance();
   if (page === 'expenses') { loadFinanceData().then(() => renderExpenses()); }
   if (page === 'invoices') renderInvoices();
+  if (page === 'manual-order') initManualOrder();
   if (page === 'ledger') renderLedger();
 }
 
@@ -963,7 +1061,7 @@ function showPageMobile(page, btn) {
   if (page === 'finance') renderFinance();
   if (page === 'expenses') { loadFinanceData().then(() => renderExpenses()); }
   if (page === 'invoices') renderInvoices();
-  if (page === 'ledger') renderLedger();
+  if (page === 'manual-order') initManualOrder();
 }
 
 // ═══════════════════════════════════════
@@ -1156,7 +1254,7 @@ function renderOrders(data) {
       <td>${esc(o.customer_phone||'–')}</td>
       <td>
         <select class="status-select" onchange="updateOrderStatus('${o.id}',this.value)">
-          ${['new','contacted','confirmed','payment','production','ready','delivered','cancelled'].map(s=>
+          ${['new','contacted','confirmed','invoiced','payment','production','ready','delivered','cancelled'].map(s=>
             `<option value="${s}" ${o.status===s?'selected':''}>${statusLabel(s)}</option>`
           ).join('')}
         </select>
@@ -1224,7 +1322,7 @@ function openOrderModal(id) {
     </div>
     <div class="modal-actions">
       <select class="status-select" id="modal-status-select" style="padding:8px 12px;">
-        ${['new','contacted','confirmed','payment','production','ready','delivered','cancelled'].map(s=>
+        ${['new','contacted','confirmed','invoiced','payment','production','ready','delivered','cancelled'].map(s=>
           `<option value="${s}" ${o.status===s?'selected':''}>${statusLabel(s)}</option>`
         ).join('')}
       </select>
@@ -1941,71 +2039,565 @@ async function deleteExpense(id) {
 }
 
 // ── INVOICES ──
-let allInvoiceOrders = [];
 
-function renderInvoices(data) {
-  const orders = data || allOrders;
-  const invoiceOrders = orders.filter(o =>
-    ['confirmed','payment','production','ready','delivered'].includes(o.status)
-  );
-  allInvoiceOrders = invoiceOrders;
+// ══════════════════════════════════════════════════
+// INVOICE SYSTEM — FULL REBUILD
+// ══════════════════════════════════════════════════
+let allInvoices = [];
+let allInvoiceItems = {};
+let invLineItems = []; // current builder line items
+let editingInvoiceId = null;
+let invNextNum = 50;
 
-  const container = document.getElementById('invoices-list');
-  if (!invoiceOrders.length) {
-    container.innerHTML = '<div class="table-empty" style="padding:48px;text-align:center;">No confirmed orders yet. Invoices appear when orders are confirmed.</div>';
+// ── Load all invoices ──
+async function loadInvoices() {
+  try {
+    const [invs, items] = await Promise.all([
+      sb('invoices?order=created_at.desc&select=*'),
+      sb('invoice_items?select=*')
+    ]);
+    allInvoices = invs || [];
+    // Group items by invoice_id
+    allInvoiceItems = {};
+    (items || []).forEach(item => {
+      if (!allInvoiceItems[item.invoice_id]) allInvoiceItems[item.invoice_id] = [];
+      allInvoiceItems[item.invoice_id].push(item);
+    });
+    invNextNum = 50 + allInvoices.length;
+  } catch(e) { allInvoices = []; allInvoiceItems = {}; }
+}
+
+// ── Render Invoices List ──
+async function renderInvoices(data) {
+  await loadInvoices();
+  const invoices = data || allInvoices;
+
+  // Summary cards
+  const total = invoices.reduce((s,i) => s + parseFloat(i.total||0), 0);
+  const unpaid = invoices.filter(i => i.payment_status==='unpaid').reduce((s,i) => s + parseFloat(i.total||0), 0);
+  const paid = invoices.filter(i => i.payment_status==='paid').reduce((s,i) => s + parseFloat(i.total||0), 0);
+  document.getElementById('inv-total-amount').textContent = fmt(total);
+  document.getElementById('inv-unpaid').textContent = fmt(unpaid);
+  document.getElementById('inv-paid').textContent = fmt(paid);
+  document.getElementById('inv-count').textContent = invoices.length;
+
+  const tbody = document.getElementById('invoices-tbody');
+  if (!invoices.length) {
+    tbody.innerHTML = '<tr><td colspan="7" class="table-empty">No invoices yet. Click + Generate Invoice to create your first one.</td></tr>';
     return;
   }
 
-  let invNum = 44;
-  container.innerHTML = invoiceOrders.map((o, i) => {
-    const amount = orderAmount(o);
-    const num = String(invNum + i).padStart(4, '0');
-    const waMsg = encodeURIComponent(
-      `Hello ${o.customer_name}, please find your Sempéra invoice attached.
-
-Order: ${o.product_name}
-Amount: ${fmt(amount)}
-Status: ${o.status}
-
-Thank you for choosing Sempéra Fashion.`
-    );
-    return `
-    <div class="inv-list-card">
-      <div class="inv-list-info">
-        <div class="inv-list-name">${esc(o.customer_name)}</div>
-        <div class="inv-list-meta">
-          #SP-2026-${num} &nbsp;·&nbsp; ${esc(o.product_name||'–')} &nbsp;·&nbsp; ${fmtDate(o.created_at)}
-          &nbsp;·&nbsp; <span class="badge badge-${o.status==='delivered'?'delivered':o.status==='payment'?'payment':'confirmed'}">${o.status}</span>
+  tbody.innerHTML = invoices.map(inv => {
+    const items = allInvoiceItems[inv.id] || [];
+    const statusClass = { unpaid:'status-unpaid', partial:'status-partial', paid:'status-paid' }[inv.payment_status] || 'status-unpaid';
+    const statusLabel = { unpaid:'Unpaid', partial:'Partial', paid:'Paid' }[inv.payment_status] || inv.payment_status;
+    return `<tr>
+      <td style="font-weight:500;color:var(--gold);">${esc(inv.invoice_number)}</td>
+      <td>${fmtDate(inv.date)}</td>
+      <td>
+        <div style="font-weight:400;">${esc(inv.customer_name)}</div>
+        <div style="font-size:0.65rem;color:var(--muted);">${esc(inv.customer_phone||'')} ${inv.customer_email ? '· ' + esc(inv.customer_email) : ''}</div>
+      </td>
+      <td style="font-size:0.75rem;color:var(--muted);">${items.length} item${items.length!==1?'s':''}</td>
+      <td style="font-weight:500;color:var(--gold);">${fmt(parseFloat(inv.total||0))}</td>
+      <td><span class="status-pill ${statusClass}">${statusLabel}</span></td>
+      <td>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;">
+          <button class="btn-sm" onclick="viewInvoice('${inv.id}')">View</button>
+          <button class="btn-sm" onclick="editInvoice('${inv.id}')">Edit</button>
+          <select class="status-select" style="font-size:0.7rem;padding:4px 6px;" onchange="updateInvoiceStatus('${inv.id}',this.value)">
+            <option value="unpaid" ${inv.payment_status==='unpaid'?'selected':''}>Unpaid</option>
+            <option value="partial" ${inv.payment_status==='partial'?'selected':''}>Partial</option>
+            <option value="paid" ${inv.payment_status==='paid'?'selected':''}>Paid ✓</option>
+          </select>
         </div>
-        ${o.customer_email ? `<div class="inv-list-meta" style="margin-top:3px;">📧 ${esc(o.customer_email)}</div>` : ''}
-      </div>
-      <div class="inv-list-amount">${fmt(amount)}</div>
-      <div class="inv-actions">
-        <button class="btn-sm" onclick="previewInvoice('${o.id}', '${num}')">👁 Preview</button>
-        <button class="btn-sm" onclick="downloadInvoice('${o.id}', '${num}')">⬇ PDF</button>
-        <a href="https://wa.me/${(o.customer_phone||'').replace(/[^0-9]/g,'')}?text=${waMsg}" target="_blank">
-          <button class="btn-gold-sm" style="padding:8px 14px;">💬 WhatsApp</button>
-        </a>
-      </div>
-    </div>`;
+      </td>
+    </tr>`;
   }).join('');
 }
 
 function filterInvoices() {
-  const q = document.getElementById('inv-search').value.toLowerCase();
-  const filtered = allOrders.filter(o =>
-    ['confirmed','payment','production','ready','delivered'].includes(o.status) &&
-    ((o.customer_name||'').toLowerCase().includes(q) || (o.product_name||'').toLowerCase().includes(q))
-  );
-  renderInvoices(filtered);
+  const q = (document.getElementById('inv-search')?.value || '').toLowerCase();
+  const st = document.getElementById('inv-status-filter')?.value || '';
+  const filtered = allInvoices.filter(inv => {
+    const matchQ = !q || (inv.customer_name||'').toLowerCase().includes(q) || (inv.invoice_number||'').toLowerCase().includes(q);
+    const matchSt = !st || inv.payment_status === st;
+    return matchQ && matchSt;
+  });
+  renderInvoicesTable(filtered);
 }
 
-function generateInvoiceHTML(order, invNum) {
-  const amount = orderAmount(order);
-  const total = amount;
-  const date = new Date(order.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+function renderInvoicesTable(invoices) {
+  const tbody = document.getElementById('invoices-tbody');
+  if (!invoices.length) {
+    tbody.innerHTML = '<tr><td colspan="7" class="table-empty">No invoices match.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = invoices.map(inv => {
+    const items = allInvoiceItems[inv.id] || [];
+    const statusClass = { unpaid:'status-unpaid', partial:'status-partial', paid:'status-paid' }[inv.payment_status] || 'status-unpaid';
+    const statusLabel = { unpaid:'Unpaid', partial:'Partial', paid:'Paid' }[inv.payment_status] || inv.payment_status;
+    return `<tr>
+      <td style="font-weight:500;color:var(--gold);">${esc(inv.invoice_number)}</td>
+      <td>${fmtDate(inv.date)}</td>
+      <td><div style="font-weight:400;">${esc(inv.customer_name)}</div><div style="font-size:0.65rem;color:var(--muted);">${esc(inv.customer_phone||'')}</div></td>
+      <td style="font-size:0.75rem;color:var(--muted);">${items.length} item${items.length!==1?'s':''}</td>
+      <td style="font-weight:500;color:var(--gold);">${fmt(parseFloat(inv.total||0))}</td>
+      <td><span class="status-pill ${statusClass}">${statusLabel}</span></td>
+      <td><div style="display:flex;gap:5px;">
+        <button class="btn-sm" onclick="viewInvoice('${inv.id}')">View</button>
+        <button class="btn-sm" onclick="editInvoice('${inv.id}')">Edit</button>
+        <select class="status-select" style="font-size:0.7rem;padding:4px 6px;" onchange="updateInvoiceStatus('${inv.id}',this.value)">
+          <option value="unpaid" ${inv.payment_status==='unpaid'?'selected':''}>Unpaid</option>
+          <option value="partial" ${inv.payment_status==='partial'?'selected':''}>Partial</option>
+          <option value="paid" ${inv.payment_status==='paid'?'selected':''}>Paid ✓</option>
+        </select>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Invoice Status Update ──
+async function updateInvoiceStatus(id, status) {
+  try {
+    await sb(`invoices?id=eq.${id}`, { method:'PATCH', body: JSON.stringify({ payment_status: status }) });
+    const inv = allInvoices.find(i => i.id === id);
+    if (inv) inv.payment_status = status;
+
+    // If marked paid → create income entry + update linked orders
+    if (status === 'paid' && inv) {
+      // Add to income ledger
+      const incomePayload = {
+        description: `Invoice ${inv.invoice_number} — ${inv.customer_name}`,
+        amount: parseFloat(inv.total || 0),
+        date: new Date().toISOString().split('T')[0],
+        source: 'Invoice',
+        customer_name: inv.customer_name,
+        notes: `Invoice ${inv.invoice_number}`
+      };
+      try { await sb('income', { method:'POST', body: JSON.stringify(incomePayload) }); } catch(e) {}
+
+      // Update linked orders to delivered
+      const links = await sb(`invoice_order_links?invoice_id=eq.${id}&select=order_id`).catch(() => []);
+      if (links?.length) {
+        for (const link of links) {
+          await sb(`orders?id=eq.${link.order_id}`, { method:'PATCH', body: JSON.stringify({ status:'delivered' }) }).catch(()=>{});
+        }
+        await loadOrders();
+      }
+    }
+    renderInvoices();
+    showToast(status === 'paid' ? 'Invoice paid ✓ Revenue recorded in Ledger' : 'Status updated ✓');
+  } catch(e) { showToast('Failed to update status', 'error'); }
+}
+
+// ══ INVOICE BUILDER ══════════════════════════════
+
+function openInvoiceBuilder() {
+  editingInvoiceId = null;
+  invLineItems = [];
+  const today = new Date().toISOString().split('T')[0];
+  const due = new Date(); due.setDate(due.getDate() + 7);
+  document.getElementById('inv-builder-title').textContent = 'Generate Invoice';
+  document.getElementById('inv-builder-num').textContent = `#SP-2026-${String(invNextNum).padStart(4,'0')}`;
+  document.getElementById('inv-customer-search').value = '';
+  document.getElementById('inv-cname').value = '';
+  document.getElementById('inv-cphone').value = '';
+  document.getElementById('inv-cemail').value = '';
+  document.getElementById('inv-date').value = today;
+  document.getElementById('inv-due').value = due.toISOString().split('T')[0];
+  document.getElementById('inv-status').value = 'unpaid';
+  document.getElementById('inv-delivery').value = '0';
+  document.getElementById('inv-discount').value = '0';
+  document.getElementById('inv-notes').value = '';
+  document.getElementById('inv-catalog-search').value = '';
+  document.getElementById('inv-catalog-results').style.display = 'none';
+  document.getElementById('inv-orders-list').innerHTML = '<div style="padding:20px;text-align:center;font-size:0.8rem;color:var(--muted);">Search a customer above to load their orders.</div>';
+  renderInvLineItems();
+  showInvTab('orders');
+  document.getElementById('invoice-builder-modal').classList.add('open');
+}
+
+async function editInvoice(id) {
+  await loadInvoices();
+  const inv = allInvoices.find(i => i.id === id);
+  if (!inv) return;
+  editingInvoiceId = id;
+  invLineItems = (allInvoiceItems[id] || []).map(item => ({
+    id: item.id,
+    product_name: item.product_name,
+    product_code: item.product_code || '',
+    size: item.size || '',
+    quantity: item.quantity || 1,
+    unit_price: parseFloat(item.unit_price || 0),
+    line_total: parseFloat(item.line_total || 0),
+    order_id: item.order_id || null,
+    notes: item.notes || ''
+  }));
+  document.getElementById('inv-builder-title').textContent = `Edit Invoice`;
+  document.getElementById('inv-builder-num').textContent = inv.invoice_number;
+  document.getElementById('inv-customer-search').value = inv.customer_name;
+  document.getElementById('inv-cname').value = inv.customer_name || '';
+  document.getElementById('inv-cphone').value = inv.customer_phone || '';
+  document.getElementById('inv-cemail').value = inv.customer_email || '';
+  document.getElementById('inv-date').value = inv.date || '';
+  document.getElementById('inv-due').value = inv.due_date || '';
+  document.getElementById('inv-status').value = inv.payment_status || 'unpaid';
+  document.getElementById('inv-delivery').value = inv.delivery_fee || '0';
+  document.getElementById('inv-discount').value = inv.discount || '0';
+  document.getElementById('inv-notes').value = inv.notes || '';
+  renderInvLineItems();
+  recalcInvoice();
+  showInvTab('orders');
+  document.getElementById('invoice-builder-modal').classList.add('open');
+}
+
+// ── Tab switching ──
+function showInvTab(tab) {
+  ['orders','catalog','manual'].forEach(t => {
+    document.getElementById(`inv-tab-content-${t}`).style.display = t === tab ? 'block' : 'none';
+    const btn = document.getElementById(`inv-tab-${t}`);
+    if (btn) btn.style.background = t === tab ? 'var(--gold)' : '';
+    if (btn) btn.style.color = t === tab ? 'white' : '';
+  });
+}
+
+// ── Customer search ──
+function searchInvCustomer(q) {
+  const box = document.getElementById('inv-customer-suggestions');
+  if (!q || q.length < 2) { box.style.display = 'none'; return; }
+  const matches = allOrders
+    .filter(o => (o.customer_name||'').toLowerCase().includes(q.toLowerCase()))
+    .reduce((acc, o) => {
+      const key = (o.customer_phone || o.customer_name);
+      if (!acc[key]) acc[key] = o;
+      return acc;
+    }, {});
+  const results = Object.values(matches).slice(0, 8);
+  if (!results.length) { box.style.display = 'none'; return; }
+  box.innerHTML = results.map(o => `
+    <div class="catalog-suggestion" onclick="selectInvCustomer(${JSON.stringify(o.customer_name).replace(/"/g,'&quot;')}, ${JSON.stringify(o.customer_phone||'').replace(/"/g,'&quot;')}, ${JSON.stringify(o.customer_email||'').replace(/"/g,'&quot;')})">
+      <strong>${esc(o.customer_name)}</strong> · ${esc(o.customer_phone||'')}
+    </div>`).join('');
+  box.style.display = 'block';
+}
+
+function selectInvCustomer(name, phone, email) {
+  document.getElementById('inv-cname').value = name;
+  document.getElementById('inv-cphone').value = phone;
+  document.getElementById('inv-cemail').value = email;
+  document.getElementById('inv-customer-search').value = name;
+  document.getElementById('inv-customer-suggestions').style.display = 'none';
+  loadCustomerOrders(name);
+}
+
+function loadCustomerOrders(customerName) {
+  const customerOrders = allOrders.filter(o =>
+    o.customer_name === customerName &&
+    !['delivered','cancelled'].includes(o.status)
+  );
+  const container = document.getElementById('inv-orders-list');
+  if (!customerOrders.length) {
+    container.innerHTML = '<div style="padding:16px;text-align:center;font-size:0.78rem;color:var(--muted);">No pending orders for this customer.</div>';
+    return;
+  }
+  container.innerHTML = customerOrders.map(o => `
+    <div class="order-select-item" onclick="toggleOrderSelect(this, '${o.id}')">
+      <input type="checkbox" class="order-select-check" data-order-id="${o.id}"
+        data-name="${esc(o.product_name||'')}" data-code="${esc(o.product_code||'')}"
+        data-size="${esc(o.size||'')}" data-qty="${o.quantity||1}"
+        data-price="${parsePrice(o.product_price)}" data-oid="${o.id}"/>
+      <div style="flex:1;">
+        <div style="font-size:0.82rem;font-weight:400;">${esc(o.product_name||'Unknown Product')}</div>
+        <div style="font-size:0.68rem;color:var(--muted);">${esc(o.product_code||'')} · Size ${esc(o.size||'–')} · Qty ${o.quantity||1} · ${fmt(parsePrice(o.product_price) * (parseInt(o.quantity)||1))}</div>
+      </div>
+      <span class="badge badge-${o.status}" style="font-size:0.58rem;">${o.status}</span>
+    </div>`).join('');
+}
+
+function toggleOrderSelect(el, orderId) {
+  const cb = el.querySelector('input[type=checkbox]');
+  cb.checked = !cb.checked;
+  el.classList.toggle('selected', cb.checked);
+}
+
+function addSelectedOrdersToInvoice() {
+  const checkboxes = document.querySelectorAll('#inv-orders-list input[type=checkbox]:checked');
+  if (!checkboxes.length) { showToast('Select at least one order', 'error'); return; }
+  checkboxes.forEach(cb => {
+    const price = parseFloat(cb.dataset.price) || 0;
+    const qty = parseInt(cb.dataset.qty) || 1;
+    invLineItems.push({
+      product_name: cb.dataset.name,
+      product_code: cb.dataset.code,
+      size: cb.dataset.size,
+      quantity: qty,
+      unit_price: price,
+      line_total: price * qty,
+      order_id: cb.dataset.oid,
+      notes: ''
+    });
+  });
+  renderInvLineItems();
+  recalcInvoice();
+  showToast(`${checkboxes.length} order${checkboxes.length>1?'s':''} added to invoice`);
+}
+
+// ── Catalog search ──
+function searchInvCatalog(q) {
+  const box = document.getElementById('inv-catalog-results');
+  if (!q || q.length < 2) { box.style.display = 'none'; return; }
+  const matches = allProducts.filter(p =>
+    (p.name||'').toLowerCase().includes(q.toLowerCase()) ||
+    (p.code||'').toLowerCase().includes(q.toLowerCase())
+  ).slice(0, 8);
+  if (!matches.length) { box.style.display = 'none'; return; }
+  box.style.display = 'block';
+  box.innerHTML = matches.map(p => `
+    <div class="catalog-suggestion" onclick="addCatalogItemToInvoice('${p.id}')">
+      <strong>${esc(p.name)}</strong> · ${esc(p.code)} · <span style="color:var(--gold)">${esc(p.price||'')}</span>
+    </div>`).join('');
+}
+
+function addCatalogItemToInvoice(productId) {
+  const p = allProducts.find(x => x.id === productId);
+  if (!p) return;
+  const price = parsePrice(p.price);
+  invLineItems.push({
+    product_name: p.name,
+    product_code: p.code,
+    size: '',
+    quantity: 1,
+    unit_price: price,
+    line_total: price,
+    order_id: null,
+    notes: ''
+  });
+  renderInvLineItems();
+  recalcInvoice();
+  document.getElementById('inv-catalog-search').value = '';
+  document.getElementById('inv-catalog-results').style.display = 'none';
+  showToast(`${p.name} added`);
+}
+
+// ── Manual item ──
+function calcManualItemTotal() {
+  const qty = parseFloat(document.getElementById('inv-m-qty').value) || 0;
+  const price = parseFloat(document.getElementById('inv-m-price').value) || 0;
+  document.getElementById('inv-m-total').value = fmt(qty * price);
+}
+
+function addManualItemToInvoice() {
+  const name = document.getElementById('inv-m-product').value.trim();
+  const price = parseFloat(document.getElementById('inv-m-price').value) || 0;
+  const qty = parseInt(document.getElementById('inv-m-qty').value) || 1;
+  if (!name) { showToast('Product name is required', 'error'); return; }
+  invLineItems.push({
+    product_name: name,
+    product_code: document.getElementById('inv-m-code').value.trim(),
+    size: document.getElementById('inv-m-size').value.trim(),
+    quantity: qty,
+    unit_price: price,
+    line_total: price * qty,
+    order_id: null,
+    notes: document.getElementById('inv-m-notes').value.trim()
+  });
+  renderInvLineItems();
+  recalcInvoice();
+  ['inv-m-product','inv-m-code','inv-m-size','inv-m-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('inv-m-qty').value = '1';
+  document.getElementById('inv-m-price').value = '';
+  document.getElementById('inv-m-total').value = '';
+  showToast('Item added');
+}
+
+// ── Render line items ──
+function renderInvLineItems() {
+  const container = document.getElementById('inv-line-items');
+  document.getElementById('inv-items-count').textContent = `(${invLineItems.length} item${invLineItems.length!==1?'s':''})`;
+  if (!invLineItems.length) {
+    container.innerHTML = '<div style="padding:20px;text-align:center;font-size:0.8rem;color:var(--muted);">No items added yet.</div>';
+    return;
+  }
+  container.innerHTML = invLineItems.map((item, i) => `
+    <div class="inv-line-item">
+      <div>
+        <div style="font-size:0.8rem;font-weight:400;">${esc(item.product_name)}</div>
+        <div style="font-size:0.65rem;color:var(--muted);">${esc(item.product_code||'')}${item.size?' · '+item.size:''}</div>
+        <input class="inv-line-input" style="margin-top:4px;font-size:0.72rem;" value="${esc(item.notes||'')}" placeholder="Notes..." onchange="invLineItems[${i}].notes=this.value"/>
+      </div>
+      <input class="inv-line-input" type="text" value="${esc(item.size||'')}" placeholder="Size" onchange="invLineItems[${i}].size=this.value"/>
+      <input class="inv-line-input" type="number" value="${item.quantity}" min="1" onchange="invLineItems[${i}].quantity=parseInt(this.value)||1;invLineItems[${i}].line_total=invLineItems[${i}].unit_price*invLineItems[${i}].quantity;recalcInvoice();"/>
+      <input class="inv-line-input" type="number" value="${item.unit_price}" onchange="invLineItems[${i}].unit_price=parseFloat(this.value)||0;invLineItems[${i}].line_total=invLineItems[${i}].unit_price*invLineItems[${i}].quantity;recalcInvoice();" placeholder="Price"/>
+      <button class="img-remove" style="position:relative;top:0;right:0;width:26px;height:26px;" onclick="removeInvItem(${i})">✕</button>
+    </div>`).join('');
+}
+
+function removeInvItem(i) {
+  invLineItems.splice(i, 1);
+  renderInvLineItems();
+  recalcInvoice();
+}
+
+function recalcInvoice() {
+  const subtotal = invLineItems.reduce((s, item) => s + (item.unit_price * item.quantity), 0);
+  const delivery = parseFloat(document.getElementById('inv-delivery').value) || 0;
+  const discount = parseFloat(document.getElementById('inv-discount').value) || 0;
+  const grand = subtotal + delivery - discount;
+  document.getElementById('inv-subtotal').textContent = fmt(subtotal);
+  document.getElementById('inv-grand-total').textContent = fmt(grand);
+}
+
+// ── Save Invoice ──
+async function saveInvoice() {
+  const name = document.getElementById('inv-cname').value.trim();
+  if (!name) { showToast('Customer name is required', 'error'); return; }
+  if (!invLineItems.length) { showToast('Add at least one item', 'error'); return; }
+
+  const btn = document.getElementById('save-inv-btn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+
+  const subtotal = invLineItems.reduce((s, i) => s + i.unit_price * i.quantity, 0);
+  const delivery = parseFloat(document.getElementById('inv-delivery').value) || 0;
+  const discount = parseFloat(document.getElementById('inv-discount').value) || 0;
+  const total = subtotal + delivery - discount;
+  const invNum = editingInvoiceId
+    ? allInvoices.find(i => i.id === editingInvoiceId)?.invoice_number
+    : `#SP-2026-${String(invNextNum).padStart(4,'0')}`;
+
+  const invPayload = {
+    invoice_number: invNum,
+    customer_name: name,
+    customer_phone: document.getElementById('inv-cphone').value.trim(),
+    customer_email: document.getElementById('inv-cemail').value.trim(),
+    date: document.getElementById('inv-date').value,
+    due_date: document.getElementById('inv-due').value,
+    subtotal, delivery_fee: delivery, discount, total,
+    payment_status: document.getElementById('inv-status').value,
+    notes: document.getElementById('inv-notes').value.trim()
+  };
+
+  try {
+    let invoiceId = editingInvoiceId;
+
+    if (editingInvoiceId) {
+      await sb(`invoices?id=eq.${editingInvoiceId}`, { method:'PATCH', body: JSON.stringify(invPayload) });
+      // Delete old items and re-insert
+      await sb(`invoice_items?invoice_id=eq.${editingInvoiceId}`, { method:'DELETE' }).catch(()=>{});
+      await sb(`invoice_order_links?invoice_id=eq.${editingInvoiceId}`, { method:'DELETE' }).catch(()=>{});
+    } else {
+      const res = await sb('invoices', { method:'POST', body: JSON.stringify(invPayload) });
+      invoiceId = res?.[0]?.id;
+      invNextNum++;
+    }
+
+    // Save line items
+    for (const item of invLineItems) {
+      await sb('invoice_items', {
+        method: 'POST',
+        body: JSON.stringify({
+          invoice_id: invoiceId,
+          product_name: item.product_name,
+          product_code: item.product_code || null,
+          size: item.size || null,
+          quantity: item.quantity,
+          unit_price: item.unit_price,
+          line_total: item.unit_price * item.quantity,
+          order_id: item.order_id || null,
+          notes: item.notes || null
+        })
+      });
+    }
+
+    // Save order links + update order statuses to invoiced
+    const orderIds = invLineItems.filter(i => i.order_id).map(i => i.order_id);
+    for (const oid of orderIds) {
+      await sb('invoice_order_links', {
+        method: 'POST',
+        body: JSON.stringify({ invoice_id: invoiceId, order_id: oid })
+      }).catch(()=>{});
+      await sb(`orders?id=eq.${oid}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status: 'confirmed', invoiced: true, invoice_id: invoiceId })
+      }).catch(()=>{});
+    }
+
+    closeModal('invoice-builder-modal');
+    await loadOrders();
+    await renderInvoices();
+    showToast(editingInvoiceId ? 'Invoice updated ✓' : `Invoice ${invNum} created ✓`);
+  } catch(e) {
+    showToast('Failed to save invoice: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = '💾 Save Invoice';
+  }
+}
+
+// ── View Invoice ──
+async function viewInvoice(id) {
+  await loadInvoices();
+  const inv = allInvoices.find(i => i.id === id);
+  if (!inv) return;
+  const items = allInvoiceItems[id] || [];
+
+  document.getElementById('invoice-view-title').textContent = `${inv.invoice_number} — ${inv.customer_name}`;
+
+  // WhatsApp button
+  const waMsg = encodeURIComponent(
+    `Hello ${inv.customer_name}, please find your Sempéra invoice below.\n\nInvoice: ${inv.invoice_number}\nTotal: ${fmt(parseFloat(inv.total||0))}\nStatus: ${inv.payment_status}\n\nPayment: OPay — 8027825606 (Olalekan Oluwaseyi Elizabeth)\n\nThank you for choosing Sempéra Fashion.`
+  );
+  const phone = (inv.customer_phone||'').replace(/[^0-9]/g,'');
+  document.getElementById('inv-wa-btn').onclick = () => window.open(`https://wa.me/${phone}?text=${waMsg}`, '_blank');
+  document.getElementById('inv-download-btn').onclick = () => downloadInvoiceFull(inv, items);
+
+  document.getElementById('invoice-view-body').innerHTML = generateFullInvoiceHTML(inv, items);
+  document.getElementById('invoice-view-modal').classList.add('open');
+}
+
+function previewCurrentInvoice() {
+  const name = document.getElementById('inv-cname').value.trim() || 'Customer';
+  const phone = document.getElementById('inv-cphone').value.trim();
+  const email = document.getElementById('inv-cemail').value.trim();
+  const invNum = document.getElementById('inv-builder-num').textContent;
+  const subtotal = invLineItems.reduce((s,i) => s + i.unit_price*i.quantity, 0);
+  const delivery = parseFloat(document.getElementById('inv-delivery').value)||0;
+  const discount = parseFloat(document.getElementById('inv-discount').value)||0;
+  const fakeInv = { invoice_number: invNum, customer_name: name, customer_phone: phone, customer_email: email,
+    date: document.getElementById('inv-date').value, due_date: document.getElementById('inv-due').value,
+    subtotal, delivery_fee: delivery, discount, total: subtotal+delivery-discount,
+    payment_status: document.getElementById('inv-status').value, notes: document.getElementById('inv-notes').value };
+  document.getElementById('invoice-view-title').textContent = `Preview — ${invNum}`;
+  document.getElementById('inv-wa-btn').onclick = null;
+  document.getElementById('inv-download-btn').onclick = () => downloadInvoiceFull(fakeInv, invLineItems.map(i=>({...i})));
+  document.getElementById('invoice-view-body').innerHTML = generateFullInvoiceHTML(fakeInv, invLineItems);
+  document.getElementById('invoice-view-modal').classList.add('open');
+}
+
+function generateFullInvoiceHTML(inv, items) {
+  const rows = items.map(item => `
+    <tr>
+      <td style="padding:8px;font-size:0.78rem;border-bottom:1px solid #f0e8d8;">
+        <span style="font-family:'Cormorant Garamond',serif;font-size:0.9rem;font-weight:500;">${esc(item.product_name||'–')}</span>
+        ${item.product_code ? `<span style="font-size:0.6rem;color:#7a6a52;display:block;">${esc(item.product_code)}</span>` : ''}
+        ${item.notes ? `<span style="font-size:0.6rem;color:#7a6a52;font-style:italic;">${esc(item.notes)}</span>` : ''}
+      </td>
+      <td style="padding:8px;font-size:0.75rem;border-bottom:1px solid #f0e8d8;text-align:center;">${esc(item.size||'–')}</td>
+      <td style="padding:8px;font-size:0.75rem;border-bottom:1px solid #f0e8d8;text-align:center;">${item.quantity||1}</td>
+      <td style="padding:8px;font-size:0.75rem;border-bottom:1px solid #f0e8d8;">${fmt(parseFloat(item.unit_price||0))}</td>
+      <td style="padding:8px;font-size:0.75rem;border-bottom:1px solid #f0e8d8;text-align:right;font-weight:500;">${fmt(parseFloat(item.unit_price||0)*(item.quantity||1))}</td>
+    </tr>`).join('');
+
+  const sub = parseFloat(inv.subtotal||0);
+  const del = parseFloat(inv.delivery_fee||0);
+  const dis = parseFloat(inv.discount||0);
+  const total = parseFloat(inv.total||0) || (sub + del - dis);
+  const date = inv.date ? new Date(inv.date).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}) : '–';
+  const due = inv.due_date ? new Date(inv.due_date).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}) : 'Upon Receipt';
+  const statusLabel = {unpaid:'Unpaid',partial:'Partially Paid',paid:'Paid'}[inv.payment_status] || inv.payment_status;
+  const statusColor = {unpaid:'#dc2626',partial:'#ea580c',paid:'#16a34a'}[inv.payment_status] || '#7a6a52';
+
   return `
-  <div style="font-family:'Jost',sans-serif;max-width:700px;margin:0 auto;background:white;">
+  <div style="font-family:'Jost',sans-serif;max-width:700px;margin:0 auto;">
     <div style="height:4px;background:linear-gradient(90deg,#1a1208,#b8965a,#1a1208);"></div>
     <div style="padding:20px 28px 14px;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid #e8d5b0;">
       <div>
@@ -2015,17 +2607,18 @@ function generateInvoiceHTML(order, invNum) {
       </div>
       <div style="text-align:right;">
         <div style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:#b8965a;">Invoice</div>
-        <div style="font-size:0.62rem;color:#7a6a52;margin-top:4px;">No. <strong style="color:#2c2416;">#SP-2026-${invNum}</strong></div>
+        <div style="font-size:0.62rem;color:#7a6a52;margin-top:4px;">No. <strong style="color:#2c2416;">${esc(inv.invoice_number||'–')}</strong></div>
         <div style="font-size:0.62rem;color:#7a6a52;">Date: ${date}</div>
-        <div style="font-size:0.62rem;color:#7a6a52;">Due: Upon Receipt</div>
+        <div style="font-size:0.62rem;color:#7a6a52;">Due: ${due}</div>
+        <div style="margin-top:6px;display:inline-block;padding:3px 10px;background:${statusColor}22;color:${statusColor};font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:500;border:1px solid ${statusColor}44;">${statusLabel}</div>
       </div>
     </div>
     <div style="padding:12px 28px;display:grid;grid-template-columns:1fr 1fr;gap:14px;border-bottom:1px solid #e8d5b0;background:#fdfaf5;">
       <div>
         <div style="font-size:0.52rem;letter-spacing:0.2em;text-transform:uppercase;color:#b8965a;margin-bottom:5px;">Billed To</div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:500;color:#2c2416;">${esc(order.customer_name)}</div>
-        ${order.customer_phone ? `<div style="font-size:0.68rem;color:#7a6a52;">${esc(order.customer_phone)}</div>` : ''}
-        ${order.customer_email ? `<div style="font-size:0.68rem;color:#7a6a52;">${esc(order.customer_email)}</div>` : ''}
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:500;color:#2c2416;">${esc(inv.customer_name)}</div>
+        ${inv.customer_phone ? `<div style="font-size:0.68rem;color:#7a6a52;">${esc(inv.customer_phone)}</div>` : ''}
+        ${inv.customer_email ? `<div style="font-size:0.68rem;color:#7a6a52;">${esc(inv.customer_email)}</div>` : ''}
       </div>
       <div style="background:#1a1208;padding:10px 14px;border-left:3px solid #b8965a;">
         <div style="font-size:0.52rem;letter-spacing:0.2em;text-transform:uppercase;color:#d4b07a;margin-bottom:5px;">Payment Details</div>
@@ -2037,29 +2630,24 @@ function generateInvoiceHTML(order, invNum) {
     <div style="padding:0 28px;">
       <table style="width:100%;border-collapse:collapse;margin:12px 0;">
         <thead><tr style="border-bottom:2px solid #b8965a;">
-          <th style="font-size:0.52rem;letter-spacing:0.16em;text-transform:uppercase;color:#b8965a;padding:6px 8px;text-align:left;width:50%;">Item</th>
-          <th style="font-size:0.52rem;letter-spacing:0.16em;text-transform:uppercase;color:#b8965a;padding:6px 8px;text-align:left;">Unit Price</th>
+          <th style="font-size:0.52rem;letter-spacing:0.16em;text-transform:uppercase;color:#b8965a;padding:6px 8px;text-align:left;width:44%;">Item</th>
+          <th style="font-size:0.52rem;letter-spacing:0.16em;text-transform:uppercase;color:#b8965a;padding:6px 8px;text-align:center;">Size</th>
           <th style="font-size:0.52rem;letter-spacing:0.16em;text-transform:uppercase;color:#b8965a;padding:6px 8px;text-align:center;">Qty</th>
+          <th style="font-size:0.52rem;letter-spacing:0.16em;text-transform:uppercase;color:#b8965a;padding:6px 8px;">Unit Price</th>
           <th style="font-size:0.52rem;letter-spacing:0.16em;text-transform:uppercase;color:#b8965a;padding:6px 8px;text-align:right;">Total</th>
         </tr></thead>
-        <tbody>
-          <tr><td style="padding:8px 8px;font-size:0.78rem;border-bottom:1px solid #f0e8d8;">
-            <span style="font-family:'Cormorant Garamond',serif;font-size:0.9rem;font-weight:500;">${esc(order.product_name||'–')}</span>
-            <span style="font-size:0.6rem;color:#7a6a52;display:block;margin-top:1px;">${esc(order.product_code||'')}</span>
-          </td>
-          <td style="padding:8px 8px;font-size:0.75rem;border-bottom:1px solid #f0e8d8;">${fmt(parsePrice(order.product_price))}</td>
-          <td style="padding:8px 8px;font-size:0.75rem;border-bottom:1px solid #f0e8d8;text-align:center;">${order.quantity||1}</td>
-          <td style="padding:8px 8px;font-size:0.75rem;border-bottom:1px solid #f0e8d8;text-align:right;">${fmt(amount)}</td>
-          </tr>
-        </tbody>
+        <tbody>${rows}</tbody>
       </table>
     </div>
     <div style="padding:0 28px;display:flex;justify-content:flex-end;margin-bottom:16px;">
-      <div style="width:220px;">
-        <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:0.7rem;color:#7a6a52;border-bottom:1px solid #f0e8d8;"><span>Subtotal</span><span>${fmt(amount)}</span></div>
-        <div style="display:flex;justify-content:space-between;background:#1a1208;color:#d4b07a;padding:8px 12px;margin-top:5px;font-size:0.82rem;"><span>Total Due</span><strong style="color:white;font-family:'Cormorant Garamond',serif;font-size:1rem;">${fmt(total)}</strong></div>
+      <div style="width:240px;">
+        <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:0.7rem;color:#7a6a52;border-bottom:1px solid #f0e8d8;"><span>Subtotal</span><span>${fmt(sub)}</span></div>
+        ${del > 0 ? `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:0.7rem;color:#7a6a52;border-bottom:1px solid #f0e8d8;"><span>Delivery</span><span>${fmt(del)}</span></div>` : ''}
+        ${dis > 0 ? `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:0.7rem;color:#b8965a;border-bottom:1px solid #f0e8d8;"><span>Discount</span><span>− ${fmt(dis)}</span></div>` : ''}
+        <div style="display:flex;justify-content:space-between;background:#1a1208;color:#d4b07a;padding:8px 12px;margin-top:5px;font-size:0.85rem;"><span>Total Due</span><strong style="color:white;font-family:'Cormorant Garamond',serif;font-size:1.05rem;">${fmt(total)}</strong></div>
       </div>
     </div>
+    ${inv.notes ? `<div style="padding:0 28px 12px;font-size:0.7rem;color:#7a6a52;font-style:italic;">Note: ${esc(inv.notes)}</div>` : ''}
     <div style="padding:10px 28px 16px;border-top:1px solid #e8d5b0;display:flex;justify-content:space-between;align-items:flex-end;">
       <div>
         <div style="font-family:'Cormorant Garamond',serif;font-size:1rem;font-style:italic;color:#b8965a;margin-bottom:4px;">Thank you for your patronage.</div>
@@ -2067,86 +2655,154 @@ function generateInvoiceHTML(order, invNum) {
       </div>
       <div style="text-align:right;">
         <div style="font-family:'Cormorant Garamond',serif;font-size:0.75rem;color:#e8d5b0;border:1px solid #e8d5b0;padding:5px 14px;display:inline-block;letter-spacing:0.12em;text-transform:uppercase;">Sempéra Fashion</div>
-        <div style="font-size:0.62rem;color:#7a6a52;margin-top:5px;line-height:1.6;">@sempera_fashion<br/>+234 802 782 5606</div>
+        <div style="font-size:0.62rem;color:#7a6a52;margin-top:5px;line-height:1.6;">@sempera_fashion · +234 802 782 5606</div>
       </div>
     </div>
     <div style="height:4px;background:linear-gradient(90deg,#1a1208,#b8965a,#1a1208);"></div>
   </div>`;
 }
 
-function previewInvoice(orderId, invNum) {
-  const order = allOrders.find(o => o.id === orderId);
-  if (!order) return;
-  document.getElementById('invoice-modal-title').textContent = `Invoice #SP-2026-${invNum} — ${order.customer_name}`;
-  document.getElementById('invoice-modal-body').innerHTML = `
-    <div style="margin-bottom:16px;display:flex;gap:10px;justify-content:flex-end;">
-      <button class="btn-gold-sm" onclick="downloadInvoice('${orderId}','${invNum}')" style="padding:8px 18px;">⬇ Download PDF</button>
-    </div>
-    ${generateInvoiceHTML(order, invNum)}
-  `;
-  document.getElementById('invoice-modal').classList.add('open');
-}
-
-function downloadInvoice(orderId, invNum) {
-  const order = allOrders.find(o => o.id === orderId);
-  if (!order) return;
+function downloadInvoiceFull(inv, items) {
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
-  <style>*{margin:0;padding:0;box-sizing:border-box;}body{padding:20px;background:white;}</style>
+  <style>*{margin:0;padding:0;box-sizing:border-box;}body{padding:24px;background:white;}</style>
   <script>window.onload=function(){window.print();}<\/script>
-  </head><body>${generateInvoiceHTML(order, invNum)}</body></html>`;
-  const blob = new Blob([html], { type: 'text/html' });
+  </head><body>${generateFullInvoiceHTML(inv, items)}</body></html>`;
+  const blob = new Blob([html], { type:'text/html' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url; a.download = `sempera-invoice-SP-2026-${invNum}-${(order.customer_name||'').replace(/\s+/g,'-')}.html`;
-  a.click(); URL.revokeObjectURL(url);
+  a.href = url;
+  a.download = `sempera-${(inv.invoice_number||'invoice').replace('#','').replace(/\s/g,'-')}-${(inv.customer_name||'').replace(/\s/g,'-')}.html`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
-// ── LEDGER ──
+// ══ MANUAL ORDER ═════════════════════════════════
+
+function initManualOrder() {
+  document.getElementById('mo-qty').value = '1';
+  document.getElementById('mo-total').value = '';
+}
+
+function calcManualTotal() {
+  const qty = parseFloat(document.getElementById('mo-qty').value) || 0;
+  const price = parseFloat(document.getElementById('mo-price').value) || 0;
+  document.getElementById('mo-total').value = fmt(qty * price);
+}
+
+function searchCatalogForOrder(q) {
+  const box = document.getElementById('mo-catalog-suggestions');
+  if (!q || q.length < 2) { box.style.display = 'none'; return; }
+  const matches = allProducts.filter(p =>
+    (p.name||'').toLowerCase().includes(q.toLowerCase()) ||
+    (p.code||'').toLowerCase().includes(q.toLowerCase())
+  ).slice(0, 6);
+  if (!matches.length) { box.style.display = 'none'; return; }
+  box.style.display = 'block';
+  box.innerHTML = matches.map(p => `
+    <div class="catalog-suggestion" onclick="selectCatalogProduct('${p.id}')">
+      <strong>${esc(p.name)}</strong> · ${esc(p.code)} · <span style="color:var(--gold)">${esc(p.price||'')}</span>
+    </div>`).join('');
+}
+
+function selectCatalogProduct(id) {
+  const p = allProducts.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('mo-product').value = p.name;
+  document.getElementById('mo-code').value = p.code;
+  document.getElementById('mo-price').value = parsePrice(p.price);
+  document.getElementById('mo-catalog-suggestions').style.display = 'none';
+  calcManualTotal();
+}
+
+async function saveManualOrder() {
+  const name = document.getElementById('mo-name').value.trim();
+  const phone = document.getElementById('mo-phone').value.trim();
+  const product = document.getElementById('mo-product').value.trim();
+  const price = document.getElementById('mo-price').value.trim();
+  if (!name || !phone || !product) { showToast('Name, phone and product are required', 'error'); return; }
+
+  const payload = {
+    customer_name: name,
+    customer_phone: phone,
+    customer_email: document.getElementById('mo-email').value.trim(),
+    product_name: product,
+    product_code: document.getElementById('mo-code').value.trim(),
+    product_price: price ? `₦${parseFloat(price).toLocaleString()}` : '',
+    size: document.getElementById('mo-size').value.trim(),
+    quantity: parseInt(document.getElementById('mo-qty').value) || 1,
+    notes: (document.getElementById('mo-notes').value.trim() || '') + ' [Manual Order]',
+    status: 'new'
+  };
+
+  try {
+    const res = await sb('orders', { method:'POST', body: JSON.stringify(payload) });
+    if (res?.[0]) allOrders.unshift(res[0]);
+    clearManualOrder();
+    showToast('Manual order created ✓ — visible in Orders table');
+  } catch(e) { showToast('Failed to create order: ' + e.message, 'error'); }
+}
+
+function clearManualOrder() {
+  ['mo-name','mo-phone','mo-email','mo-product','mo-code','mo-size','mo-notes','mo-price','mo-total'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('mo-qty').value = '1';
+}
+
+// ══ UPDATED FINANCE LEDGER ═══════════════════════
+// Override renderLedger to also include invoice payments
+
 async function renderLedger() {
   await loadFinanceData();
+  await loadInvoices();
 
   const filterType = document.getElementById('ledger-filter').value;
   const filterMonth = document.getElementById('ledger-month').value;
 
-  // Build combined entries
   const revenueEntries = (allOrders || [])
     .filter(o => ['payment','delivered'].includes(o.status))
     .map(o => ({
       date: o.created_at?.split('T')[0] || '',
-      type: 'income',
-      description: `${o.product_name||'Order'} — ${o.customer_name}`,
-      category: 'Order Revenue',
-      source: 'Order',
-      amount: orderAmount(o),
+      type: 'income', description: `${o.product_name||'Order'} — ${o.customer_name}`,
+      category: 'Order Revenue', source: 'Order', amount: orderAmount(o),
+    }));
+
+  const invoiceRevenue = allInvoices
+    .filter(i => i.payment_status === 'paid')
+    .map(i => ({
+      date: i.date || i.created_at?.split('T')[0] || '',
+      type: 'income', description: `Invoice ${i.invoice_number} — ${i.customer_name}`,
+      category: 'Invoice Payment', source: 'Invoice', amount: parseFloat(i.total||0),
     }));
 
   const manualIncome = allIncome.map(i => ({
-    date: i.date || '',
-    type: 'income',
-    description: i.description,
-    category: i.source || 'Manual',
-    source: 'Manual',
-    amount: parseFloat(i.amount || 0),
+    date: i.date || '', type: 'income', description: i.description,
+    category: i.source || 'Manual', source: 'Manual', amount: parseFloat(i.amount||0),
   }));
 
   const expenseEntries = allExpenses.map(e => ({
-    date: e.date || '',
-    type: 'expense',
-    description: e.title,
-    category: e.category,
-    source: 'Expense',
-    amount: parseFloat(e.amount || 0),
+    date: e.date || '', type: 'expense', description: e.title,
+    category: e.category, source: 'Expense', amount: parseFloat(e.amount||0),
   }));
 
-  let all = [...revenueEntries, ...manualIncome, ...expenseEntries]
+  let all = [...revenueEntries, ...invoiceRevenue, ...manualIncome, ...expenseEntries]
     .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  // Deduplicate: if an order is linked to a paid invoice, prefer invoice entry
+  const invoicedOrderIds = new Set(
+    allInvoices.filter(i => i.payment_status === 'paid')
+      .flatMap(i => (allInvoiceItems[i.id]||[]).map(item => item.order_id).filter(Boolean))
+  );
+  if (invoicedOrderIds.size > 0) {
+    all = all.filter(e => !(e.source === 'Order' && e.category === 'Order Revenue'));
+  }
 
   if (filterType) all = all.filter(e => e.type === filterType);
   if (filterMonth) all = all.filter(e => e.date.startsWith(filterMonth));
 
-  const totalIn = all.filter(e => e.type === 'income').reduce((s,e) => s + e.amount, 0);
-  const totalOut = all.filter(e => e.type === 'expense').reduce((s,e) => s + e.amount, 0);
+  const totalIn = all.filter(e => e.type==='income').reduce((s,e) => s+e.amount, 0);
+  const totalOut = all.filter(e => e.type==='expense').reduce((s,e) => s+e.amount, 0);
   document.getElementById('ledger-in').textContent = fmt(totalIn);
   document.getElementById('ledger-out').textContent = fmt(totalOut);
   const bal = totalIn - totalOut;
@@ -2155,14 +2811,13 @@ async function renderLedger() {
 
   const tbody = document.getElementById('ledger-tbody');
   if (!all.length) {
-    tbody.innerHTML = '<tr><td colspan="6" class="table-empty">No transactions found for this period.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" class="table-empty">No transactions found.</td></tr>';
     return;
   }
-
   tbody.innerHTML = all.map(e => `
     <tr class="ledger-row-${e.type}">
       <td>${fmtDate(e.date)}</td>
-      <td style="font-weight:500;${e.type==='income'?'color:#10b981;':'color:#ef4444;'}">${e.type === 'income' ? '↑ Income' : '↓ Expense'}</td>
+      <td style="font-weight:500;${e.type==='income'?'color:#10b981;':'color:#ef4444;'}">${e.type==='income'?'↑ Income':'↓ Expense'}</td>
       <td>${esc(e.description)}</td>
       <td><span class="badge badge-contacted" style="font-size:0.58rem;">${esc(e.category)}</span></td>
       <td style="font-size:0.72rem;color:var(--muted);">${e.source}</td>
@@ -2171,6 +2826,7 @@ async function renderLedger() {
 }
 
 function filterLedger() { renderLedger(); }
+
 
 </script>
 
