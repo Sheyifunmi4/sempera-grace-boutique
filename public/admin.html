@@ -764,38 +764,88 @@ textarea.form-input{resize:vertical;min-height:80px;}
       <!-- ═══ MANUAL ORDER PAGE ═══ -->
       <div class="page-content" id="page-manual-order">
         <div class="section-stripe"></div>
-        <div class="table-header" style="margin-bottom:20px;">
+        <div class="table-header" style="margin-bottom:8px;">
           <h2>Create Manual Order</h2>
         </div>
-        <p style="font-size:0.78rem;color:var(--muted);margin-bottom:20px;">For orders received via WhatsApp, Instagram, phone or walk-in. These appear in the Orders table alongside website orders.</p>
-        <div style="max-width:640px;">
+        <p style="font-size:0.78rem;color:var(--muted);margin-bottom:20px;">For orders received via WhatsApp, Instagram, phone or walk-in. Appears in Orders table and can be added to invoices.</p>
+        <div style="max-width:660px;">
+
+          <!-- Customer Section -->
           <div class="form-section">
-            <div class="form-section-title">Customer Details</div>
-            <div class="form-grid">
-              <div class="form-group"><label class="form-label">Full Name *</label><input class="form-input" id="mo-name" placeholder="Customer name"/></div>
-              <div class="form-group"><label class="form-label">Phone *</label><input class="form-input" id="mo-phone" placeholder="+234..."/></div>
-              <div class="form-group full"><label class="form-label">Email</label><input class="form-input" id="mo-email" placeholder="customer@email.com"/></div>
-            </div>
-          </div>
-          <div class="form-section" style="margin-top:16px;">
-            <div class="form-section-title">Order Details</div>
-            <div class="form-grid">
-              <div class="form-group full">
-                <label class="form-label">Product</label>
-                <input class="form-input" id="mo-product" placeholder="Type to search catalog..." oninput="searchCatalogForOrder(this.value)" autocomplete="off"/>
-                <div id="mo-catalog-suggestions" style="background:white;border:1px solid var(--border);display:none;max-height:160px;overflow-y:auto;"></div>
+            <div class="form-section-title" style="display:flex;align-items:center;justify-content:space-between;">
+              Customer
+              <div style="display:flex;gap:6px;">
+                <button class="btn-sm" id="mo-tab-existing" onclick="moShowTab('existing')" style="font-size:0.6rem;padding:4px 10px;background:var(--gold);color:white;">Existing Customer</button>
+                <button class="btn-sm" id="mo-tab-new" onclick="moShowTab('new')" style="font-size:0.6rem;padding:4px 10px;">New Customer</button>
               </div>
-              <div class="form-group"><label class="form-label">Product Code</label><input class="form-input" id="mo-code" placeholder="SP-EL-001"/></div>
-              <div class="form-group"><label class="form-label">Size</label><input class="form-input" id="mo-size" placeholder="e.g. 12"/></div>
-              <div class="form-group"><label class="form-label">Quantity</label><input class="form-input" id="mo-qty" type="number" value="1" min="1"/></div>
-              <div class="form-group"><label class="form-label">Unit Price (₦)</label><input class="form-input" id="mo-price" placeholder="35000" oninput="calcManualTotal()"/></div>
-              <div class="form-group"><label class="form-label">Total</label><input class="form-input" id="mo-total" readonly style="background:#f5ead8;font-weight:500;color:var(--gold);"/></div>
-              <div class="form-group full"><label class="form-label">Notes</label><textarea class="form-input" id="mo-notes" rows="2" placeholder="Any special instructions..."></textarea></div>
+            </div>
+
+            <!-- Existing customer search -->
+            <div id="mo-existing-tab">
+              <div style="position:relative;">
+                <input class="form-input" id="mo-customer-search" placeholder="Search by name or phone..." oninput="searchMoCustomer(this.value)" autocomplete="off"/>
+                <div id="mo-customer-suggestions" style="position:absolute;top:100%;left:0;right:0;background:white;border:1px solid var(--border);z-index:100;display:none;max-height:200px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,0.1);"></div>
+              </div>
+              <div id="mo-selected-customer" style="display:none;margin-top:10px;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-left:3px solid var(--gold);">
+                <div style="font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;">Selected Customer</div>
+                <div id="mo-selected-name" style="font-weight:500;font-size:0.88rem;"></div>
+                <div id="mo-selected-detail" style="font-size:0.72rem;color:var(--muted);margin-top:2px;"></div>
+              </div>
+            </div>
+
+            <!-- New customer fields -->
+            <div id="mo-new-tab" style="display:none;">
+              <div class="form-grid">
+                <div class="form-group"><label class="form-label">Full Name *</label><input class="form-input" id="mo-name" placeholder="Customer name"/></div>
+                <div class="form-group"><label class="form-label">Phone *</label><input class="form-input" id="mo-phone" placeholder="+234..."/></div>
+                <div class="form-group full"><label class="form-label">Email</label><input class="form-input" id="mo-email" placeholder="customer@email.com"/></div>
+              </div>
             </div>
           </div>
-          <div style="margin-top:16px;display:flex;gap:10px;">
+
+          <!-- Product Section -->
+          <div class="form-section" style="margin-top:16px;">
+            <div class="form-section-title">Product</div>
+
+            <!-- Product selector from catalog -->
+            <div style="position:relative;margin-bottom:12px;">
+              <label class="form-label" style="margin-bottom:6px;display:block;">Select from Catalog *</label>
+              <input class="form-input" id="mo-product-search" placeholder="Search product by name or code..." oninput="searchMoProduct(this.value)" autocomplete="off"/>
+              <div id="mo-product-suggestions" style="position:absolute;top:100%;left:0;right:0;background:white;border:1px solid var(--border);z-index:100;display:none;max-height:220px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,0.1);"></div>
+            </div>
+
+            <!-- Selected product display -->
+            <div id="mo-selected-product" style="display:none;margin-bottom:12px;padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-left:3px solid var(--gold);">
+              <div style="font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;">Selected Product</div>
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                  <div id="mo-sel-pname" style="font-weight:500;font-size:0.88rem;"></div>
+                  <div id="mo-sel-pcode" style="font-size:0.68rem;color:var(--muted);margin-top:2px;"></div>
+                </div>
+                <div id="mo-sel-pprice" style="color:var(--gold);font-weight:500;font-size:1rem;"></div>
+              </div>
+            </div>
+
+            <!-- Hidden fields populated by product select -->
+            <input type="hidden" id="mo-product" />
+            <input type="hidden" id="mo-code" />
+
+            <div class="form-grid">
+              <div class="form-group"><label class="form-label">Size</label><input class="form-input" id="mo-size" placeholder="e.g. 12, 14, 16"/></div>
+              <div class="form-group"><label class="form-label">Quantity</label><input class="form-input" id="mo-qty" type="number" value="1" min="1" oninput="calcManualTotal()"/></div>
+              <div class="form-group">
+                <label class="form-label">Unit Price (₦) <span style="color:var(--muted);font-weight:300;">editable</span></label>
+                <input class="form-input" id="mo-price" placeholder="Auto-filled from catalog" oninput="calcManualTotal()"/>
+              </div>
+              <div class="form-group"><label class="form-label">Order Total</label><input class="form-input" id="mo-total" readonly style="background:#f5ead8;font-weight:500;color:var(--gold);"/></div>
+              <div class="form-group full"><label class="form-label">Notes / Special Instructions</label><textarea class="form-input" id="mo-notes" rows="2" placeholder="Any special instructions, colour preferences, etc."></textarea></div>
+            </div>
+          </div>
+
+          <div style="margin-top:16px;display:flex;gap:10px;align-items:center;">
             <button class="btn-gold-sm" onclick="saveManualOrder()" style="padding:11px 28px;">Save Order</button>
-            <button class="btn-sm" onclick="clearManualOrder()">Clear</button>
+            <button class="btn-sm" onclick="clearManualOrder()">Clear Form</button>
+            <span id="mo-save-msg" style="font-size:0.75rem;color:#10b981;"></span>
           </div>
         </div>
       </div>
@@ -2667,7 +2717,158 @@ function downloadInvoiceFull(inv, items) {
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>*{margin:0;padding:0;box-sizing:border-box;}body{padding:24px;background:white;}</style>
   <script>window.onload=function(){window.print();}<\/script>
-  </head><body>${generateFullInvoiceHTML(inv, items)}</body></html>`;
+  </head><body>${generateFullInvoiceHTML(inv, items)}
+<!-- ═══ INVOICE BUILDER MODAL ═══ -->
+<div class="modal-overlay" id="invoice-builder-modal" style="align-items:flex-start;padding:20px;overflow-y:auto;">
+  <div class="modal" style="max-width:960px;width:100%;margin:0 auto;">
+    <div class="modal-header" style="position:sticky;top:0;z-index:10;background:white;">
+      <h3 id="inv-builder-title">Generate Invoice</h3>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <span id="inv-builder-num" style="font-size:0.7rem;color:var(--muted);letter-spacing:0.1em;"></span>
+        <button class="modal-close" onclick="closeModal('invoice-builder-modal')">✕</button>
+      </div>
+    </div>
+    <div class="modal-body" style="padding:20px;">
+      <div class="inv-builder-cols">
+
+        <!-- LEFT -->
+        <div>
+          <!-- Customer -->
+          <div class="inv-section">
+            <div class="inv-section-title">Customer</div>
+            <div style="position:relative;margin-bottom:10px;">
+              <input class="form-input" id="inv-customer-search" placeholder="Search existing customer or type new name..." oninput="searchInvCustomer(this.value)" autocomplete="off"/>
+              <div id="inv-customer-suggestions" style="position:absolute;top:100%;left:0;right:0;background:white;border:1px solid var(--border);z-index:200;display:none;max-height:180px;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,0.12);"></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <input class="form-input" id="inv-cname" placeholder="Full name *"/>
+              <input class="form-input" id="inv-cphone" placeholder="Phone number"/>
+              <input class="form-input" id="inv-cemail" placeholder="Email address" style="grid-column:1/-1;"/>
+            </div>
+          </div>
+
+          <!-- Add Items -->
+          <div class="inv-section">
+            <div class="inv-section-title">
+              Add Items
+              <div style="display:flex;gap:6px;">
+                <button onclick="showInvTab('orders')" id="inv-tab-orders" style="padding:4px 12px;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--border);background:var(--gold);color:white;cursor:pointer;font-family:Jost,sans-serif;">Orders</button>
+                <button onclick="showInvTab('catalog')" id="inv-tab-catalog" style="padding:4px 12px;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--border);background:none;cursor:pointer;font-family:Jost,sans-serif;color:var(--muted);">Catalog</button>
+                <button onclick="showInvTab('manual')" id="inv-tab-manual" style="padding:4px 12px;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--border);background:none;cursor:pointer;font-family:Jost,sans-serif;color:var(--muted);">Manual</button>
+              </div>
+            </div>
+
+            <!-- From Orders -->
+            <div id="inv-tab-content-orders">
+              <p style="font-size:0.73rem;color:var(--muted);margin-bottom:10px;">Select a customer above to load their pending orders.</p>
+              <div id="inv-orders-list" style="max-height:260px;overflow-y:auto;border:1px solid var(--border);">
+                <div style="padding:24px;text-align:center;font-size:0.8rem;color:var(--muted);">Search a customer above to see their orders.</div>
+              </div>
+              <button onclick="addSelectedOrdersToInvoice()" style="margin-top:10px;width:100%;padding:9px;font-family:Jost,sans-serif;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;border:1px solid var(--border);background:var(--bg);cursor:pointer;">+ Add Selected Orders to Invoice</button>
+            </div>
+
+            <!-- Catalog -->
+            <div id="inv-tab-content-catalog" style="display:none;">
+              <div style="position:relative;">
+                <input class="form-input" id="inv-catalog-search" placeholder="Search product catalog by name or code..." oninput="searchInvCatalog(this.value)"/>
+                <div id="inv-catalog-results" style="position:absolute;top:100%;left:0;right:0;background:white;border:1px solid var(--border);z-index:200;display:none;max-height:220px;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,0.12);"></div>
+              </div>
+              <p style="font-size:0.7rem;color:var(--muted);margin-top:8px;">Select a product to add it as a line item. You can edit the price after.</p>
+            </div>
+
+            <!-- Manual -->
+            <div id="inv-tab-content-manual" style="display:none;">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <input class="form-input" id="inv-m-product" placeholder="Product name *" style="grid-column:1/-1;"/>
+                <input class="form-input" id="inv-m-code" placeholder="Product code (optional)"/>
+                <input class="form-input" id="inv-m-size" placeholder="Size (optional)"/>
+                <input class="form-input" id="inv-m-qty" type="number" value="1" min="1" placeholder="Qty" oninput="calcManualItemTotal()"/>
+                <input class="form-input" id="inv-m-price" type="number" placeholder="Unit price ₦" oninput="calcManualItemTotal()"/>
+                <input class="form-input" id="inv-m-total" readonly placeholder="Line total" style="background:#f5ead8;color:var(--gold);font-weight:500;"/>
+                <input class="form-input" id="inv-m-notes" placeholder="Notes" style="grid-column:1/-1;"/>
+              </div>
+              <button onclick="addManualItemToInvoice()" style="margin-top:10px;width:100%;padding:9px;font-family:Jost,sans-serif;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;border:1px solid var(--border);background:var(--bg);cursor:pointer;">+ Add Item to Invoice</button>
+            </div>
+          </div>
+
+          <!-- Line Items -->
+          <div class="inv-section">
+            <div class="inv-section-title">Invoice Line Items <span id="inv-items-count" style="color:var(--muted);font-weight:300;">(0 items)</span></div>
+            <div class="inv-line-header">
+              <span>Product</span><span>Size</span><span>Qty</span><span>Price ₦</span><span></span>
+            </div>
+            <div id="inv-line-items">
+              <div style="padding:24px;text-align:center;font-size:0.8rem;color:var(--muted);">No items yet. Use tabs above to add.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Summary -->
+        <div>
+          <div class="inv-section" style="position:sticky;top:80px;">
+            <div class="inv-section-title">Invoice Details</div>
+            <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:14px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+                <label class="form-label" style="white-space:nowrap;">Invoice Date</label>
+                <input class="fin-input" id="inv-date" type="date" style="width:155px;"/>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+                <label class="form-label" style="white-space:nowrap;">Due Date</label>
+                <input class="fin-input" id="inv-due" type="date" style="width:155px;"/>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+                <label class="form-label">Status</label>
+                <select class="fin-select" id="inv-status" style="width:155px;">
+                  <option value="unpaid">Unpaid</option>
+                  <option value="partial">Partially Paid</option>
+                  <option value="paid">Paid</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="height:1px;background:var(--border);margin:12px 0;"></div>
+            <div class="inv-section-title">Totals</div>
+            <div class="inv-total-row"><span>Subtotal</span><span id="inv-subtotal">₦0</span></div>
+            <div class="inv-total-row" style="align-items:center;">
+              <span>Delivery Fee</span>
+              <input class="fin-input" id="inv-delivery" type="number" value="0" oninput="recalcInvoice()" style="width:110px;text-align:right;padding:4px 8px;font-size:0.8rem;"/>
+            </div>
+            <div class="inv-total-row" style="align-items:center;">
+              <span>Discount</span>
+              <input class="fin-input" id="inv-discount" type="number" value="0" oninput="recalcInvoice()" style="width:110px;text-align:right;padding:4px 8px;font-size:0.8rem;"/>
+            </div>
+            <div class="inv-total-row grand"><span>Total Due</span><strong id="inv-grand-total">₦0</strong></div>
+
+            <textarea class="fin-input" id="inv-notes" placeholder="Optional notes..." rows="2" style="margin-top:12px;width:100%;font-size:0.8rem;"></textarea>
+
+            <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px;">
+              <button onclick="saveInvoice()" id="save-inv-btn" style="width:100%;padding:12px;background:var(--gold);color:white;border:none;font-family:Jost,sans-serif;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;">💾 Save Invoice</button>
+              <button onclick="previewCurrentInvoice()" style="width:100%;padding:10px;background:none;border:1px solid var(--border);font-family:Jost,sans-serif;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;color:var(--muted);">👁 Preview</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ INVOICE VIEW MODAL ═══ -->
+<div class="modal-overlay" id="invoice-view-modal" style="align-items:flex-start;padding:20px;overflow-y:auto;">
+  <div class="modal" style="max-width:820px;width:100%;margin:0 auto;">
+    <div class="modal-header" style="position:sticky;top:0;background:white;z-index:10;">
+      <h3 id="invoice-view-title">Invoice</h3>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button id="inv-download-btn" style="padding:7px 14px;background:var(--gold);color:white;border:none;font-family:Jost,sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;">⬇ Download</button>
+        <button id="inv-wa-btn" style="padding:7px 14px;background:none;border:1px solid var(--border);font-family:Jost,sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;color:var(--muted);">💬 WhatsApp</button>
+        <button class="modal-close" onclick="closeModal('invoice-view-modal')">✕</button>
+      </div>
+    </div>
+    <div class="modal-body" id="invoice-view-body"></div>
+  </div>
+</div>
+
+</body></html>`;
   const blob = new Blob([html], { type:'text/html' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -2679,9 +2880,88 @@ function downloadInvoiceFull(inv, items) {
 
 // ══ MANUAL ORDER ═════════════════════════════════
 
+// ══ MANUAL ORDER ═════════════════════════════════
+let moCustomerData = { name:'', phone:'', email:'' };
+
 function initManualOrder() {
-  document.getElementById('mo-qty').value = '1';
-  document.getElementById('mo-total').value = '';
+  moCustomerData = { name:'', phone:'', email:'' };
+  moShowTab('existing');
+}
+
+function moShowTab(tab) {
+  document.getElementById('mo-existing-tab').style.display = tab === 'existing' ? 'block' : 'none';
+  document.getElementById('mo-new-tab').style.display = tab === 'new' ? 'block' : 'none';
+  const existBtn = document.getElementById('mo-tab-existing');
+  const newBtn = document.getElementById('mo-tab-new');
+  existBtn.style.background = tab === 'existing' ? 'var(--gold)' : '';
+  existBtn.style.color = tab === 'existing' ? 'white' : '';
+  newBtn.style.background = tab === 'new' ? 'var(--gold)' : '';
+  newBtn.style.color = tab === 'new' ? 'white' : '';
+}
+
+function searchMoCustomer(q) {
+  const box = document.getElementById('mo-customer-suggestions');
+  if (!q || q.length < 2) { box.style.display = 'none'; return; }
+  const seen = {};
+  const matches = allOrders.filter(o => {
+    const key = o.customer_phone || o.customer_name;
+    if (seen[key]) return false;
+    seen[key] = true;
+    return (o.customer_name||'').toLowerCase().includes(q.toLowerCase()) ||
+           (o.customer_phone||'').includes(q);
+  }).slice(0, 8);
+  if (!matches.length) { box.style.display = 'none'; return; }
+  box.style.display = 'block';
+  box.innerHTML = matches.map(o => `
+    <div class="catalog-suggestion" onclick="selectMoCustomer(${JSON.stringify({name:o.customer_name,phone:o.customer_phone||'',email:o.customer_email||''})})">
+      <strong>${esc(o.customer_name)}</strong>
+      <span style="color:var(--muted);font-size:0.72rem;"> · ${esc(o.customer_phone||'')} ${o.customer_email?'· '+esc(o.customer_email):''}</span>
+    </div>`).join('');
+}
+
+function selectMoCustomer(data) {
+  moCustomerData = data;
+  document.getElementById('mo-customer-search').value = data.name;
+  document.getElementById('mo-customer-suggestions').style.display = 'none';
+  document.getElementById('mo-selected-customer').style.display = 'block';
+  document.getElementById('mo-selected-name').textContent = data.name;
+  document.getElementById('mo-selected-detail').textContent = [data.phone, data.email].filter(Boolean).join(' · ');
+}
+
+function searchMoProduct(q) {
+  const box = document.getElementById('mo-product-suggestions');
+  if (!q || q.length < 1) { box.style.display = 'none'; return; }
+  const matches = allProducts.filter(p =>
+    (p.name||'').toLowerCase().includes(q.toLowerCase()) ||
+    (p.code||'').toLowerCase().includes(q.toLowerCase())
+  ).slice(0, 8);
+  if (!matches.length) { box.style.display = 'none'; return; }
+  box.style.display = 'block';
+  box.innerHTML = matches.map(p => `
+    <div class="catalog-suggestion" onclick="selectMoProduct('${p.id}')">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <strong>${esc(p.name)}</strong>
+          <span style="font-size:0.68rem;color:var(--muted);"> · ${esc(p.code)}</span>
+        </div>
+        <span style="color:var(--gold);font-weight:500;">${esc(p.price||'')}</span>
+      </div>
+    </div>`).join('');
+}
+
+function selectMoProduct(id) {
+  const p = allProducts.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('mo-product').value = p.name;
+  document.getElementById('mo-code').value = p.code;
+  document.getElementById('mo-price').value = parsePrice(p.price);
+  document.getElementById('mo-product-search').value = p.name;
+  document.getElementById('mo-product-suggestions').style.display = 'none';
+  document.getElementById('mo-selected-product').style.display = 'block';
+  document.getElementById('mo-sel-pname').textContent = p.name;
+  document.getElementById('mo-sel-pcode').textContent = p.code + (p.sizes ? ' · Sizes: ' + p.sizes : '');
+  document.getElementById('mo-sel-pprice').textContent = p.price || '';
+  calcManualTotal();
 }
 
 function calcManualTotal() {
@@ -2690,48 +2970,37 @@ function calcManualTotal() {
   document.getElementById('mo-total').value = fmt(qty * price);
 }
 
-function searchCatalogForOrder(q) {
-  const box = document.getElementById('mo-catalog-suggestions');
-  if (!q || q.length < 2) { box.style.display = 'none'; return; }
-  const matches = allProducts.filter(p =>
-    (p.name||'').toLowerCase().includes(q.toLowerCase()) ||
-    (p.code||'').toLowerCase().includes(q.toLowerCase())
-  ).slice(0, 6);
-  if (!matches.length) { box.style.display = 'none'; return; }
-  box.style.display = 'block';
-  box.innerHTML = matches.map(p => `
-    <div class="catalog-suggestion" onclick="selectCatalogProduct('${p.id}')">
-      <strong>${esc(p.name)}</strong> · ${esc(p.code)} · <span style="color:var(--gold)">${esc(p.price||'')}</span>
-    </div>`).join('');
-}
-
-function selectCatalogProduct(id) {
-  const p = allProducts.find(x => x.id === id);
-  if (!p) return;
-  document.getElementById('mo-product').value = p.name;
-  document.getElementById('mo-code').value = p.code;
-  document.getElementById('mo-price').value = parsePrice(p.price);
-  document.getElementById('mo-catalog-suggestions').style.display = 'none';
-  calcManualTotal();
-}
-
 async function saveManualOrder() {
-  const name = document.getElementById('mo-name').value.trim();
-  const phone = document.getElementById('mo-phone').value.trim();
+  // Get customer data from either tab
+  let name, phone, email;
+  const newTab = document.getElementById('mo-new-tab').style.display !== 'none';
+  if (newTab) {
+    name = document.getElementById('mo-name').value.trim();
+    phone = document.getElementById('mo-phone').value.trim();
+    email = document.getElementById('mo-email').value.trim();
+  } else {
+    name = moCustomerData.name;
+    phone = moCustomerData.phone;
+    email = moCustomerData.email;
+  }
+
   const product = document.getElementById('mo-product').value.trim();
   const price = document.getElementById('mo-price').value.trim();
-  if (!name || !phone || !product) { showToast('Name, phone and product are required', 'error'); return; }
+
+  if (!name) { showToast('Please select or enter a customer', 'error'); return; }
+  if (!phone && newTab) { showToast('Phone number is required', 'error'); return; }
+  if (!product) { showToast('Please select a product from the catalog', 'error'); return; }
 
   const payload = {
     customer_name: name,
     customer_phone: phone,
-    customer_email: document.getElementById('mo-email').value.trim(),
+    customer_email: email,
     product_name: product,
     product_code: document.getElementById('mo-code').value.trim(),
     product_price: price ? `₦${parseFloat(price).toLocaleString()}` : '',
     size: document.getElementById('mo-size').value.trim(),
     quantity: parseInt(document.getElementById('mo-qty').value) || 1,
-    notes: (document.getElementById('mo-notes').value.trim() || '') + ' [Manual Order]',
+    notes: document.getElementById('mo-notes').value.trim() || '',
     status: 'new'
   };
 
@@ -2739,15 +3008,21 @@ async function saveManualOrder() {
     const res = await sb('orders', { method:'POST', body: JSON.stringify(payload) });
     if (res?.[0]) allOrders.unshift(res[0]);
     clearManualOrder();
-    showToast('Manual order created ✓ — visible in Orders table');
+    document.getElementById('mo-save-msg').textContent = '✓ Order saved! Now visible in Orders & can be added to an invoice.';
+    setTimeout(() => { document.getElementById('mo-save-msg').textContent = ''; }, 5000);
   } catch(e) { showToast('Failed to create order: ' + e.message, 'error'); }
 }
 
 function clearManualOrder() {
-  ['mo-name','mo-phone','mo-email','mo-product','mo-code','mo-size','mo-notes','mo-price','mo-total'].forEach(id => {
-    document.getElementById(id).value = '';
+  moCustomerData = { name:'', phone:'', email:'' };
+  ['mo-name','mo-phone','mo-email','mo-product','mo-code','mo-size','mo-notes','mo-price','mo-total','mo-product-search','mo-customer-search'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
   });
   document.getElementById('mo-qty').value = '1';
+  document.getElementById('mo-selected-customer').style.display = 'none';
+  document.getElementById('mo-selected-product').style.display = 'none';
+  moShowTab('existing');
 }
 
 // ══ UPDATED FINANCE LEDGER ═══════════════════════
