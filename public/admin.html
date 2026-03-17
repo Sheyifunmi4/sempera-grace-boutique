@@ -2772,158 +2772,7 @@ function downloadInvoiceFull(inv, items) {
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>*{margin:0;padding:0;box-sizing:border-box;}body{padding:24px;background:white;}</style>
   <script>window.onload=function(){window.print();}<\/script>
-  </head><body>${generateFullInvoiceHTML(inv, items)}
-<!-- ═══ INVOICE BUILDER MODAL ═══ -->
-<div class="modal-overlay" id="invoice-builder-modal" style="align-items:flex-start;padding:20px;overflow-y:auto;">
-  <div class="modal" style="max-width:960px;width:100%;margin:0 auto;">
-    <div class="modal-header" style="position:sticky;top:0;z-index:10;background:white;">
-      <h3 id="inv-builder-title">Generate Invoice</h3>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <span id="inv-builder-num" style="font-size:0.7rem;color:var(--muted);letter-spacing:0.1em;"></span>
-        <button class="modal-close" onclick="closeModal('invoice-builder-modal')">✕</button>
-      </div>
-    </div>
-    <div class="modal-body" style="padding:20px;">
-      <div class="inv-builder-cols">
-
-        <!-- LEFT -->
-        <div>
-          <!-- Customer -->
-          <div class="inv-section">
-            <div class="inv-section-title">Customer</div>
-            <div style="position:relative;margin-bottom:10px;">
-              <input class="form-input" id="inv-customer-search" placeholder="Search existing customer or type new name..." oninput="searchInvCustomer(this.value)" autocomplete="off"/>
-              <div id="inv-customer-suggestions" style="position:absolute;top:100%;left:0;right:0;background:white;border:1px solid var(--border);z-index:200;display:none;max-height:180px;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,0.12);"></div>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-              <input class="form-input" id="inv-cname" placeholder="Full name *"/>
-              <input class="form-input" id="inv-cphone" placeholder="Phone number"/>
-              <input class="form-input" id="inv-cemail" placeholder="Email address" style="grid-column:1/-1;"/>
-            </div>
-          </div>
-
-          <!-- Add Items -->
-          <div class="inv-section">
-            <div class="inv-section-title">
-              Add Items
-              <div style="display:flex;gap:6px;">
-                <button onclick="showInvTab('orders')" id="inv-tab-orders" style="padding:4px 12px;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--border);background:var(--gold);color:white;cursor:pointer;font-family:Jost,sans-serif;">Orders</button>
-                <button onclick="showInvTab('catalog')" id="inv-tab-catalog" style="padding:4px 12px;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--border);background:none;cursor:pointer;font-family:Jost,sans-serif;color:var(--muted);">Catalog</button>
-                <button onclick="showInvTab('manual')" id="inv-tab-manual" style="padding:4px 12px;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--border);background:none;cursor:pointer;font-family:Jost,sans-serif;color:var(--muted);">Manual</button>
-              </div>
-            </div>
-
-            <!-- From Orders -->
-            <div id="inv-tab-content-orders">
-              <p style="font-size:0.73rem;color:var(--muted);margin-bottom:10px;">Select a customer above to load their pending orders.</p>
-              <div id="inv-orders-list" style="max-height:260px;overflow-y:auto;border:1px solid var(--border);">
-                <div style="padding:24px;text-align:center;font-size:0.8rem;color:var(--muted);">Search a customer above to see their orders.</div>
-              </div>
-              <button onclick="addSelectedOrdersToInvoice()" style="margin-top:10px;width:100%;padding:9px;font-family:Jost,sans-serif;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;border:1px solid var(--border);background:var(--bg);cursor:pointer;">+ Add Selected Orders to Invoice</button>
-            </div>
-
-            <!-- Catalog -->
-            <div id="inv-tab-content-catalog" style="display:none;">
-              <div style="position:relative;">
-                <input class="form-input" id="inv-catalog-search" placeholder="Search product catalog by name or code..." oninput="searchInvCatalog(this.value)"/>
-                <div id="inv-catalog-results" style="position:absolute;top:100%;left:0;right:0;background:white;border:1px solid var(--border);z-index:200;display:none;max-height:220px;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,0.12);"></div>
-              </div>
-              <p style="font-size:0.7rem;color:var(--muted);margin-top:8px;">Select a product to add it as a line item. You can edit the price after.</p>
-            </div>
-
-            <!-- Manual -->
-            <div id="inv-tab-content-manual" style="display:none;">
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                <input class="form-input" id="inv-m-product" placeholder="Product name *" style="grid-column:1/-1;"/>
-                <input class="form-input" id="inv-m-code" placeholder="Product code (optional)"/>
-                <input class="form-input" id="inv-m-size" placeholder="Size (optional)"/>
-                <input class="form-input" id="inv-m-qty" type="number" value="1" min="1" placeholder="Qty" oninput="calcManualItemTotal()"/>
-                <input class="form-input" id="inv-m-price" type="number" placeholder="Unit price ₦" oninput="calcManualItemTotal()"/>
-                <input class="form-input" id="inv-m-total" readonly placeholder="Line total" style="background:#f5ead8;color:var(--gold);font-weight:500;"/>
-                <input class="form-input" id="inv-m-notes" placeholder="Notes" style="grid-column:1/-1;"/>
-              </div>
-              <button onclick="addManualItemToInvoice()" style="margin-top:10px;width:100%;padding:9px;font-family:Jost,sans-serif;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;border:1px solid var(--border);background:var(--bg);cursor:pointer;">+ Add Item to Invoice</button>
-            </div>
-          </div>
-
-          <!-- Line Items -->
-          <div class="inv-section">
-            <div class="inv-section-title">Invoice Line Items <span id="inv-items-count" style="color:var(--muted);font-weight:300;">(0 items)</span></div>
-            <div class="inv-line-header">
-              <span>Product</span><span>Size</span><span>Qty</span><span>Price ₦</span><span></span>
-            </div>
-            <div id="inv-line-items">
-              <div style="padding:24px;text-align:center;font-size:0.8rem;color:var(--muted);">No items yet. Use tabs above to add.</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- RIGHT: Summary -->
-        <div>
-          <div class="inv-section" style="position:sticky;top:80px;">
-            <div class="inv-section-title">Invoice Details</div>
-            <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:14px;">
-              <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
-                <label class="form-label" style="white-space:nowrap;">Invoice Date</label>
-                <input class="fin-input" id="inv-date" type="date" style="width:155px;"/>
-              </div>
-              <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
-                <label class="form-label" style="white-space:nowrap;">Due Date</label>
-                <input class="fin-input" id="inv-due" type="date" style="width:155px;"/>
-              </div>
-              <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
-                <label class="form-label">Status</label>
-                <select class="fin-select" id="inv-status" style="width:155px;">
-                  <option value="unpaid">Unpaid</option>
-                  <option value="partial">Partially Paid</option>
-                  <option value="paid">Paid</option>
-                </select>
-              </div>
-            </div>
-
-            <div style="height:1px;background:var(--border);margin:12px 0;"></div>
-            <div class="inv-section-title">Totals</div>
-            <div class="inv-total-row"><span>Subtotal</span><span id="inv-subtotal">₦0</span></div>
-            <div class="inv-total-row" style="align-items:center;">
-              <span>Delivery Fee</span>
-              <input class="fin-input" id="inv-delivery" type="number" value="0" oninput="recalcInvoice()" style="width:110px;text-align:right;padding:4px 8px;font-size:0.8rem;"/>
-            </div>
-            <div class="inv-total-row" style="align-items:center;">
-              <span>Discount</span>
-              <input class="fin-input" id="inv-discount" type="number" value="0" oninput="recalcInvoice()" style="width:110px;text-align:right;padding:4px 8px;font-size:0.8rem;"/>
-            </div>
-            <div class="inv-total-row grand"><span>Total Due</span><strong id="inv-grand-total">₦0</strong></div>
-
-            <textarea class="fin-input" id="inv-notes" placeholder="Optional notes..." rows="2" style="margin-top:12px;width:100%;font-size:0.8rem;"></textarea>
-
-            <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px;">
-              <button onclick="saveInvoice()" id="save-inv-btn" style="width:100%;padding:12px;background:var(--gold);color:white;border:none;font-family:Jost,sans-serif;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;">💾 Save Invoice</button>
-              <button onclick="previewCurrentInvoice()" style="width:100%;padding:10px;background:none;border:1px solid var(--border);font-family:Jost,sans-serif;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;color:var(--muted);">👁 Preview</button>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ INVOICE VIEW MODAL ═══ -->
-<div class="modal-overlay" id="invoice-view-modal" style="align-items:flex-start;padding:20px;overflow-y:auto;">
-  <div class="modal" style="max-width:820px;width:100%;margin:0 auto;">
-    <div class="modal-header" style="position:sticky;top:0;background:white;z-index:10;">
-      <h3 id="invoice-view-title">Invoice</h3>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <button id="inv-download-btn" style="padding:7px 14px;background:var(--gold);color:white;border:none;font-family:Jost,sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;">⬇ Download</button>
-        <button id="inv-wa-btn" style="padding:7px 14px;background:none;border:1px solid var(--border);font-family:Jost,sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;color:var(--muted);">💬 WhatsApp</button>
-        <button class="modal-close" onclick="closeModal('invoice-view-modal')">✕</button>
-      </div>
-    </div>
-    <div class="modal-body" id="invoice-view-body"></div>
-  </div>
-</div>
-
-</body></html>`;
+  </head><body>${generateFullInvoiceHTML(inv, items)}</body></html>`;
   const blob = new Blob([html], { type:'text/html' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -3228,5 +3077,157 @@ function filterLedger() { renderLedger(); }
     <div class="modal-body" id="invoice-modal-body"></div>
   </div>
 </div>
+
+<!-- ═══ INVOICE BUILDER MODAL ═══ -->
+<div class="modal-overlay" id="invoice-builder-modal" style="align-items:flex-start;padding:20px;overflow-y:auto;">
+  <div class="modal" style="max-width:960px;width:100%;margin:0 auto;">
+    <div class="modal-header" style="position:sticky;top:0;z-index:10;background:white;">
+      <h3 id="inv-builder-title">Generate Invoice</h3>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <span id="inv-builder-num" style="font-size:0.7rem;color:var(--muted);letter-spacing:0.1em;"></span>
+        <button class="modal-close" onclick="closeModal('invoice-builder-modal')">✕</button>
+      </div>
+    </div>
+    <div class="modal-body" style="padding:20px;">
+      <div class="inv-builder-cols">
+
+        <!-- LEFT -->
+        <div>
+          <!-- Customer -->
+          <div class="inv-section">
+            <div class="inv-section-title">Customer</div>
+            <div style="position:relative;margin-bottom:10px;">
+              <input class="form-input" id="inv-customer-search" placeholder="Search existing customer or type new name..." oninput="searchInvCustomer(this.value)" autocomplete="off"/>
+              <div id="inv-customer-suggestions" style="position:absolute;top:100%;left:0;right:0;background:white;border:1px solid var(--border);z-index:200;display:none;max-height:180px;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,0.12);"></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <input class="form-input" id="inv-cname" placeholder="Full name *"/>
+              <input class="form-input" id="inv-cphone" placeholder="Phone number"/>
+              <input class="form-input" id="inv-cemail" placeholder="Email address" style="grid-column:1/-1;"/>
+            </div>
+          </div>
+
+          <!-- Add Items -->
+          <div class="inv-section">
+            <div class="inv-section-title">
+              Add Items
+              <div style="display:flex;gap:6px;">
+                <button onclick="showInvTab('orders')" id="inv-tab-orders" style="padding:4px 12px;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--border);background:var(--gold);color:white;cursor:pointer;font-family:Jost,sans-serif;">Orders</button>
+                <button onclick="showInvTab('catalog')" id="inv-tab-catalog" style="padding:4px 12px;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--border);background:none;cursor:pointer;font-family:Jost,sans-serif;color:var(--muted);">Catalog</button>
+                <button onclick="showInvTab('manual')" id="inv-tab-manual" style="padding:4px 12px;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--border);background:none;cursor:pointer;font-family:Jost,sans-serif;color:var(--muted);">Manual</button>
+              </div>
+            </div>
+
+            <!-- From Orders -->
+            <div id="inv-tab-content-orders">
+              <p style="font-size:0.73rem;color:var(--muted);margin-bottom:10px;">Select a customer above to load their pending orders.</p>
+              <div id="inv-orders-list" style="max-height:260px;overflow-y:auto;border:1px solid var(--border);">
+                <div style="padding:24px;text-align:center;font-size:0.8rem;color:var(--muted);">Search a customer above to see their orders.</div>
+              </div>
+              <button onclick="addSelectedOrdersToInvoice()" style="margin-top:10px;width:100%;padding:9px;font-family:Jost,sans-serif;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;border:1px solid var(--border);background:var(--bg);cursor:pointer;">+ Add Selected Orders to Invoice</button>
+            </div>
+
+            <!-- Catalog -->
+            <div id="inv-tab-content-catalog" style="display:none;">
+              <div style="position:relative;">
+                <input class="form-input" id="inv-catalog-search" placeholder="Search product catalog by name or code..." oninput="searchInvCatalog(this.value)"/>
+                <div id="inv-catalog-results" style="position:absolute;top:100%;left:0;right:0;background:white;border:1px solid var(--border);z-index:200;display:none;max-height:220px;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,0.12);"></div>
+              </div>
+              <p style="font-size:0.7rem;color:var(--muted);margin-top:8px;">Select a product to add it as a line item. You can edit the price after.</p>
+            </div>
+
+            <!-- Manual -->
+            <div id="inv-tab-content-manual" style="display:none;">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <input class="form-input" id="inv-m-product" placeholder="Product name *" style="grid-column:1/-1;"/>
+                <input class="form-input" id="inv-m-code" placeholder="Product code (optional)"/>
+                <input class="form-input" id="inv-m-size" placeholder="Size (optional)"/>
+                <input class="form-input" id="inv-m-qty" type="number" value="1" min="1" placeholder="Qty" oninput="calcManualItemTotal()"/>
+                <input class="form-input" id="inv-m-price" type="number" placeholder="Unit price ₦" oninput="calcManualItemTotal()"/>
+                <input class="form-input" id="inv-m-total" readonly placeholder="Line total" style="background:#f5ead8;color:var(--gold);font-weight:500;"/>
+                <input class="form-input" id="inv-m-notes" placeholder="Notes" style="grid-column:1/-1;"/>
+              </div>
+              <button onclick="addManualItemToInvoice()" style="margin-top:10px;width:100%;padding:9px;font-family:Jost,sans-serif;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;border:1px solid var(--border);background:var(--bg);cursor:pointer;">+ Add Item to Invoice</button>
+            </div>
+          </div>
+
+          <!-- Line Items -->
+          <div class="inv-section">
+            <div class="inv-section-title">Invoice Line Items <span id="inv-items-count" style="color:var(--muted);font-weight:300;">(0 items)</span></div>
+            <div class="inv-line-header">
+              <span>Product</span><span>Size</span><span>Qty</span><span>Price ₦</span><span></span>
+            </div>
+            <div id="inv-line-items">
+              <div style="padding:24px;text-align:center;font-size:0.8rem;color:var(--muted);">No items yet. Use tabs above to add.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Summary -->
+        <div>
+          <div class="inv-section" style="position:sticky;top:80px;">
+            <div class="inv-section-title">Invoice Details</div>
+            <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:14px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+                <label class="form-label" style="white-space:nowrap;">Invoice Date</label>
+                <input class="fin-input" id="inv-date" type="date" style="width:155px;"/>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+                <label class="form-label" style="white-space:nowrap;">Due Date</label>
+                <input class="fin-input" id="inv-due" type="date" style="width:155px;"/>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+                <label class="form-label">Status</label>
+                <select class="fin-select" id="inv-status" style="width:155px;">
+                  <option value="unpaid">Unpaid</option>
+                  <option value="partial">Partially Paid</option>
+                  <option value="paid">Paid</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="height:1px;background:var(--border);margin:12px 0;"></div>
+            <div class="inv-section-title">Totals</div>
+            <div class="inv-total-row"><span>Subtotal</span><span id="inv-subtotal">₦0</span></div>
+            <div class="inv-total-row" style="align-items:center;">
+              <span>Delivery Fee</span>
+              <input class="fin-input" id="inv-delivery" type="number" value="0" oninput="recalcInvoice()" style="width:110px;text-align:right;padding:4px 8px;font-size:0.8rem;"/>
+            </div>
+            <div class="inv-total-row" style="align-items:center;">
+              <span>Discount</span>
+              <input class="fin-input" id="inv-discount" type="number" value="0" oninput="recalcInvoice()" style="width:110px;text-align:right;padding:4px 8px;font-size:0.8rem;"/>
+            </div>
+            <div class="inv-total-row grand"><span>Total Due</span><strong id="inv-grand-total">₦0</strong></div>
+
+            <textarea class="fin-input" id="inv-notes" placeholder="Optional notes..." rows="2" style="margin-top:12px;width:100%;font-size:0.8rem;"></textarea>
+
+            <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px;">
+              <button onclick="saveInvoice()" id="save-inv-btn" style="width:100%;padding:12px;background:var(--gold);color:white;border:none;font-family:Jost,sans-serif;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;">💾 Save Invoice</button>
+              <button onclick="previewCurrentInvoice()" style="width:100%;padding:10px;background:none;border:1px solid var(--border);font-family:Jost,sans-serif;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;color:var(--muted);">👁 Preview</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ INVOICE VIEW MODAL ═══ -->
+<div class="modal-overlay" id="invoice-view-modal" style="align-items:flex-start;padding:20px;overflow-y:auto;">
+  <div class="modal" style="max-width:820px;width:100%;margin:0 auto;">
+    <div class="modal-header" style="position:sticky;top:0;background:white;z-index:10;">
+      <h3 id="invoice-view-title">Invoice</h3>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button id="inv-download-btn" style="padding:7px 14px;background:var(--gold);color:white;border:none;font-family:Jost,sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;">⬇ Download</button>
+        <button id="inv-wa-btn" style="padding:7px 14px;background:none;border:1px solid var(--border);font-family:Jost,sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;color:var(--muted);">💬 WhatsApp</button>
+        <button class="modal-close" onclick="closeModal('invoice-view-modal')">✕</button>
+      </div>
+    </div>
+    <div class="modal-body" id="invoice-view-body"></div>
+  </div>
+</div>
+
+
 </body>
 </html>
