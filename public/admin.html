@@ -552,6 +552,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
               <tr>
                 <th>Code</th>
                 <th>Name</th>
+                <th>Collection</th>
                 <th>Price</th>
                 <th>Original</th>
                 <th>Sizes</th>
@@ -561,7 +562,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
               </tr>
             </thead>
             <tbody id="products-tbody">
-              <tr><td colspan="8" class="table-empty"><div class="spinner"></div><br/>Loading products...</td></tr>
+              <tr><td colspan="9" class="table-empty"><div class="spinner"></div><br/>Loading products...</td></tr>
             </tbody>
           </table>
         </div>
@@ -929,6 +930,13 @@ textarea.form-input{resize:vertical;min-height:80px;}
               <option value="active">Active</option>
               <option value="soldout">Sold Out</option>
               <option value="hidden">Hidden</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Collection *</label>
+            <select class="form-input" id="pf-collection" required>
+              <option value="elan">ELÁN</option>
+              <option value="ease">EASE</option>
             </select>
           </div>
           <div class="form-group full"><label class="form-label">Description</label><textarea class="form-input" id="pf-description" placeholder="Product description..."></textarea></div>
@@ -1402,7 +1410,7 @@ async function saveOrderFromModal(id) {
 function renderProducts(data) {
   const products = data || allProducts;
   const tbody = document.getElementById('products-tbody');
-  if (!products.length) { tbody.innerHTML = '<tr><td colspan="8" class="table-empty">No products found.</td></tr>'; return; }
+  if (!products.length) { tbody.innerHTML = '<tr><td colspan="9" class="table-empty">No products found.</td></tr>'; return; }
 
   tbody.innerHTML = products.map(p => `
     <tr>
@@ -1411,6 +1419,7 @@ function renderProducts(data) {
         <div style="font-weight:400;">${esc(p.name)}</div>
         <div style="font-size:0.7rem;color:var(--muted);">${esc(p.fabric||'')}</div>
       </td>
+      <td><span style="font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);font-weight:500;">${esc((p.collection||'elan').toUpperCase())}</span></td>
       <td style="color:var(--gold);font-weight:500;">${esc(p.price||'–')}</td>
       <td style="text-decoration:line-through;color:var(--muted);font-size:0.78rem;">${esc(p.original_price||'–')}</td>
       <td>${esc(p.sizes||'–')}</td>
@@ -1541,6 +1550,7 @@ function openProductForm(id) {
   document.getElementById('pf-original').value = p?.original_price || '';
   document.getElementById('pf-sizes').value = p?.sizes || '6–22';
   document.getElementById('pf-status').value = p?.status || 'active';
+  document.getElementById('pf-collection').value = p?.collection || 'elan';
   document.getElementById('pf-description').value = p?.description || '';
   document.getElementById('pf-fabric').value = p?.fabric || '';
   document.getElementById('pf-care').value = p?.care || '';
@@ -1583,6 +1593,7 @@ async function saveProduct() {
       original_price: document.getElementById('pf-original').value.trim(),
       sizes: document.getElementById('pf-sizes').value.trim(),
       status: document.getElementById('pf-status').value,
+      collection: document.getElementById('pf-collection').value,
       description: document.getElementById('pf-description').value.trim(),
       fabric: document.getElementById('pf-fabric').value.trim(),
       care: document.getElementById('pf-care').value.trim(),

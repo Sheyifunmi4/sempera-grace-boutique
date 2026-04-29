@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import SemperaNav from '@/components/SemperaNav';
 import HeroSection from '@/components/HeroSection';
 import FeaturedCollection from '@/components/FeaturedCollection';
+import { COLLECTIONS } from '@/components/FeaturedCollection';
 import CategorySection from '@/components/CategorySection';
 import AboutSection from '@/components/AboutSection';
 import WhySection from '@/components/WhySection';
@@ -51,8 +52,27 @@ const Index = () => {
         onRequest={() => openRequestModal()}
       />
 
-      {/* Featured Collection */}
-      <FeaturedCollection onRequest={openRequestModal} />
+      {/* ELÁN Collection — teaser */}
+      <FeaturedCollection
+        onRequest={openRequestModal}
+        collection={COLLECTIONS.elan.slug}
+        title={COLLECTIONS.elan.title}
+        tagline={COLLECTIONS.elan.tagline}
+        limit={4}
+        viewAllHref={`/collection/${COLLECTIONS.elan.slug}`}
+        sectionId="collection"
+      />
+
+      {/* EASE Collection — teaser */}
+      <FeaturedCollection
+        onRequest={openRequestModal}
+        collection={COLLECTIONS.ease.slug}
+        title={COLLECTIONS.ease.title}
+        tagline={COLLECTIONS.ease.tagline}
+        limit={4}
+        viewAllHref={`/collection/${COLLECTIONS.ease.slug}`}
+        sectionId="collection-ease"
+      />
 
       {/* Shop by Category */}
       <CategorySection />

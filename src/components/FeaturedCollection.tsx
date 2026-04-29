@@ -31,7 +31,23 @@ export interface Product {
   care: string;
   sizes: string;
   status: string;
+  collection: string;
 }
+
+export type CollectionSlug = 'elan' | 'ease';
+
+export const COLLECTIONS: Record<CollectionSlug, { slug: CollectionSlug; title: string; tagline: string }> = {
+  elan: {
+    slug: 'elan',
+    title: 'The ELÁN Collection',
+    tagline: 'Timeless silhouettes. Refined tailoring. Effortless elegance.',
+  },
+  ease: {
+    slug: 'ease',
+    title: 'The EASE Collection',
+    tagline: 'For mothers that love to slay with grace...',
+  },
+};
 
 function mapRow(row: any): Product {
   return {
@@ -48,18 +64,20 @@ function mapRow(row: any): Product {
     care: row.care || '',
     sizes: row.sizes || '6–22',
     status: row.status || 'active',
+    collection: row.collection || 'elan',
   };
 }
 
-export async function fetchProducts(): Promise<Product[]> {
+export async function fetchProducts(opts?: { collection?: string; limit?: number }): Promise<Product[]> {
   try {
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/products?status=neq.hidden&order=code.asc&select=*`,
-      {
-        method: 'GET',
-        headers: getHeaders(),
-      }
-    );
+    let url = `${SUPABASE_URL}/rest/v1/products?status=neq.hidden&order=code.asc&select=*`;
+    if (opts?.collection) url += `&collection=eq.${encodeURIComponent(opts.collection)}`;
+    if (opts?.limit) url += `&limit=${opts.limit}`;
+
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: getHeaders(),
+    });
     if (!res.ok) {
       const err = await res.text();
       console.error('Supabase fetch error:', res.status, err);
@@ -217,15 +235,32 @@ export function ProductCard({ product, onRequest }: ProductCardProps) {
 // ─── Featured Collection ──────────────────────────────────────────
 interface FeaturedCollectionProps {
   onRequest: (product: Product) => void;
+  collection?: string;
+  title: string;
+  tagline: string;
+  eyebrow?: string;
+  limit?: number;
+  viewAllHref?: string;
+  sectionId?: string;
 }
 
-export default function FeaturedCollection({ onRequest }: FeaturedCollectionProps) {
+export default function FeaturedCollection({
+  onRequest,
+  collection,
+  title,
+  tagline,
+  eyebrow = 'Sempera Fashion',
+  limit,
+  viewAllHref,
+  sectionId,
+}: FeaturedCollectionProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetchProducts()
+    setLoading(true);
+    fetchProducts({ collection, limit })
       .then((data) => {
         setProducts(data);
         setError('');
@@ -235,39 +270,21 @@ export default function FeaturedCollection({ onRequest }: FeaturedCollectionProp
         setError('Could not load collection. Please refresh.');
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [collection, limit]);
 
   return (
-    <section id="collection" className="py-24 lg:py-32 bg-background">
+    <section id={sectionId} className="py-24 lg:py-32 bg-background">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
 
         {/* Section Header */}
-        <div className="text-center mb-10 reveal">
-          <p className="section-eyebrow mb-4">Sempera Fashion</p>
+        <div className="text-center mb-14 reveal">
+          <p className="section-eyebrow mb-4">{eyebrow}</p>
           <h2 className="font-serif text-foreground mb-5" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 300 }}>
-            The ELÁN Collection
+            {title}
           </h2>
           <span className="gold-divider mx-auto mb-5" />
           <p className="font-sans text-muted-foreground max-w-lg mx-auto" style={{ fontSize: '1rem', lineHeight: 1.8, fontWeight: 300 }}>
-            Timeless silhouettes. Refined tailoring. Effortless elegance.
-          </p>
-        </div>
-
-        {/* Launch Discount Banner */}
-        <div className="reveal mb-14" style={{
-          background: 'linear-gradient(135deg, #1a1208 0%, #2d1f0a 50%, #1a1208 100%)',
-          border: '1px solid #b8965a', borderRadius: '2px',
-          padding: '20px 32px', display: 'flex', flexWrap: 'wrap',
-          alignItems: 'center', justifyContent: 'center', gap: '12px', textAlign: 'center',
-        }}>
-          <span style={{ fontSize: '1.1rem' }}>🎉</span>
-          <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(1rem, 2.5vw, 1.25rem)', fontWeight: 500, color: '#b8965a', letterSpacing: '0.04em', margin: 0 }}>
-            Launch Discount — Now Live
-          </p>
-          <span style={{ width: '1px', height: '18px', background: '#b8965a', opacity: 0.5, display: 'inline-block' }} />
-          <p style={{ fontFamily: 'Jost, sans-serif', fontSize: 'clamp(0.8rem, 2vw, 0.95rem)', fontWeight: 300, color: '#e8d5b0', letterSpacing: '0.06em', margin: 0 }}>
-            Enjoy introductory pricing on every piece in the ELÁN Collection.
-            <span style={{ color: '#b8965a', fontWeight: 400 }}> Limited time only.</span>
+            {tagline}
           </p>
         </div>
 
@@ -286,7 +303,14 @@ export default function FeaturedCollection({ onRequest }: FeaturedCollectionProp
           <div className="text-center py-24">
             <p className="font-sans text-muted-foreground mb-4">{error}</p>
             <button
-              onClick={() => { setError(''); setLoading(true); fetchProducts().then(setProducts).catch(() => setError('Could not load collection.')).finally(() => setLoading(false)); }}
+              onClick={() => {
+                setError('');
+                setLoading(true);
+                fetchProducts({ collection, limit })
+                  .then(setProducts)
+                  .catch(() => setError('Could not load collection.'))
+                  .finally(() => setLoading(false));
+              }}
               className="btn-gold"
               style={{ fontSize: '0.75rem' }}
             >
@@ -297,13 +321,23 @@ export default function FeaturedCollection({ onRequest }: FeaturedCollectionProp
 
         {/* Products */}
         {!loading && !error && products.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 lg:gap-14 items-stretch">
-            {products.map((product, i) => (
-              <div key={product.id} className="flex" style={{ opacity: 1, transform: 'none' }}>
-                <ProductCard product={product} onRequest={onRequest} />
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 lg:gap-14 items-stretch">
+              {products.map((product) => (
+                <div key={product.id} className="flex" style={{ opacity: 1, transform: 'none' }}>
+                  <ProductCard product={product} onRequest={onRequest} />
+                </div>
+              ))}
+            </div>
+
+            {viewAllHref && (
+              <div className="text-center mt-14">
+                <Link to={viewAllHref} className="btn-outline-gold inline-block">
+                  View the full {title} →
+                </Link>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
 
         {/* Empty state */}
