@@ -52,15 +52,16 @@ const Index = () => {
         onRequest={() => openRequestModal()}
       />
 
-      {/* ELÁN Collection — teaser */}
+      {/* BELLE Collection — newest, teaser */}
       <FeaturedCollection
         onRequest={openRequestModal}
-        collection={COLLECTIONS.elan.slug}
-        title={COLLECTIONS.elan.title}
-        tagline={COLLECTIONS.elan.tagline}
+        collection={COLLECTIONS.belle.slug}
+        title={COLLECTIONS.belle.title}
+        tagline={COLLECTIONS.belle.tagline}
         limit={4}
-        viewAllHref={`/collection/${COLLECTIONS.elan.slug}`}
+        viewAllHref={`/collection/${COLLECTIONS.belle.slug}`}
         sectionId="collection"
+        isNew
       />
 
       {/* EASE Collection — teaser */}
@@ -72,6 +73,17 @@ const Index = () => {
         limit={4}
         viewAllHref={`/collection/${COLLECTIONS.ease.slug}`}
         sectionId="collection-ease"
+      />
+
+      {/* ELÁN Collection — teaser */}
+      <FeaturedCollection
+        onRequest={openRequestModal}
+        collection={COLLECTIONS.elan.slug}
+        title={COLLECTIONS.elan.title}
+        tagline={COLLECTIONS.elan.tagline}
+        limit={4}
+        viewAllHref={`/collection/${COLLECTIONS.elan.slug}`}
+        sectionId="collection-elan"
       />
 
       {/* Shop by Category */}

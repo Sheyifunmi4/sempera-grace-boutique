@@ -34,9 +34,14 @@ export interface Product {
   collection: string;
 }
 
-export type CollectionSlug = 'elan' | 'ease';
+export type CollectionSlug = 'belle' | 'elan' | 'ease';
 
 export const COLLECTIONS: Record<CollectionSlug, { slug: CollectionSlug; title: string; tagline: string }> = {
+  belle: {
+    slug: 'belle',
+    title: 'The BELLE Collection',
+    tagline: 'Softness, with intention. Feminine without trying too hard…',
+  },
   elan: {
     slug: 'elan',
     title: 'The ELÁN Collection',
@@ -242,6 +247,7 @@ interface FeaturedCollectionProps {
   limit?: number;
   viewAllHref?: string;
   sectionId?: string;
+  isNew?: boolean;
 }
 
 export default function FeaturedCollection({
@@ -253,6 +259,7 @@ export default function FeaturedCollection({
   limit,
   viewAllHref,
   sectionId,
+  isNew = false,
 }: FeaturedCollectionProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -278,6 +285,11 @@ export default function FeaturedCollection({
 
         {/* Section Header */}
         <div className="text-center mb-14 reveal">
+          {isNew && (
+            <div className="mb-4 flex justify-center">
+              <span className="badge-new">✦ New Collection</span>
+            </div>
+          )}
           <p className="section-eyebrow mb-4">{eyebrow}</p>
           <h2 className="font-serif text-foreground mb-5" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 300 }}>
             {title}

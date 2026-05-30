@@ -43,6 +43,7 @@ export default function CollectionPage() {
         collection={config.slug}
         title={config.title}
         tagline={config.tagline}
+        isNew={config.slug === 'belle'}
       />
 
       <SemperaFooter />
