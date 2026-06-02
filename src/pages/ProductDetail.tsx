@@ -1,26 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import SemperaNav from '@/components/SemperaNav';
 import SemperaFooter from '@/components/SemperaFooter';
 import RequestModal from '@/components/RequestModal';
-import { fetchProductById, type Product } from '@/components/FeaturedCollection';
+import { useProduct } from '@/components/FeaturedCollection';
 
 export default function ProductDetail() {
   const { id } = useParams();
-  const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: product, isLoading: loading } = useProduct(id);
   const [activeImg, setActiveImg] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
-
-  useEffect(() => {
-    if (!id) return;
-    setLoading(true);
-    setActiveImg(0);
-    fetchProductById(id)
-      .then(setProduct)
-      .finally(() => setLoading(false));
-  }, [id]);
 
   if (loading) {
     return (
