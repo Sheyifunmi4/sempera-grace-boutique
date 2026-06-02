@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 // ─── Supabase Config ───────────────────────────────────────────────
 const SUPABASE_URL: string = 'https://sieqvcjiqdjhjnxaslrd.supabase.co';
@@ -113,6 +114,30 @@ export async function fetchProductById(id: string): Promise<Product | null> {
     console.error('fetchProductById error:', err);
     return null;
   }
+}
+
+// ─── Shared React Query hooks ──────────────────────────────────────
+// One cached request feeds EVERY collection section + the collection pages.
+// Instead of each section hitting Supabase, the whole catalog is fetched once,
+// cached, and filtered in the browser. 3 homepage requests → 1.
+export function useProducts() {
+  return useQuery({
+    queryKey: ['products'],
+    queryFn: () => fetchProducts(),
+  });
+}
+
+// Product detail reuses the cached catalog when available (0 extra requests),
+// and only falls back to a by-id fetch on a cold/deep-link load.
+export function useProduct(id: string | undefined) {
+  const queryClient = useQueryClient();
+  return useQuery({
+    queryKey: ['product', id],
+    queryFn: () => fetchProductById(id!),
+    enabled: !!id,
+    initialData: () =>
+      queryClient.getQueryData<Product[]>(['products'])?.find((p) => p.id === id),
+  });
 }
 
 // ─── Product Card ─────────────────────────────────────────────────
@@ -261,23 +286,16 @@ export default function FeaturedCollection({
   sectionId,
   isNew = false,
 }: FeaturedCollectionProps) {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const { data: allProducts = [], isLoading: loading, isError, refetch } = useProducts();
 
-  useEffect(() => {
-    setLoading(true);
-    fetchProducts({ collection, limit })
-      .then((data) => {
-        setProducts(data);
-        setError('');
-      })
-      .catch((err) => {
-        console.error('Collection load failed:', err);
-        setError('Could not load collection. Please refresh.');
-      })
-      .finally(() => setLoading(false));
-  }, [collection, limit]);
+  // Filter the shared, cached catalog down to this section's collection.
+  const products = useMemo(() => {
+    let list = collection
+      ? allProducts.filter((p) => p.collection === collection)
+      : allProducts;
+    if (limit && limit > 0) list = list.slice(0, limit);
+    return list;
+  }, [allProducts, collection, limit]);
 
   return (
     <section id={sectionId} className="py-24 lg:py-32 bg-background">
@@ -310,19 +328,14 @@ export default function FeaturedCollection({
           </div>
         )}
 
-        {/* Error */}
-        {!loading && error && (
+        {/* Error — only shown after auto-retries are exhausted */}
+        {!loading && isError && (
           <div className="text-center py-24">
-            <p className="font-sans text-muted-foreground mb-4">{error}</p>
+            <p className="font-sans text-muted-foreground mb-4">
+              Could not load collection.
+            </p>
             <button
-              onClick={() => {
-                setError('');
-                setLoading(true);
-                fetchProducts({ collection, limit })
-                  .then(setProducts)
-                  .catch(() => setError('Could not load collection.'))
-                  .finally(() => setLoading(false));
-              }}
+              onClick={() => refetch()}
               className="btn-gold"
               style={{ fontSize: '0.75rem' }}
             >
@@ -332,7 +345,7 @@ export default function FeaturedCollection({
         )}
 
         {/* Products */}
-        {!loading && !error && products.length > 0 && (
+        {!loading && !isError && products.length > 0 && (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 lg:gap-14 items-stretch">
               {products.map((product) => (
@@ -353,7 +366,7 @@ export default function FeaturedCollection({
         )}
 
         {/* Empty state */}
-        {!loading && !error && products.length === 0 && (
+        {!loading && !isError && products.length === 0 && (
           <div className="text-center py-24">
             <p className="font-sans text-muted-foreground">No products available.</p>
           </div>

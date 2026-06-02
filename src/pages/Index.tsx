@@ -34,9 +34,13 @@ const Index = () => {
         name: 'Enquire About a Piece',
         description: '',
         price: '',
+        originalPrice: '',
         images: [],
         fabric: '',
+        care: '',
         sizes: '6–22',
+        status: 'active',
+        collection: 'belle',
       });
     }
   };
