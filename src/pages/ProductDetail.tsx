@@ -5,11 +5,14 @@ import SemperaNav from '@/components/SemperaNav';
 import SemperaFooter from '@/components/SemperaFooter';
 import RequestModal from '@/components/RequestModal';
 import { useProduct } from '@/components/FeaturedCollection';
+import { useCart, SIZES } from '@/contexts/CartContext';
 
 export default function ProductDetail() {
   const { id } = useParams();
   const { data: product, isLoading: loading } = useProduct(id);
+  const { addItem } = useCart();
   const [activeImg, setActiveImg] = useState(0);
+  const [selectedSize, setSelectedSize] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
 
   if (loading) {
@@ -164,14 +167,30 @@ export default function ProductDetail() {
 
               <span className="gold-divider" />
 
-              {/* Sizes */}
+              {/* Sizes — interactive picker */}
               <div>
                 <h3 className="font-sans text-foreground mb-3" style={{ fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 400 }}>
-                  Available Sizes
+                  Select Size {product.sizes && <span className="text-muted-foreground">(available: {product.sizes})</span>}
                 </h3>
-                <p className="font-sans text-muted-foreground" style={{ fontSize: '0.95rem', lineHeight: 1.8, fontWeight: 300 }}>
-                  {product.sizes}
-                </p>
+                <div className="flex flex-wrap gap-2">
+                  {SIZES.map((s) => {
+                    const active = selectedSize === s;
+                    return (
+                      <button
+                        key={s}
+                        onClick={() => setSelectedSize(s)}
+                        className="px-4 py-2 border font-sans text-sm transition-colors duration-200"
+                        style={{
+                          borderColor: active ? '#b8965a' : 'hsl(var(--border))',
+                          backgroundColor: active ? '#b8965a' : 'transparent',
+                          color: active ? '#ffffff' : 'hsl(var(--foreground))',
+                        }}
+                      >
+                        UK {s}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* Fabric Details */}
@@ -202,21 +221,26 @@ export default function ProductDetail() {
 
               {/* CTA */}
               <div className="space-y-4 pt-2">
-                <button onClick={() => setModalOpen(true)} className="btn-gold w-full">
-                  Request This Piece
+                <button
+                  onClick={() => selectedSize && addItem(product.id, selectedSize, 1)}
+                  disabled={!selectedSize}
+                  className="btn-gold w-full"
+                  style={{ opacity: selectedSize ? 1 : 0.5, cursor: selectedSize ? 'pointer' : 'not-allowed' }}
+                >
+                  {selectedSize ? 'Add to Cart' : 'Select a size to add'}
+                </button>
+                <button onClick={() => setModalOpen(true)} className="btn-outline-gold w-full">
+                  Request This Piece Instead
                 </button>
                 <a
                   href={`https://wa.me/2348027825606?text=${whatsappMessage}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn-outline-gold w-full"
-                  style={{ textDecoration: 'none' }}
+                  className="block text-center font-sans text-muted-foreground hover:text-foreground transition-colors"
+                  style={{ textDecoration: 'none', fontSize: '0.85rem' }}
                 >
-                  Enquire via WhatsApp
+                  or enquire via WhatsApp →
                 </a>
-                <p className="text-center font-sans text-muted-foreground" style={{ fontSize: '0.78rem', letterSpacing: '0.05em', fontWeight: 300 }}>
-                  Our stylist will respond within 24 hours
-                </p>
               </div>
             </div>
           </div>
