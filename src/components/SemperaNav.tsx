@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, User as UserIcon, LogOut, ShoppingCart } from 'lucide-react';
 import semperaLogo from '@/assets/sempera-logo.png';
+import { useAuth } from '@/contexts/AuthContext';
+import { useCart } from '@/contexts/CartContext';
 
 const navItems = [
   { label: 'Shop', href: '/#collection' },
@@ -30,6 +32,14 @@ export default function SemperaNav({ onRequestPiece }: SemperaNavProps) {
   const lastScrollY = useRef(0);
 
   const location = useLocation();
+  const { user, signOut } = useAuth();
+  const { count: cartCount, setOpen: openCart } = useCart();
+
+  // First name for the greeting (falls back to the email handle).
+  const firstName =
+    (user?.user_metadata?.full_name as string | undefined)?.split(' ')[0] ||
+    user?.email?.split('@')[0] ||
+    '';
 
   // Announcement cycling
   useEffect(() => {
@@ -139,7 +149,49 @@ export default function SemperaNav({ onRequestPiece }: SemperaNavProps) {
             </nav>
 
             {/* Desktop CTA */}
-            <div className="hidden lg:flex items-center gap-4">
+            <div className="hidden lg:flex items-center gap-5">
+              <button
+                onClick={() => openCart(true)}
+                className="nav-link flex items-center gap-2 bg-transparent border-none p-0"
+                aria-label={`Open cart, ${cartCount} item${cartCount === 1 ? '' : 's'}`}
+              >
+                <span className="relative flex items-center">
+                  <ShoppingCart size={18} />
+                  {cartCount > 0 && (
+                    <span
+                      className="absolute -top-2 -right-2.5 flex items-center justify-center rounded-full text-white"
+                      style={{ backgroundColor: '#b8965a', fontSize: '0.6rem', minWidth: '16px', height: '16px', padding: '0 4px', fontFamily: 'Jost, sans-serif' }}
+                    >
+                      {cartCount}
+                    </span>
+                  )}
+                </span>
+                Cart
+              </button>
+              {user ? (
+                <>
+                  <Link
+                    to="/account"
+                    className="nav-link flex items-center gap-2"
+                    title="My account"
+                  >
+                    <UserIcon size={16} />
+                    {firstName}
+                  </Link>
+                  <button
+                    onClick={() => signOut()}
+                    className="nav-link flex items-center gap-1.5 bg-transparent border-none p-0"
+                    title="Log out"
+                  >
+                    <LogOut size={15} />
+                  </button>
+                </>
+              ) : (
+                <Link to="/auth" className="nav-link flex items-center gap-2">
+                  <UserIcon size={16} />
+                  Log In
+                </Link>
+              )}
               <button onClick={onRequestPiece} className="btn-gold text-sm">
                 Request a Piece
               </button>
@@ -169,6 +221,37 @@ export default function SemperaNav({ onRequestPiece }: SemperaNavProps) {
                   {item.label}
                 </button>
               ))}
+              <button
+                onClick={() => { setMenuOpen(false); openCart(true); }}
+                className="nav-link text-left flex items-center gap-2 bg-transparent border-none p-0 text-base"
+              >
+                <ShoppingCart size={17} /> Cart{cartCount > 0 ? ` (${cartCount})` : ''}
+              </button>
+              {user ? (
+                <>
+                  <Link
+                    to="/account"
+                    onClick={() => setMenuOpen(false)}
+                    className="nav-link text-left flex items-center gap-2 text-base"
+                  >
+                    <UserIcon size={17} /> My Account ({firstName})
+                  </Link>
+                  <button
+                    onClick={() => { setMenuOpen(false); signOut(); }}
+                    className="nav-link text-left flex items-center gap-2 bg-transparent border-none p-0 text-base"
+                  >
+                    <LogOut size={16} /> Log Out
+                  </button>
+                </>
+              ) : (
+                <Link
+                  to="/auth"
+                  onClick={() => setMenuOpen(false)}
+                  className="nav-link text-left flex items-center gap-2 text-base"
+                >
+                  <UserIcon size={17} /> Log In / Sign Up
+                </Link>
+              )}
               <button
                 onClick={() => { setMenuOpen(false); onRequestPiece?.(); }}
                 className="btn-gold w-full mt-2"
