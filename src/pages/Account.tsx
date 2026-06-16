@@ -28,17 +28,15 @@ export default function Account() {
     <div className="bg-background min-h-screen">
       <SemperaNav />
 
-      <section className="max-w-3xl mx-auto px-6 lg:px-8 pt-40 pb-24">
-        <p className="section-eyebrow mb-3">My Account</p>
-        <h1 className="font-serif text-foreground mb-3" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 300 }}>
+      <section className="max-w-3xl mx-auto px-5 sm:px-6 lg:px-8 pt-32 sm:pt-40 pb-24">
+        <p className="section-eyebrow mb-3">My Orders</p>
+        <h1 className="font-serif text-foreground mb-3" style={{ fontSize: 'clamp(1.8rem, 6vw, 3rem)', fontWeight: 300 }}>
           Hello, {fullName}
         </h1>
         <span className="gold-divider mb-3" />
-        <p className="font-sans text-muted-foreground mb-10" style={{ fontWeight: 300 }}>
+        <p className="font-sans text-muted-foreground mb-10 break-words" style={{ fontWeight: 300 }}>
           Signed in as <span className="text-foreground">{user.email}</span>
         </p>
-
-        <h2 className="font-serif text-foreground mb-6" style={{ fontSize: '1.6rem', fontWeight: 400 }}>My Orders</h2>
 
         {isLoading && (
           <div className="text-center py-16">
@@ -91,10 +89,10 @@ function OrderCard({ order }: { order: ShopOrder }) {
   return (
     <div className="border border-border/60">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-2 px-6 py-4 bg-cream">
-        <div>
+      <div className="flex items-center justify-between flex-wrap gap-2 px-5 sm:px-6 py-4 bg-cream">
+        <div className="min-w-0">
           <p className="section-eyebrow text-muted-foreground">Order · {date}</p>
-          <p className="font-sans text-foreground" style={{ fontSize: '0.8rem' }}>{order.reference}</p>
+          <p className="font-sans text-foreground break-all" style={{ fontSize: '0.78rem' }}>{order.reference}</p>
         </div>
         <span
           className="font-sans px-3 py-1 rounded-full"
@@ -113,7 +111,7 @@ function OrderCard({ order }: { order: ShopOrder }) {
 
       {/* Delivered thank-you */}
       {delivered && (
-        <div className="mx-6 mb-2 p-4 text-center" style={{ background: '#faf4e8', border: '1px solid #ecdcc0' }}>
+        <div className="mx-5 sm:mx-6 mb-2 p-4 text-center" style={{ background: '#faf4e8', border: '1px solid #ecdcc0' }}>
           <p className="font-serif text-primary text-xl mb-1">✦</p>
           <p className="font-serif text-foreground" style={{ fontSize: '1.05rem' }}>Thank you for your patronage</p>
           <p className="font-sans text-muted-foreground" style={{ fontSize: '0.82rem', fontWeight: 300 }}>
@@ -123,7 +121,7 @@ function OrderCard({ order }: { order: ShopOrder }) {
       )}
 
       {/* Items */}
-      <div className="px-6 py-5 space-y-4">
+      <div className="px-5 sm:px-6 py-5 space-y-4">
         {order.items.map((it) => (
           <div key={it.id} className="flex items-center gap-4">
             {it.image_url && <img src={it.image_url} alt={it.product_name} className="w-14 h-16 object-cover bg-cream" />}
@@ -139,11 +137,11 @@ function OrderCard({ order }: { order: ShopOrder }) {
       </div>
 
       {/* Totals + delivery */}
-      <div className="px-6 py-4 border-t border-border/40 text-sm font-sans">
+      <div className="px-5 sm:px-6 py-4 border-t border-border/40 text-sm font-sans">
         <div className="flex justify-between text-muted-foreground"><span>Subtotal</span><span>{formatNaira(order.subtotal_ngn)}</span></div>
         <div className="flex justify-between text-muted-foreground"><span>Delivery</span><span>{formatNaira(order.delivery_ngn)}</span></div>
         <div className="flex justify-between text-foreground mt-1" style={{ fontWeight: 500 }}><span>Total</span><span>{formatNaira(order.total_ngn)}</span></div>
-        <p className="text-muted-foreground mt-3" style={{ fontSize: '0.78rem' }}>
+        <p className="text-muted-foreground mt-3 break-words" style={{ fontSize: '0.78rem' }}>
           Delivering to: {order.delivery_address}{order.delivery_city ? `, ${order.delivery_city}` : ''}
         </p>
       </div>
@@ -153,26 +151,55 @@ function OrderCard({ order }: { order: ShopOrder }) {
 
 function StatusTracker({ status }: { status: string }) {
   const current = statusStep(status);
+  const dot = (done: boolean, i: number, size: number) => (
+    <div
+      className="flex items-center justify-center rounded-full flex-shrink-0"
+      style={{
+        width: size, height: size,
+        backgroundColor: done ? '#b8965a' : 'transparent',
+        border: `1.5px solid ${done ? '#b8965a' : 'hsl(var(--border))'}`,
+        color: done ? '#fff' : 'hsl(var(--muted-foreground))',
+      }}
+    >
+      {done ? <Check size={size === 24 ? 13 : 14} /> : <span style={{ fontSize: '0.6rem' }}>{i + 1}</span>}
+    </div>
+  );
+
   return (
-    <div className="px-6 py-6">
-      <div className="flex items-center">
+    <div className="px-5 sm:px-6 py-5">
+      {/* Mobile: vertical stepper — never overflows */}
+      <ol className="sm:hidden">
         {ORDER_FLOW.map((stage, i) => {
           const done = i <= current;
           const isLast = i === ORDER_FLOW.length - 1;
           return (
-            <div key={stage} className="flex items-center flex-1 last:flex-none">
+            <li key={stage} className="flex gap-3">
+              <div className="flex flex-col items-center">
+                {dot(done, i, 24)}
+                {!isLast && (
+                  <div style={{ width: 1.5, flex: 1, minHeight: 16, backgroundColor: i < current ? '#b8965a' : 'hsl(var(--border))' }} />
+                )}
+              </div>
+              <span
+                className="font-sans"
+                style={{ fontSize: '0.82rem', lineHeight: '24px', paddingBottom: isLast ? 0 : 14, color: done ? '#b8965a' : 'hsl(var(--muted-foreground))' }}
+              >
+                {STATUS_LABEL[stage]}
+              </span>
+            </li>
+          );
+        })}
+      </ol>
+
+      {/* Desktop: horizontal stepper */}
+      <div className="hidden sm:flex items-start">
+        {ORDER_FLOW.map((stage, i) => {
+          const done = i <= current;
+          const isLast = i === ORDER_FLOW.length - 1;
+          return (
+            <div key={stage} className="flex items-start flex-1 last:flex-none">
               <div className="flex flex-col items-center" style={{ minWidth: 0 }}>
-                <div
-                  className="flex items-center justify-center rounded-full"
-                  style={{
-                    width: 26, height: 26,
-                    backgroundColor: done ? '#b8965a' : 'transparent',
-                    border: `1.5px solid ${done ? '#b8965a' : 'hsl(var(--border))'}`,
-                    color: done ? '#fff' : 'hsl(var(--muted-foreground))',
-                  }}
-                >
-                  {done ? <Check size={14} /> : <span style={{ fontSize: '0.6rem' }}>{i + 1}</span>}
-                </div>
+                {dot(done, i, 26)}
                 <span
                   className="font-sans mt-2 text-center"
                   style={{ fontSize: '0.6rem', letterSpacing: '0.04em', color: done ? '#b8965a' : 'hsl(var(--muted-foreground))', maxWidth: 64 }}
@@ -181,7 +208,7 @@ function StatusTracker({ status }: { status: string }) {
                 </span>
               </div>
               {!isLast && (
-                <div className="flex-1 h-px mx-1" style={{ backgroundColor: i < current ? '#b8965a' : 'hsl(var(--border))', minWidth: 12 }} />
+                <div className="flex-1 h-px mx-1" style={{ backgroundColor: i < current ? '#b8965a' : 'hsl(var(--border))', minWidth: 12, marginTop: 13 }} />
               )}
             </div>
           );

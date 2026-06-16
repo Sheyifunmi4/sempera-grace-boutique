@@ -173,7 +173,7 @@ export default function SemperaNav({ onRequestPiece }: SemperaNavProps) {
                   <Link
                     to="/account"
                     className="nav-link flex items-center gap-2"
-                    title="My account"
+                    title="My orders"
                   >
                     <UserIcon size={16} />
                     {firstName}
@@ -234,7 +234,7 @@ export default function SemperaNav({ onRequestPiece }: SemperaNavProps) {
                     onClick={() => setMenuOpen(false)}
                     className="nav-link text-left flex items-center gap-2 text-base"
                   >
-                    <UserIcon size={17} /> My Account ({firstName})
+                    <UserIcon size={17} /> My Orders ({firstName})
                   </Link>
                   <button
                     onClick={() => { setMenuOpen(false); signOut(); }}
