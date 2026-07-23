@@ -22,6 +22,9 @@ import Checkout from "./pages/Checkout";
 import OurStory from "./pages/OurStory";
 import Policies from "./pages/Policies";
 import Contact from "./pages/Contact";
+import CollectionsAll from "./pages/CollectionsAll";
+import SizeGuide from "./pages/SizeGuide";
+import CareGuide from "./pages/CareGuide";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -61,7 +64,9 @@ const App = () => (
               <Route path="/our-story" element={<OurStory />} />
               <Route path="/policies" element={<Policies />} />
               <Route path="/contact" element={<Contact />} />
-              <Route path="/collections" element={<Navigate to="/#collection" replace />} />
+              <Route path="/collections" element={<CollectionsAll />} />
+              <Route path="/size-guide" element={<SizeGuide />} />
+              <Route path="/care-guide" element={<CareGuide />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

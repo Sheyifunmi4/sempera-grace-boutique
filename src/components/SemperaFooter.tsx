@@ -9,8 +9,10 @@ const footerLinks = {
     { label: 'ELÁN Collection', to: '/collection/elan' },
   ],
   Collections: [
-    { label: 'New Arrivals', to: '/#collection' },
-    { label: 'View All', to: '/#collection' },
+    { label: 'All Collections', to: '/collections' },
+    { label: 'BELLE', to: '/collections' },
+    { label: 'ELÁN', to: '/collections' },
+    { label: 'EASE', to: '/collections' },
   ],
   Help: [
     { label: 'Size Guide', to: '/size-guide' },

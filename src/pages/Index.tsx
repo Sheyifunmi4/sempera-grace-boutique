@@ -9,6 +9,9 @@ import WhySection from '@/components/WhySection';
 import InstagramGallery from '@/components/InstagramGallery';
 import Newsletter from '@/components/Newsletter';
 import SemperaFooter from '@/components/SemperaFooter';
+import ManifestoBand from '@/components/ManifestoBand';
+import BrandStatement from '@/components/BrandStatement';
+import CustomerQuote from '@/components/CustomerQuote';
 import RequestModal from '@/components/RequestModal';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 import { useCart } from '@/contexts/CartContext';
@@ -61,6 +64,12 @@ const Index = () => {
         onRequest={() => openRequestModal()}
       />
 
+      {/* §03 Section 2 — Brand Statement */}
+      <BrandStatement />
+
+      {/* Brand Manifesto — values strip */}
+      <ManifestoBand />
+
       {/* BELLE Collection — newest, teaser */}
       <FeaturedCollection
         onRequest={openRequestModal}
@@ -97,6 +106,9 @@ const Index = () => {
         viewAllHref={`/collection/${COLLECTIONS.elan.slug}`}
         sectionId="collection-elan"
       />
+
+      {/* §03 Section 4 — Customer Quote */}
+      <CustomerQuote />
 
       {/* Shop by Category */}
       <CategorySection />

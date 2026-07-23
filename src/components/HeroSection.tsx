@@ -36,122 +36,44 @@ export default function HeroSection({ onExplore }: HeroSectionProps) {
         />
       </div>
 
-      {/* Content — centered */}
+      {/* Content — bottom-left per brief */}
       <div
-        className="relative z-10 flex flex-col justify-center items-center w-full"
-        style={{ minHeight: '100vh' }}
+        className="relative z-10 flex flex-col justify-end w-full"
+        style={{ minHeight: '100vh', paddingBottom: '72px' }}
       >
-        <div className="max-w-7xl mx-auto w-full px-6 lg:px-8">
-          <div className="max-w-2xl animate-fade-in-up" style={{ textAlign: 'left' }}>
-
-            {/* Caramel rule + eyebrow */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: '14px', marginBottom: '22px' }}>
-              <span style={{ display: 'block', width: '32px', height: '1px', background: 'rgba(245,240,232,0.5)' }} />
-              <p style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: '10px',
-                fontWeight: 500,
-                letterSpacing: '0.28em',
-                textTransform: 'uppercase',
-                color: '#FFFFFF',
-                margin: 0,
-                textShadow: '0 1px 8px rgba(0,0,0,0.6)',
-              }}>
-                Luxury Ready-to-Wear · New Season
-              </p>
-            </div>
-
-            {/* Headline — "Designed with" plain, "Grace." in caramel */}
+        <div className="max-w-7xl mx-auto w-full px-6 lg:px-12">
+          <div style={{ maxWidth: '600px' }}>
             <h1 style={{
               fontFamily: "'Cormorant Garamond', Georgia, serif",
               fontStyle: 'italic',
-              fontWeight: 600,
-              fontSize: 'clamp(3.6rem, 7vw, 76px)',
+              fontWeight: 300,
+              fontSize: 'clamp(3.2rem, 6.5vw, 72px)',
               lineHeight: 1.0,
-              marginBottom: '24px',
+              color: '#F5F0E8',
+              marginBottom: '32px',
               letterSpacing: '-0.01em',
-              textShadow: '0 2px 24px rgba(26,24,20,0.45)',
+              textShadow: '0 2px 24px rgba(26,24,20,0.5)',
             }}>
-              <span style={{ color: '#FFFFFF' }}>Designed with </span>
-              <span style={{ color: '#FFFFFF' }}>Grace.</span>
+              Designed with Grace.
             </h1>
-
-            {/* Tagline */}
-            <p style={{
-              fontFamily: "'Cormorant Garamond', Georgia, serif",
-              fontStyle: 'italic',
-              fontWeight: 300,
-              fontSize: 'clamp(1.1rem, 2.2vw, 20px)',
-              color: '#FFFFFF',
-              letterSpacing: '0.01em',
-              lineHeight: 1.65,
-              margin: '0 0 14px',
-              maxWidth: '520px',
-              textShadow: '0 2px 16px rgba(0,0,0,0.7)',
-            }}>
-              For women who want to get dressed<br />and feel exactly like themselves.
-            </p>
-
-            {/* Supporting body */}
-            <p style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: '13px',
-              fontWeight: 300,
-              color: 'rgba(255,255,255,0.90)',
-              letterSpacing: '0.04em',
-              lineHeight: 1.8,
-              margin: '0 0 2.8rem',
-              maxWidth: '400px',
-              textTransform: 'uppercase',
-              textShadow: '0 1px 10px rgba(0,0,0,0.65)',
-            }}>
-              Feminine · Put-together · At ease
-            </p>
-
-            {/* CTAs */}
-            <div style={{ display: 'flex', gap: '14px', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
-              <button
-                onClick={onExplore}
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: '11px',
-                  fontWeight: 500,
-                  letterSpacing: '0.16em',
-                  textTransform: 'uppercase',
-                  background: '#F5F0E8',
-                  color: '#1A1814',
-                  padding: '16px 40px',
-                  border: 'none',
-                  borderRadius: '3px',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                }}
-              >
-                Shop the Collection
-              </button>
-              <button
-                onClick={onExplore}
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: '11px',
-                  fontWeight: 400,
-                  letterSpacing: '0.16em',
-                  textTransform: 'uppercase',
-                  background: 'transparent',
-                  color: '#F5F0E8',
-                  padding: '16px 32px',
-                  border: '1px solid rgba(245,240,232,0.45)',
-                  borderRadius: '3px',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                }}
-              >
-                Our Story
-              </button>
-            </div>
-
+            <button
+              onClick={onExplore}
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '11px',
+                fontWeight: 500,
+                letterSpacing: '0.16em',
+                textTransform: 'uppercase',
+                background: '#1A1814',
+                color: '#F5F0E8',
+                padding: '16px 40px',
+                border: 'none',
+                borderRadius: '0',
+                cursor: 'pointer',
+              }}
+            >
+              Shop the Collection
+            </button>
           </div>
         </div>
       </div>
