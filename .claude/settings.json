@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(bun run *)"
+      "Bash(bun run *)",
+      "Bash(npm run *)",
+      "Bash(echo \"build exit: $?\")",
+      "Bash(curl -s -o /dev/null -w \"dev server 8080 -> HTTP %{http_code} in %{time_total}s\\\\n\" --max-time 8 http://127.0.0.1:8080/)",
+      "Bash(curl -s -o /dev/null -w \"preview 4173 -> HTTP %{http_code}\\\\n\" --max-time 8 http://127.0.0.1:4173/)"
     ]
   }
 }

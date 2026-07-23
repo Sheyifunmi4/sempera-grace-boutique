@@ -8,11 +8,13 @@ import FeaturedCollection, {
   type CollectionSlug,
   type Product,
 } from '@/components/FeaturedCollection';
+import { useCart } from '@/contexts/CartContext';
 import NotFound from './NotFound';
 
 export default function CollectionPage() {
   const { slug } = useParams<{ slug: string }>();
   const [modalProduct, setModalProduct] = useState<Product | null>(null);
+  const { addItem } = useCart();
 
   const config = slug && (slug in COLLECTIONS) ? COLLECTIONS[slug as CollectionSlug] : null;
   if (!config) return <NotFound />;
@@ -40,6 +42,7 @@ export default function CollectionPage() {
 
       <FeaturedCollection
         onRequest={openRequestModal}
+        onAddToCart={(p) => addItem(p.id)}
         collection={config.slug}
         title={config.title}
         tagline={config.tagline}

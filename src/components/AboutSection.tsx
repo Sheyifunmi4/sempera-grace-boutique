@@ -1,4 +1,4 @@
-import aboutImage from '@/assets/elan-batik-lace-2.jpg';
+const aboutImage = '/founder-hero.jpg';
 
 export default function AboutSection() {
   return (

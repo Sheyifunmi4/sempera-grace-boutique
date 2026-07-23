@@ -11,12 +11,16 @@ import Newsletter from '@/components/Newsletter';
 import SemperaFooter from '@/components/SemperaFooter';
 import RequestModal from '@/components/RequestModal';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
+import { useCart } from '@/contexts/CartContext';
 import type { Product } from '@/components/FeaturedCollection';
 
 const Index = () => {
   const [modalProduct, setModalProduct] = useState<Product | null>(null);
   const collectionRef = useRef<HTMLElement>(null);
   const pageRef = useScrollReveal();
+  const { addItem } = useCart();
+
+  const handleAddToCart = (product: Product) => addItem(product.id);
 
   const scrollToCollection = () => {
     const el = document.getElementById('collection');
@@ -34,6 +38,7 @@ const Index = () => {
         name: 'Enquire About a Piece',
         description: '',
         price: '',
+        priceNgn: 0,
         originalPrice: '',
         images: [],
         fabric: '',
@@ -59,6 +64,7 @@ const Index = () => {
       {/* BELLE Collection — newest, teaser */}
       <FeaturedCollection
         onRequest={openRequestModal}
+        onAddToCart={handleAddToCart}
         collection={COLLECTIONS.belle.slug}
         title={COLLECTIONS.belle.title}
         tagline={COLLECTIONS.belle.tagline}
@@ -71,6 +77,7 @@ const Index = () => {
       {/* EASE Collection — teaser */}
       <FeaturedCollection
         onRequest={openRequestModal}
+        onAddToCart={handleAddToCart}
         collection={COLLECTIONS.ease.slug}
         title={COLLECTIONS.ease.title}
         tagline={COLLECTIONS.ease.tagline}
@@ -82,6 +89,7 @@ const Index = () => {
       {/* ELÁN Collection — teaser */}
       <FeaturedCollection
         onRequest={openRequestModal}
+        onAddToCart={handleAddToCart}
         collection={COLLECTIONS.elan.slug}
         title={COLLECTIONS.elan.title}
         tagline={COLLECTIONS.elan.tagline}

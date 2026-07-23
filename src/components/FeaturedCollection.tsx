@@ -25,7 +25,8 @@ export interface Product {
   code: string;
   name: string;
   description: string;
-  price: string;
+  price: string; // display text, e.g. "₦45,000"
+  priceNgn: number; // numeric Naira for cart math + Paystack
   originalPrice: string;
   images: string[];
   fabric: string;
@@ -33,6 +34,17 @@ export interface Product {
   sizes: string;
   status: string;
   collection: string;
+}
+
+// Pull a whole-Naira number out of a price string like "₦45,000" → 45000.
+export function parsePriceToNgn(text: string): number {
+  const digits = (text || '').replace(/[^0-9]/g, '');
+  return digits ? parseInt(digits, 10) : 0;
+}
+
+// Format a Naira amount for display, e.g. 45000 → "₦45,000".
+export function formatNaira(amount: number): string {
+  return '₦' + (amount || 0).toLocaleString('en-NG');
 }
 
 export type CollectionSlug = 'belle' | 'elan' | 'ease';
@@ -62,6 +74,10 @@ function mapRow(row: any): Product {
     name: row.name,
     description: row.description || '',
     price: row.price || '',
+    // Use the numeric column when present; otherwise parse the text price so
+    // the cart keeps working before price_ngn is filled in for every product.
+    priceNgn:
+      typeof row.price_ngn === 'number' ? row.price_ngn : parsePriceToNgn(row.price || ''),
     originalPrice: row.original_price || '',
     images: Array.isArray(row.image_urls) && row.image_urls.length > 0
       ? row.image_urls
@@ -144,9 +160,10 @@ export function useProduct(id: string | undefined) {
 interface ProductCardProps {
   product: Product;
   onRequest: (product: Product) => void;
+  onAddToCart?: (product: Product) => void;
 }
 
-export function ProductCard({ product, onRequest }: ProductCardProps) {
+export function ProductCard({ product, onRequest, onAddToCart }: ProductCardProps) {
   const [currentImg, setCurrentImg] = useState(0);
 
   const nextImg = (e: React.MouseEvent) => {
@@ -249,13 +266,30 @@ export function ProductCard({ product, onRequest }: ProductCardProps) {
           </span>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 pt-2 mt-auto">
-          <Link to={`/product/${product.id}`} className="btn-outline-gold flex-1 text-center">
-            View Details
-          </Link>
-          <button onClick={() => onRequest(product)} className="btn-gold flex-1">
-            Request This Piece
-          </button>
+        <div className="flex flex-col gap-3 pt-2 mt-auto">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link to={`/product/${product.id}`} className="btn-outline-gold flex-1 text-center">
+              View Details
+            </Link>
+            {onAddToCart ? (
+              <button onClick={() => onAddToCart(product)} className="btn-gold flex-1">
+                Add to Cart
+              </button>
+            ) : (
+              <button onClick={() => onRequest(product)} className="btn-gold flex-1">
+                Request This Piece
+              </button>
+            )}
+          </div>
+          {onAddToCart && (
+            <button
+              onClick={() => onRequest(product)}
+              className="font-sans text-muted-foreground hover:text-foreground transition-colors duration-300 text-center"
+              style={{ fontSize: '0.78rem', letterSpacing: '0.05em' }}
+            >
+              or request this piece →
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -265,6 +299,7 @@ export function ProductCard({ product, onRequest }: ProductCardProps) {
 // ─── Featured Collection ──────────────────────────────────────────
 interface FeaturedCollectionProps {
   onRequest: (product: Product) => void;
+  onAddToCart?: (product: Product) => void;
   collection?: string;
   title: string;
   tagline: string;
@@ -277,6 +312,7 @@ interface FeaturedCollectionProps {
 
 export default function FeaturedCollection({
   onRequest,
+  onAddToCart,
   collection,
   title,
   tagline,
@@ -350,7 +386,7 @@ export default function FeaturedCollection({
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 lg:gap-14 items-stretch">
               {products.map((product) => (
                 <div key={product.id} className="flex" style={{ opacity: 1, transform: 'none' }}>
-                  <ProductCard product={product} onRequest={onRequest} />
+                  <ProductCard product={product} onRequest={onRequest} onAddToCart={onAddToCart} />
                 </div>
               ))}
             </div>

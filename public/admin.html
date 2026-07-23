@@ -169,8 +169,8 @@ textarea.form-input{resize:vertical;min-height:80px;}
 @keyframes spin{to{transform:rotate(360deg);}}
 
 /* ── TOAST ── */
-#toast{position:fixed;bottom:24px;right:24px;background:var(--dark);color:white;padding:12px 20px;font-size:0.78rem;letter-spacing:0.06em;z-index:999;transform:translateY(100px);opacity:0;transition:all 0.3s;pointer-events:none;}
-#toast.show{transform:translateY(0);opacity:1;}
+#toast{position:fixed;top:24px;left:50%;background:var(--dark);color:white;padding:12px 24px;font-size:0.78rem;letter-spacing:0.06em;z-index:9999;transform:translateX(-50%) translateY(-120px);opacity:0;transition:all 0.3s;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.18);}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
 #toast.success{border-left:3px solid var(--gold);}
 #toast.error{border-left:3px solid #ef4444;}
 
@@ -361,6 +361,10 @@ textarea.form-input{resize:vertical;min-height:80px;}
       <span class="mobile-nav-icon">📋</span>
       <span class="mobile-nav-label">Orders</span>
     </button>
+    <button class="mobile-nav-item" onclick="showPageMobile('shop-orders', this)">
+      <span class="mobile-nav-icon">🛍️</span>
+      <span class="mobile-nav-label">E-Pay</span>
+    </button>
     <button class="mobile-nav-item" onclick="showPageMobile('products', this)">
       <span class="mobile-nav-icon">👗</span>
       <span class="mobile-nav-label">Products</span>
@@ -398,6 +402,9 @@ textarea.form-input{resize:vertical;min-height:80px;}
         </div>
         <div class="nav-item" onclick="showPage('orders')">
           <span class="nav-icon">📦</span> Orders
+        </div>
+        <div class="nav-item" onclick="showPage('shop-orders')">
+          <span class="nav-icon">🛍️</span> Cart E-Payment Orders
         </div>
         <div class="nav-item" onclick="showPage('products')">
           <span class="nav-icon">👗</span> Products
@@ -519,6 +526,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
             <thead>
               <tr>
                 <th>Order ID</th>
+                <th>Source</th>
                 <th>Customer</th>
                 <th>Product</th>
                 <th>Size</th>
@@ -530,10 +538,51 @@ textarea.form-input{resize:vertical;min-height:80px;}
               </tr>
             </thead>
             <tbody id="orders-tbody">
-              <tr><td colspan="9" class="table-empty"><div class="spinner"></div><br/>Loading orders...</td></tr>
+              <tr><td colspan="10" class="table-empty"><div class="spinner"></div><br/>Loading orders...</td></tr>
             </tbody>
           </table>
         </div>
+      </div>
+
+      <!-- ═══ CART E-PAYMENT ORDERS PAGE ═══ -->
+      <div class="page-content" id="page-shop-orders">
+        <div class="section-stripe"></div>
+        <div class="table-header">
+          <h2>Cart E-Payment Orders</h2>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <select id="shop-orders-filter" onchange="filterShopOrders()" style="padding:8px 12px;border:1px solid var(--border);font-family:'Jost',sans-serif;font-size:0.78rem;outline:none;background:white;">
+              <option value="">All Statuses</option>
+              <option value="paid">Payment Received</option>
+              <option value="confirmed">Order Confirmed</option>
+              <option value="packaging">In Packaging</option>
+              <option value="in_transit">In Delivery</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <input class="search-box" placeholder="Search name, reference, phone..." id="shop-orders-search" oninput="filterShopOrders()"/>
+            <button onclick="loadShopOrders().then(renderShopOrders)" style="padding:8px 14px;border:1px solid var(--border);background:white;font-family:'Jost',sans-serif;font-size:0.75rem;cursor:pointer;">↻ Refresh</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Date &amp; Time</th>
+                <th>Reference</th>
+                <th>Customer</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="shop-orders-tbody">
+              <tr><td colspan="8" class="table-empty"><div class="spinner"></div><br/>Loading e-payment orders...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="shop-orders-pagination" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-top:14px;font-size:0.78rem;color:var(--muted);"></div>
       </div>
 
       <!-- ═══ PRODUCTS PAGE ═══ -->
@@ -922,6 +971,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
           <div class="form-group"><label class="form-label">Product Name *</label><input class="form-input" id="pf-name" placeholder="e.g. Metallic Blue Dress"/></div>
           <div class="form-group"><label class="form-label">Product Code *</label><input class="form-input" id="pf-code" placeholder="e.g. SP-EL-016"/></div>
           <div class="form-group"><label class="form-label">Price *</label><input class="form-input" id="pf-price" placeholder="₦34,999"/></div>
+          <div class="form-group"><label class="form-label">Price (₦) — number only *</label><input class="form-input" id="pf-price-ngn" type="number" min="0" step="1" placeholder="34999"/><small style="color:var(--muted);font-size:0.7rem;">Used for cart &amp; payment. Digits only, no ₦ or commas.</small></div>
           <div class="form-group"><label class="form-label">Original Price</label><input class="form-input" id="pf-original" placeholder="₦39,999"/></div>
           <div class="form-group"><label class="form-label">Available Sizes</label><input class="form-input" id="pf-sizes" placeholder="6–22"/></div>
           <div class="form-group">
@@ -1092,12 +1142,14 @@ function showPage(page) {
   event.currentTarget.classList.add('active');
   const titles = {
     dashboard:'Dashboard', orders:'Orders & Requests',
+    'shop-orders':'Cart E-Payment Orders',
     products:'Product Management', customers:'Customer Management',
     finance:'Finance Dashboard', expenses:'Expenses',
     invoices:'Invoices', ledger:'Financial Ledger'
   };
   document.getElementById('page-title').textContent = titles[page] || page;
   if (page === 'orders') renderOrders();
+  if (page === 'shop-orders') renderShopOrders();
   if (page === 'products') renderProducts();
   if (page === 'customers') renderCustomers();
   if (page === 'finance') renderFinance();
@@ -1115,6 +1167,7 @@ function showPageMobile(page, btn) {
   if (btn) btn.classList.add('active');
   window.scrollTo(0, 0);
   if (page === 'orders') renderOrders();
+  if (page === 'shop-orders') renderShopOrders();
   if (page === 'products') renderProducts();
   if (page === 'customers') renderCustomers();
   if (page === 'finance') renderFinance();
@@ -1124,10 +1177,150 @@ function showPageMobile(page, btn) {
 }
 
 // ═══════════════════════════════════════
+// ONLINE (PAID) ORDERS
+// ═══════════════════════════════════════
+const SHOP_STATUSES = ['paid','confirmed','packaging','in_transit','delivered','cancelled'];
+const SHOP_STATUS_LABELS = {
+  paid:'Payment Received', confirmed:'Order Confirmed', packaging:'In Packaging',
+  in_transit:'In Delivery', delivered:'Delivered', cancelled:'Cancelled'
+};
+const SHOP_STATUS_BADGE = {
+  paid:'#7c3aed', confirmed:'#2563eb', packaging:'#d97706', in_transit:'#0891b2', delivered:'#16a34a', cancelled:'#ef4444'
+};
+
+let allShopOrders = [];
+let shopOrdersPage = 1;
+const SHOP_PAGE_SIZE = 10;
+
+async function loadShopOrders() {
+  try {
+    allShopOrders = await sb('shop_orders?select=*,items:shop_order_items(*)&order=created_at.desc') || [];
+  } catch (e) {
+    allShopOrders = [];
+    console.error('Load e-payment orders failed:', e);
+  }
+  return allShopOrders;
+}
+
+function getFilteredShopOrders() {
+  const status = (document.getElementById('shop-orders-filter') || {}).value || '';
+  const q = ((document.getElementById('shop-orders-search') || {}).value || '').toLowerCase().trim();
+  return (allShopOrders || []).filter(o => {
+    if (status && o.status !== status) return false;
+    if (q) {
+      const hay = `${o.customer_name||''} ${o.reference||''} ${o.customer_phone||''} ${o.customer_email||''}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+function filterShopOrders() { shopOrdersPage = 1; renderShopOrders(); }
+
+async function renderShopOrders() {
+  const tbody = document.getElementById('shop-orders-tbody');
+  if (!tbody) return;
+  if (!allShopOrders.length) {
+    tbody.innerHTML = '<tr><td colspan="8" class="table-empty"><div class="spinner"></div><br/>Loading e-payment orders...</td></tr>';
+    await loadShopOrders();
+  }
+  const filtered = getFilteredShopOrders();
+  const total = filtered.length;
+  const pagEl = document.getElementById('shop-orders-pagination');
+  if (!total) {
+    tbody.innerHTML = '<tr><td colspan="8" class="table-empty">No e-payment orders found.</td></tr>';
+    if (pagEl) pagEl.innerHTML = '';
+    return;
+  }
+  const pages = Math.ceil(total / SHOP_PAGE_SIZE);
+  if (shopOrdersPage > pages) shopOrdersPage = pages;
+  const start = (shopOrdersPage - 1) * SHOP_PAGE_SIZE;
+  const pageRows = filtered.slice(start, start + SHOP_PAGE_SIZE);
+
+  tbody.innerHTML = pageRows.map((o, i) => shopOrderRow(o, start + i + 1)).join('');
+  renderShopPagination(total, pages, start, pageRows.length);
+}
+
+function shopOrderRow(o, num) {
+  const dt = new Date(o.created_at);
+  const date = dt.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+  const time = dt.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+  const itemCount = (o.items || []).reduce((n, it) => n + (it.quantity || 1), 0);
+  const itemNames = (o.items || []).map(it => `${esc(it.product_name)} (UK ${esc(it.size || '–')}×${it.quantity})`).join(', ');
+  const opts = SHOP_STATUSES.map(s => `<option value="${s}" ${s === o.status ? 'selected' : ''}>${SHOP_STATUS_LABELS[s]}</option>`).join('');
+  const badge = SHOP_STATUS_BADGE[o.status] || '#888';
+
+  return `
+    <tr>
+      <td style="color:var(--muted);">${num}</td>
+      <td style="white-space:nowrap;"><div style="font-size:0.78rem;">${date}</div><div style="font-size:0.66rem;color:var(--muted);">${time}</div></td>
+      <td style="font-size:0.68rem;color:var(--muted);">${esc(o.reference)}</td>
+      <td><strong>${esc(o.customer_name)}</strong><div style="font-size:0.66rem;color:var(--muted);">${esc(o.customer_phone || '')}</div></td>
+      <td style="max-width:240px;"><div style="font-size:0.74rem;">${itemCount} item${itemCount === 1 ? '' : 's'}</div><div style="font-size:0.64rem;color:var(--muted);">${itemNames}</div></td>
+      <td style="color:var(--gold);font-weight:500;white-space:nowrap;">${fmt(o.total_ngn)}</td>
+      <td style="white-space:nowrap;">
+        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${badge};margin-right:6px;"></span>
+        <select onchange="updateShopOrderStatus('${o.id}', this.value)" style="padding:6px 8px;border:1px solid var(--border);font-family:'Jost',sans-serif;font-size:0.72rem;outline:none;background:white;">${opts}</select>
+      </td>
+      <td><button class="btn-sm" onclick="toggleShopDetail('${o.id}')">Details</button></td>
+    </tr>
+    <tr id="shop-detail-${o.id}" style="display:none;background:var(--bg);">
+      <td colspan="8" style="padding:14px 18px;font-size:0.76rem;color:var(--muted);line-height:1.8;">
+        <div><strong style="color:var(--dark);">Deliver to:</strong> ${esc(o.delivery_address)}${o.delivery_city ? ', ' + esc(o.delivery_city) : ''} · <span style="text-transform:capitalize;">${esc(o.delivery_zone)}</span></div>
+        <div><strong style="color:var(--dark);">Contact:</strong> ${esc(o.customer_email || '')} · ${esc(o.customer_phone || '')}</div>
+        <div><strong style="color:var(--dark);">Breakdown:</strong> Subtotal ${fmt(o.subtotal_ngn)} · Delivery ${fmt(o.delivery_ngn)} · Total ${fmt(o.total_ngn)}</div>
+        ${o.notes ? `<div><strong style="color:var(--dark);">Note:</strong> ${esc(o.notes)}</div>` : ''}
+      </td>
+    </tr>`;
+}
+
+function toggleShopDetail(id) {
+  const row = document.getElementById('shop-detail-' + id);
+  if (row) row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+}
+
+function renderShopPagination(total, pages, start, shown) {
+  const el = document.getElementById('shop-orders-pagination');
+  if (!el) return;
+  if (pages <= 1) { el.innerHTML = `<div>Showing ${total} order${total === 1 ? '' : 's'}</div>`; return; }
+  let nums = '';
+  for (let p = 1; p <= pages; p++) {
+    nums += `<button onclick="shopGoPage(${p})" style="padding:5px 10px;margin:0 2px;border:1px solid var(--border);background:${p === shopOrdersPage ? 'var(--gold)' : 'white'};color:${p === shopOrdersPage ? 'white' : 'var(--dark)'};font-family:'Jost',sans-serif;font-size:0.72rem;cursor:pointer;">${p}</button>`;
+  }
+  el.innerHTML = `
+    <div>Showing ${start + 1}–${start + shown} of ${total}</div>
+    <div>
+      <button onclick="shopGoPage(${shopOrdersPage - 1})" ${shopOrdersPage === 1 ? 'disabled' : ''} style="padding:5px 10px;border:1px solid var(--border);background:white;cursor:pointer;font-size:0.72rem;">‹ Prev</button>
+      ${nums}
+      <button onclick="shopGoPage(${shopOrdersPage + 1})" ${shopOrdersPage === pages ? 'disabled' : ''} style="padding:5px 10px;border:1px solid var(--border);background:white;cursor:pointer;font-size:0.72rem;">Next ›</button>
+    </div>`;
+}
+
+function shopGoPage(p) {
+  const filtered = getFilteredShopOrders();
+  const pages = Math.max(1, Math.ceil(filtered.length / SHOP_PAGE_SIZE));
+  shopOrdersPage = Math.min(Math.max(1, p), pages);
+  renderShopOrders();
+}
+
+async function updateShopOrderStatus(id, status) {
+  try {
+    await sb(`shop_orders?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ status }) });
+    const o = allShopOrders.find(x => x.id === id);
+    if (o) o.status = status; // reflect locally without a full refetch
+    showToast(status === 'delivered' ? 'Marked delivered — customer sees a thank-you 💛' : 'Order status updated', 'success');
+    renderShopOrders();
+    renderOrders(); // keep the unified all-orders view in sync
+  } catch (e) {
+    showToast('Could not update status (are you an admin?)', 'error');
+  }
+}
+
+// ═══════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════
 async function initApp() {
-  await Promise.all([loadOrders(), loadProducts(), loadCustomers()]);
+  await Promise.all([loadOrders(), loadProducts(), loadCustomers(), loadShopOrders()]);
   renderDashboard();
 }
 
@@ -1295,49 +1488,90 @@ function setChartFilter(days, btn) {
 // ═══════════════════════════════════════
 // ORDERS
 // ═══════════════════════════════════════
-function renderOrders(data) {
-  const orders = data || allOrders;
-  const tbody = document.getElementById('orders-tbody');
-  if (!orders.length) { tbody.innerHTML = '<tr><td colspan="9" class="table-empty">No orders found.</td></tr>'; return; }
+// Build the unified all-orders view: normal + manual orders, plus paid
+// e-payment (cart) orders — each tagged with a source, honouring the
+// page's search box and status filter.
+function buildOrdersView() {
+  const search = (document.getElementById('orders-search')?.value || '').toLowerCase();
+  const status = document.getElementById('orders-filter')?.value || '';
 
-  tbody.innerHTML = orders.map(o => `
+  const normal = (allOrders || []).filter(o => {
+    const ms = !search || (o.customer_name||'').toLowerCase().includes(search) ||
+      (o.product_name||'').toLowerCase().includes(search) || (o.customer_phone||'').includes(search);
+    const mst = !status || o.status === status;
+    return ms && mst;
+  }).map(o => ({
+    kind:'normal', id:o.id, src:(o.source === 'manual' ? 'Manual' : 'Normal'),
+    customer_name:o.customer_name, customer_phone:o.customer_phone,
+    product_name:o.product_name, product_code:o.product_code, size:o.size,
+    quantity:o.quantity, status:o.status, created_at:o.created_at
+  }));
+
+  const epay = (allShopOrders || []).filter(o => {
+    const ms = !search || (o.customer_name||'').toLowerCase().includes(search) ||
+      (o.reference||'').toLowerCase().includes(search) || (o.customer_phone||'').includes(search);
+    const mst = !status || o.status === status; // overlapping statuses (confirmed/delivered/cancelled) match
+    return ms && mst;
+  }).map(o => ({
+    kind:'epayment', id:o.id, src:'E-Payment',
+    customer_name:o.customer_name, customer_phone:o.customer_phone,
+    product_name:(o.items||[]).map(it=>it.product_name).join(', ') || '(cart items)',
+    product_code:'', size:(o.items||[]).map(it=>it.size).filter(Boolean).join('/') || '–',
+    quantity:(o.items||[]).reduce((n,it)=>n+(it.quantity||1),0),
+    status:o.status, created_at:o.created_at
+  }));
+
+  return [...normal, ...epay].sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+}
+
+function srcBadgeColor(src) {
+  return src === 'E-Payment' ? '#b8965a' : src === 'Manual' ? '#2563eb' : '#94a3b8';
+}
+
+function renderOrders() {
+  const tbody = document.getElementById('orders-tbody');
+  if (!tbody) return;
+  const view = buildOrdersView();
+  if (!view.length) { tbody.innerHTML = '<tr><td colspan="10" class="table-empty">No orders found.</td></tr>'; return; }
+
+  tbody.innerHTML = view.map(r => {
+    const statusCell = r.kind === 'epayment'
+      ? `<select class="status-select" onchange="updateShopOrderStatus('${r.id}',this.value)">${SHOP_STATUSES.map(s=>`<option value="${s}" ${r.status===s?'selected':''}>${SHOP_STATUS_LABELS[s]}</option>`).join('')}</select>`
+      : `<select class="status-select" onchange="updateOrderStatus('${r.id}',this.value)">${['new','contacted','confirmed','invoiced','payment','production','ready','delivered','cancelled'].map(s=>`<option value="${s}" ${r.status===s?'selected':''}>${statusLabel(s)}</option>`).join('')}</select>`;
+    const action = r.kind === 'epayment'
+      ? `<button class="btn-sm" onclick="openEpayPage()">View</button>`
+      : `<button class="btn-sm" onclick="openOrderModal('${r.id}')">View</button>`;
+    return `
     <tr>
-      <td style="font-size:0.7rem;color:var(--muted);">${o.id.slice(0,8)}...</td>
-      <td><strong>${esc(o.customer_name)}</strong></td>
+      <td style="font-size:0.7rem;color:var(--muted);">${r.id.slice(0,8)}...</td>
+      <td><span style="display:inline-block;padding:2px 8px;border-radius:999px;font-size:0.58rem;letter-spacing:0.04em;background:${srcBadgeColor(r.src)};color:#fff;white-space:nowrap;">${r.src}</span></td>
+      <td><strong>${esc(r.customer_name)}</strong></td>
       <td>
-        <div style="font-size:0.8rem;">${esc(o.product_name||'')}</div>
-        <div style="font-size:0.65rem;color:var(--muted);">${esc(o.product_code||'')}</div>
+        <div style="font-size:0.8rem;">${esc(r.product_name||'')}</div>
+        <div style="font-size:0.65rem;color:var(--muted);">${esc(r.product_code||'')}</div>
       </td>
-      <td>${esc(o.size||'–')}</td>
-      <td>${o.quantity||1}</td>
-      <td>${esc(o.customer_phone||'–')}</td>
-      <td>
-        <select class="status-select" onchange="updateOrderStatus('${o.id}',this.value)">
-          ${['new','contacted','confirmed','invoiced','payment','production','ready','delivered','cancelled'].map(s=>
-            `<option value="${s}" ${o.status===s?'selected':''}>${statusLabel(s)}</option>`
-          ).join('')}
-        </select>
-      </td>
-      <td style="font-size:0.75rem;white-space:nowrap;">${formatDate(o.created_at)}</td>
-      <td>
-        <button class="btn-sm" onclick="openOrderModal('${o.id}')">View</button>
-      </td>
-    </tr>
-  `).join('');
+      <td>${esc(r.size||'–')}</td>
+      <td>${r.quantity||1}</td>
+      <td>${esc(r.customer_phone||'–')}</td>
+      <td>${statusCell}</td>
+      <td style="font-size:0.75rem;white-space:nowrap;">${formatDate(r.created_at)}</td>
+      <td>${action}</td>
+    </tr>`;
+  }).join('');
+}
+
+// Jump to the dedicated E-Payment Orders page (used by the "View" action).
+function openEpayPage() {
+  document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-shop-orders').classList.add('active');
+  document.getElementById('page-title').textContent = 'Cart E-Payment Orders';
+  window.scrollTo(0, 0);
+  renderShopOrders();
 }
 
 function filterOrders() {
-  const search = document.getElementById('orders-search').value.toLowerCase();
-  const status = document.getElementById('orders-filter').value;
-  const filtered = allOrders.filter(o => {
-    const matchSearch = !search ||
-      (o.customer_name||'').toLowerCase().includes(search) ||
-      (o.product_name||'').toLowerCase().includes(search) ||
-      (o.customer_phone||'').includes(search);
-    const matchStatus = !status || o.status === status;
-    return matchSearch && matchStatus;
-  });
-  renderOrders(filtered);
+  // renderOrders() reads the search box + status filter itself (via buildOrdersView).
+  renderOrders();
 }
 
 async function updateOrderStatus(id, status) {
@@ -1548,6 +1782,7 @@ function openProductForm(id) {
   document.getElementById('pf-name').value = p?.name || '';
   document.getElementById('pf-code').value = p?.code || '';
   document.getElementById('pf-price').value = p?.price || '';
+  document.getElementById('pf-price-ngn').value = (p?.price_ngn ?? '');
   document.getElementById('pf-original').value = p?.original_price || '';
   document.getElementById('pf-sizes').value = p?.sizes || '6–22';
   document.getElementById('pf-status').value = p?.status || 'active';
@@ -1591,6 +1826,7 @@ async function saveProduct() {
     const payload = {
       name, code,
       price: document.getElementById('pf-price').value.trim(),
+      price_ngn: parseInt(document.getElementById('pf-price-ngn').value, 10) || null,
       original_price: document.getElementById('pf-original').value.trim(),
       sizes: document.getElementById('pf-sizes').value.trim(),
       status: document.getElementById('pf-status').value,
@@ -1831,13 +2067,17 @@ async function renderFinance() {
 
   const revOrders = getRevenueOrders(days);
   const pendOrders = getPendingOrders(days);
-  const totalRevenue = revOrders.reduce((s, o) => s + orderAmount(o), 0);
+  // E-payment (cart) orders count toward revenue once DELIVERED.
+  const epayDelivered = (allShopOrders || []).filter(o => o.status === 'delivered' && new Date(o.created_at) >= cutoff);
+  const epayRevenue = epayDelivered.reduce((s, o) => s + (o.total_ngn || 0), 0);
+  const revCount = revOrders.length + epayDelivered.length;
+  const totalRevenue = revOrders.reduce((s, o) => s + orderAmount(o), 0) + epayRevenue;
   const totalPending = pendOrders.reduce((s, o) => s + orderAmount(o), 0);
 
   const periodExpenses = allExpenses.filter(e => new Date(e.date) >= cutoff);
   const totalExpenses = periodExpenses.reduce((s, e) => s + parseFloat(e.amount || 0), 0);
   const netProfit = totalRevenue - totalExpenses;
-  const avg = revOrders.length > 0 ? totalRevenue / revOrders.length : 0;
+  const avg = revCount > 0 ? totalRevenue / revCount : 0;
   const profitPct = totalRevenue > 0 ? Math.max(0, Math.min(100, (netProfit / totalRevenue) * 100)) : 0;
 
   document.getElementById('fin-revenue').textContent = fmt(totalRevenue);
@@ -1846,23 +2086,35 @@ async function renderFinance() {
   document.getElementById('fin-profit').className = 'fin-value ' + (netProfit >= 0 ? 'green' : 'red');
   document.getElementById('fin-pending').textContent = fmt(totalPending);
   document.getElementById('fin-pending-sub').textContent = pendOrders.length + ' orders awaiting payment';
-  document.getElementById('fin-order-count').textContent = revOrders.length;
+  document.getElementById('fin-order-count').textContent = revCount;
   document.getElementById('fin-avg').textContent = fmt(avg);
-  document.getElementById('fin-revenue-sub').textContent = revOrders.length + ' confirmed orders';
+  document.getElementById('fin-revenue-sub').textContent = revCount + ' confirmed orders';
   document.getElementById('fin-profit-bar').style.width = profitPct + '%';
 
   // Revenue table
   const tbody = document.getElementById('fin-revenue-tbody');
-  if (!revOrders.length) {
+  const revRows = [
+    ...revOrders.map(o => ({
+      created_at:o.created_at, customer_name:o.customer_name, product_name:o.product_name||'–',
+      quantity:o.quantity||1, amount:orderAmount(o), status:o.status
+    })),
+    ...epayDelivered.map(o => ({
+      created_at:o.created_at, customer_name:o.customer_name,
+      product_name:((o.items||[]).map(it=>it.product_name).join(', ') || 'Cart order') + ' (E-Payment)',
+      quantity:(o.items||[]).reduce((n,it)=>n+(it.quantity||1),0), amount:o.total_ngn||0, status:o.status
+    }))
+  ].sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+
+  if (!revRows.length) {
     tbody.innerHTML = '<tr><td colspan="6" class="table-empty">No revenue yet for this period.</td></tr>';
   } else {
-    tbody.innerHTML = revOrders.slice(0, 20).map(o => `
+    tbody.innerHTML = revRows.slice(0, 20).map(o => `
       <tr>
         <td>${fmtDate(o.created_at)}</td>
         <td><strong>${esc(o.customer_name)}</strong></td>
         <td>${esc(o.product_name||'–')}</td>
         <td style="text-align:center">${o.quantity||1}</td>
-        <td style="color:#10b981;font-weight:500;">${fmt(orderAmount(o))}</td>
+        <td style="color:#10b981;font-weight:500;">${fmt(o.amount)}</td>
         <td><span class="badge badge-delivered">${o.status}</span></td>
       </tr>`).join('');
   }
@@ -2930,7 +3182,8 @@ async function saveManualOrder() {
     size: document.getElementById('mo-size').value.trim(),
     quantity: parseInt(document.getElementById('mo-qty').value) || 1,
     notes: document.getElementById('mo-notes').value.trim() || '',
-    status: 'new'
+    status: 'new',
+    source: 'manual'
   };
 
   try {
