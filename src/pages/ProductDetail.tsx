@@ -225,9 +225,14 @@ export default function ProductDetail() {
                   onClick={() => selectedSize && addItem(product.id, selectedSize, 1)}
                   disabled={!selectedSize}
                   className="btn-gold w-full"
-                  style={{ opacity: selectedSize ? 1 : 0.5, cursor: selectedSize ? 'pointer' : 'not-allowed' }}
+                  style={{ opacity: 1, cursor: selectedSize ? 'pointer' : 'not-allowed', position: 'relative' }}
                 >
-                  {selectedSize ? 'Add to Cart' : 'Select a size to add'}
+                  Add to Cart
+                  {!selectedSize && (
+                    <span style={{ display: 'block', fontSize: '9px', letterSpacing: '0.1em', opacity: 0.65, marginTop: '2px' }}>
+                      — select a size above —
+                    </span>
+                  )}
                 </button>
                 <button onClick={() => setModalOpen(true)} className="btn-outline-gold w-full">
                   Request This Piece Instead

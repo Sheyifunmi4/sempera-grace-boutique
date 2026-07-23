@@ -1,105 +1,229 @@
+import type { CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
-import semperaLogo from '@/assets/sempera-logo.png';
+
+const footerLinks = {
+  Shop: [
+    { label: 'All Products', to: '/#collection' },
+    { label: 'BELLE Collection', to: '/collection/belle' },
+    { label: 'EASE Collection', to: '/collection/ease' },
+    { label: 'ELÁN Collection', to: '/collection/elan' },
+  ],
+  Collections: [
+    { label: 'New Arrivals', to: '/#collection' },
+    { label: 'View All', to: '/#collection' },
+  ],
+  Help: [
+    { label: 'Size Guide', to: '/size-guide' },
+    { label: 'Care Guide', to: '/care-guide' },
+    { label: 'Contact', to: '/contact' },
+  ],
+  Legal: [
+    { label: 'Privacy Policy', to: '/policies?tab=privacy' },
+    { label: 'Cookies Policy', to: '/policies?tab=cookies' },
+    { label: 'Refund Policy', to: '/policies?tab=refund' },
+    { label: 'Delivery Policy', to: '/policies?tab=delivery' },
+  ],
+};
+
+const LINK_STYLE: CSSProperties = {
+  fontFamily: "'DM Sans', sans-serif",
+  fontSize: '13px',
+  fontWeight: 300,
+  color: '#C4B49A',
+  textDecoration: 'none',
+  lineHeight: 1.6,
+  transition: 'color 0.25s ease',
+};
+
+const HEADING_STYLE: CSSProperties = {
+  fontFamily: "'DM Sans', sans-serif",
+  fontSize: '10px',
+  fontWeight: 400,
+  letterSpacing: '0.18em',
+  textTransform: 'uppercase',
+  color: '#8A7F6E',
+  marginBottom: '20px',
+};
 
 export default function SemperaFooter() {
   return (
-    <footer className="bg-background border-t border-border/60 py-16 lg:py-20">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 mb-14">
-          {/* Brand */}
-          <div className="lg:col-span-2">
-            <img src={semperaLogo} alt="Sempera Fashion" className="h-24 w-auto mb-5" />
-            <p
-              className="font-sans text-muted-foreground max-w-xs"
-              style={{ fontSize: '0.9rem', lineHeight: 1.8, fontWeight: 300 }}
-            >
-              Luxury ready-to-wear for the modern, elegant woman. Crafted with intention. Worn with grace.
-            </p>
-          </div>
-
-          {/* Navigation */}
-          <div>
-            <h4
-              className="font-sans text-foreground mb-5"
-              style={{ fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 400 }}
-            >
-              Navigate
-            </h4>
-            <ul className="space-y-3">
-              {['Shop', 'Collection', 'About', 'Contact'].map((item) => (
-                <li key={item}>
-                  <Link
-                    to={`/${item.toLowerCase()}`}
-                    className="font-sans text-muted-foreground hover:text-primary transition-colors duration-300"
-                    style={{ fontSize: '0.9rem', fontWeight: 300 }}
-                  >
-                    {item}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div>
-            <h4
-              className="font-sans text-foreground mb-5"
-              style={{ fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 400 }}
-            >
-              Connect
-            </h4>
-            <ul className="space-y-3">
-              <li>
-                <a
-                  href="mailto:hello@semperafashion.com"
-                  className="font-sans text-muted-foreground hover:text-primary transition-colors duration-300"
-                  style={{ fontSize: '0.9rem', fontWeight: 300 }}
-                >
-                  hello@semperafashion.com
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://instagram.com/sempera_fashion"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-sans text-muted-foreground hover:text-primary transition-colors duration-300"
-                  style={{ fontSize: '0.9rem', fontWeight: 300 }}
-                >
-                  Instagram
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://wa.me/2348027825606"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-sans text-muted-foreground hover:text-primary transition-colors duration-300"
-                  style={{ fontSize: '0.9rem', fontWeight: 300 }}
-                >
-                  WhatsApp
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        {/* Bottom bar */}
-        <div className="border-t border-border/40 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <>
+      {/* Email capture strip — sits above the dark footer */}
+      <div style={{ backgroundColor: '#1A1814', padding: '56px 24px' }}>
+        <div className="max-w-7xl mx-auto" style={{ textAlign: 'center' }}>
           <p
-            className="font-sans text-muted-foreground"
-            style={{ fontSize: '0.8rem', fontWeight: 300, letterSpacing: '0.05em' }}
+            style={{
+              fontFamily: "'Cormorant Garamond', Georgia, serif",
+              fontStyle: 'italic',
+              fontWeight: 300,
+              fontSize: 'clamp(1.4rem, 3vw, 1.8rem)',
+              color: '#F5F0E8',
+              marginBottom: '28px',
+            }}
           >
-            © {new Date().getFullYear()} Sempera Fashion. All rights reserved.
+            Join the Sempéra edit — be the first to know.
           </p>
-          <p
-            className="font-serif text-primary"
-            style={{ fontSize: '0.95rem', fontStyle: 'italic', fontWeight: 300 }}
+          <form
+            onSubmit={(e) => e.preventDefault()}
+            style={{ display: 'flex', justifyContent: 'center', gap: '0', maxWidth: '440px', margin: '0 auto' }}
           >
-            Designed with Grace.
-          </p>
+            <input
+              type="email"
+              placeholder="Your email address"
+              style={{
+                flex: 1,
+                padding: '13px 18px',
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '13px',
+                fontWeight: 300,
+                background: 'rgba(245,240,232,0.07)',
+                border: '1px solid rgba(196,180,154,0.4)',
+                borderRight: 'none',
+                color: '#F5F0E8',
+                outline: 'none',
+                borderRadius: '4px 0 0 4px',
+              }}
+            />
+            <button
+              type="submit"
+              style={{
+                padding: '13px 22px',
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '11px',
+                fontWeight: 400,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                background: '#C4B49A',
+                color: '#1A1814',
+                border: 'none',
+                borderRadius: '0 4px 4px 0',
+                cursor: 'pointer',
+              }}
+            >
+              Join
+            </button>
+          </form>
         </div>
       </div>
-    </footer>
+
+      {/* Main footer */}
+      <footer style={{ backgroundColor: '#1A1814', borderTop: '0.5px solid rgba(196,180,154,0.2)', paddingTop: '64px', paddingBottom: '48px' }}>
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+              gap: '48px',
+              marginBottom: '56px',
+            }}
+          >
+            {/* Shop column */}
+            <div>
+              <p style={HEADING_STYLE}>Shop</p>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {footerLinks.Shop.map((l) => (
+                  <li key={l.label}>
+                    <Link to={l.to} style={LINK_STYLE} onMouseEnter={(e) => (e.currentTarget.style.color = '#F5F0E8')} onMouseLeave={(e) => (e.currentTarget.style.color = '#C4B49A')}>
+                      {l.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Collections column */}
+            <div>
+              <p style={HEADING_STYLE}>Collections</p>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {footerLinks.Collections.map((l) => (
+                  <li key={l.label}>
+                    <Link to={l.to} style={LINK_STYLE} onMouseEnter={(e) => (e.currentTarget.style.color = '#F5F0E8')} onMouseLeave={(e) => (e.currentTarget.style.color = '#C4B49A')}>
+                      {l.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Help column */}
+            <div>
+              <p style={HEADING_STYLE}>Help</p>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {footerLinks.Help.map((l) => (
+                  <li key={l.label}>
+                    <Link to={l.to} style={LINK_STYLE} onMouseEnter={(e) => (e.currentTarget.style.color = '#F5F0E8')} onMouseLeave={(e) => (e.currentTarget.style.color = '#C4B49A')}>
+                      {l.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Legal column */}
+            <div>
+              <p style={HEADING_STYLE}>Legal</p>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {footerLinks.Legal.map((l) => (
+                  <li key={l.label}>
+                    <Link to={l.to} style={LINK_STYLE} onMouseEnter={(e) => (e.currentTarget.style.color = '#F5F0E8')} onMouseLeave={(e) => (e.currentTarget.style.color = '#C4B49A')}>
+                      {l.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Follow column */}
+            <div>
+              <p style={HEADING_STYLE}>Follow Us</p>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <li>
+                  <a href="https://instagram.com/sempera_fashion" target="_blank" rel="noopener noreferrer" style={LINK_STYLE} onMouseEnter={(e) => (e.currentTarget.style.color = '#F5F0E8')} onMouseLeave={(e) => (e.currentTarget.style.color = '#C4B49A')}>
+                    Instagram
+                  </a>
+                </li>
+                <li>
+                  <a href="https://wa.me/2348027825606" target="_blank" rel="noopener noreferrer" style={LINK_STYLE} onMouseEnter={(e) => (e.currentTarget.style.color = '#F5F0E8')} onMouseLeave={(e) => (e.currentTarget.style.color = '#C4B49A')}>
+                    WhatsApp
+                  </a>
+                </li>
+                <li>
+                  <a href="mailto:hello@semperafashion.com" style={LINK_STYLE} onMouseEnter={(e) => (e.currentTarget.style.color = '#F5F0E8')} onMouseLeave={(e) => (e.currentTarget.style.color = '#C4B49A')}>
+                    Email Us
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom bar + brand signature */}
+          <div style={{ borderTop: '0.5px solid rgba(196,180,154,0.2)', paddingTop: '32px', textAlign: 'center' }}>
+            <p
+              style={{
+                fontFamily: "'Cormorant Garamond', Georgia, serif",
+                fontStyle: 'italic',
+                fontWeight: 300,
+                fontSize: '1.1rem',
+                color: '#C4B49A',
+                marginBottom: '12px',
+              }}
+            >
+              Sempéra. Designed with grace.
+            </p>
+            <p
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '11px',
+                fontWeight: 300,
+                color: '#8A7F6E',
+                letterSpacing: '0.05em',
+              }}
+            >
+              © {new Date().getFullYear()} Sempéra Fashion. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
+    </>
   );
 }

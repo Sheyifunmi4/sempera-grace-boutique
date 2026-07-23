@@ -1,16 +1,40 @@
-import elanBatikLace1 from '@/assets/elan-batik-lace-1.jpg';
-import elanPurpleRhinestone2 from '@/assets/elan-purple-rhinestone-2.jpg';
+import { useNavigate } from 'react-router-dom';
+import elanOliveGreen1 from '@/assets/elan-olive-green-1.jpg';
+import elanPurpleRhinestone1 from '@/assets/elan-purple-rhinestone-1.jpg';
+import elanGracefulShort1 from '@/assets/elan-graceful-short-1.jpg';
 import elanRedTribal1 from '@/assets/elan-red-tribal-1.jpg';
-import elanPlaidBurgundy1 from '@/assets/elan-plaid-burgundy-1.jpg';
 
+// Product UUIDs from Supabase
 const categories = [
-  { title: 'Dresses', img: elanBatikLace1, description: 'Flowing & Feminine' },
-  { title: 'Two-Piece Sets', img: elanRedTribal1, description: 'Tailored & Refined' },
-  { title: 'Occasion Wear', img: elanPurpleRhinestone2, description: 'Glamorous & Timeless' },
-  { title: 'Everyday Elegance', img: elanPlaidBurgundy1, description: 'Effortless & Polished' },
+  {
+    title: 'Dresses',
+    description: 'Flowing & Feminine',
+    img: elanOliveGreen1,
+    productId: 'dea5bc2b-ba27-4a03-aafd-ef7e73f0b737', // SP-EL-004 Olive Green Crystal Dress
+  },
+  {
+    title: 'Two-Piece Sets',
+    description: 'Tailored & Refined',
+    img: elanRedTribal1,
+    productId: 'c5fb332b-8fef-431f-8b02-caf884b901e5', // SP-EL-38 The Cherry Belle
+  },
+  {
+    title: 'Occasion Wear',
+    description: 'Glamorous & Timeless',
+    img: elanPurpleRhinestone1,
+    productId: '1929f5d2-d4b3-4049-8efd-f4e866d0c152', // SP-EL-008 Purple & Black Rhinestone Kaftan
+  },
+  {
+    title: 'Everyday Elegance',
+    description: 'Effortless & Polished',
+    img: elanGracefulShort1,
+    productId: 'e7372696-3de4-4f70-b538-d7139eae72d5', // SP-EL-36 The Sunshine Belle
+  },
 ];
 
 export default function CategorySection() {
+  const navigate = useNavigate();
+
   return (
     <section className="py-24 lg:py-32 bg-cream">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -22,6 +46,7 @@ export default function CategorySection() {
           {categories.map((cat, i) => (
             <div
               key={cat.title}
+              onClick={() => navigate(`/product/${cat.productId}`)}
               className={`category-tile cursor-pointer group reveal delay-${(i + 1) * 100}`}
             >
               <div className="relative overflow-hidden aspect-[3/4]">

@@ -88,7 +88,7 @@ export default function Auth() {
         <img src={semperaLogo} alt="Sempera Fashion" style={{ height: '120px', width: 'auto', objectFit: 'contain' }} />
       </Link>
 
-      <div className="w-full max-w-md bg-background shadow-xl p-8 lg:p-10">
+      <div className="w-full max-w-md shadow-xl p-8 lg:p-10" style={{ backgroundColor: '#FFFFFF' }}>
         <div className="text-center mb-8">
           <p className="section-eyebrow mb-3">Sempera Fashion</p>
           <h1 className="font-serif text-foreground" style={{ fontSize: '1.9rem', fontWeight: 300 }}>
@@ -130,8 +130,8 @@ export default function Auth() {
                 value={form.fullName}
                 onChange={(e) => update('fullName', e.target.value)}
                 maxLength={100}
-                className="w-full px-4 py-3 border font-sans text-sm outline-none transition-colors duration-300 focus:border-primary bg-background text-foreground"
-                style={{ borderColor: 'hsl(var(--border))' }}
+                className="w-full px-4 py-3 border font-sans text-sm outline-none transition-colors duration-300"
+                style={{ borderColor: '#C4B49A', backgroundColor: '#FFFFFF', color: '#1A1814' }}
                 placeholder="Your full name"
               />
             </div>

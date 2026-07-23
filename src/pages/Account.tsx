@@ -87,9 +87,9 @@ function OrderCard({ order }: { order: ShopOrder }) {
   });
 
   return (
-    <div className="border border-border/60">
+    <div className="border border-border/60" style={{ backgroundColor: '#FFFFFF', boxShadow: '0 2px 16px rgba(26,24,20,0.06)' }}>
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-2 px-5 sm:px-6 py-4 bg-cream">
+      <div className="flex items-center justify-between flex-wrap gap-2 px-5 sm:px-6 py-4" style={{ backgroundColor: '#F5F0E8', borderBottom: '1px solid rgba(196,180,154,0.3)' }}>
         <div className="min-w-0">
           <p className="section-eyebrow text-muted-foreground">Order · {date}</p>
           <p className="font-sans text-foreground break-all" style={{ fontSize: '0.78rem' }}>{order.reference}</p>
