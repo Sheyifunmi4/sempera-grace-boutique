@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import SemperaNav from '@/components/SemperaNav';
 import SemperaFooter from '@/components/SemperaFooter';
 import RequestModal from '@/components/RequestModal';
+import SizeGuideModal from '@/components/SizeGuideModal';
 import { useProduct } from '@/components/FeaturedCollection';
 import { useCart, SIZES } from '@/contexts/CartContext';
 
@@ -14,6 +15,7 @@ export default function ProductDetail() {
   const [activeImg, setActiveImg] = useState(0);
   const [selectedSize, setSelectedSize] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
+  const [showSizeGuide, setShowSizeGuide] = useState(false);
 
   if (loading) {
     return (
@@ -169,9 +171,22 @@ export default function ProductDetail() {
 
               {/* Sizes — interactive picker */}
               <div>
-                <h3 className="font-sans text-foreground mb-3" style={{ fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 400 }}>
-                  Select Size {product.sizes && <span className="text-muted-foreground">(available: {product.sizes})</span>}
-                </h3>
+                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '12px' }}>
+                  <h3 className="font-sans text-foreground" style={{ fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 400, margin: 0 }}>
+                    Select Size {product.sizes && <span className="text-muted-foreground">(available: {product.sizes})</span>}
+                  </h3>
+                  <button
+                    onClick={() => setShowSizeGuide(true)}
+                    style={{
+                      background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+                      fontFamily: "'DM Sans', sans-serif", fontSize: '11px', fontWeight: 400,
+                      color: '#8A7F6E', letterSpacing: '0.04em', textDecoration: 'underline',
+                      textUnderlineOffset: '3px',
+                    }}
+                  >
+                    Find your size
+                  </button>
+                </div>
                 <div className="flex flex-wrap gap-2">
                   {SIZES.map((s) => {
                     const active = selectedSize === s;
@@ -256,6 +271,10 @@ export default function ProductDetail() {
 
       {modalOpen && (
         <RequestModal product={product} onClose={() => setModalOpen(false)} />
+      )}
+
+      {showSizeGuide && (
+        <SizeGuideModal onClose={() => setShowSizeGuide(false)} />
       )}
     </div>
   );

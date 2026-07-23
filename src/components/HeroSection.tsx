@@ -1,9 +1,15 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 interface HeroSectionProps {
   onExplore: () => void;
   onRequest: () => void;
 }
 
-export default function HeroSection({ onExplore }: HeroSectionProps) {
+export default function HeroSection({ }: HeroSectionProps) {
+  const navigate = useNavigate();
+  const [btnHovered, setBtnHovered] = useState(false);
+
   return (
     <section
       className="relative overflow-hidden"
@@ -57,19 +63,22 @@ export default function HeroSection({ onExplore }: HeroSectionProps) {
               Designed with Grace.
             </h1>
             <button
-              onClick={onExplore}
+              onClick={() => navigate('/collections')}
+              onMouseEnter={() => setBtnHovered(true)}
+              onMouseLeave={() => setBtnHovered(false)}
               style={{
                 fontFamily: "'DM Sans', sans-serif",
                 fontSize: '11px',
                 fontWeight: 500,
                 letterSpacing: '0.16em',
                 textTransform: 'uppercase',
-                background: '#1A1814',
-                color: '#F5F0E8',
+                background: btnHovered ? '#C4B49A' : '#1A1814',
+                color: btnHovered ? '#1A1814' : '#F5F0E8',
                 padding: '16px 40px',
                 border: 'none',
                 borderRadius: '0',
                 cursor: 'pointer',
+                transition: 'background 0.25s ease, color 0.25s ease',
               }}
             >
               Shop the Collection

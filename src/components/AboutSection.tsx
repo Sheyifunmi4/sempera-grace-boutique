@@ -12,12 +12,23 @@ export default function AboutSection() {
                 className="absolute -top-5 -left-5 w-full h-full border border-primary/20 rounded-none"
                 style={{ zIndex: 0 }}
               />
-              <img
-                src={aboutImage}
-                alt="The Sempera Woman"
-                className="relative z-10 w-full object-cover"
-                style={{ objectPosition: 'top' }}
-              />
+              <div
+                className="relative z-10 w-full overflow-hidden"
+                style={{ height: 'clamp(520px, 75vh, 780px)' }}
+              >
+                <img
+                  src={aboutImage}
+                  alt="The Sempera Woman"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: 'center 8%',
+                    transform: 'scale(1.08)',
+                    transformOrigin: 'center top',
+                  }}
+                />
+              </div>
             </div>
           </div>
 

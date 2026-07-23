@@ -358,7 +358,8 @@
 }
 
 .btn-gold:hover {
-  background: #2e2b25;
+  background: #C4B49A;
+  color: #1A1814;
 }
 
 .btn-gold:disabled {
@@ -387,7 +388,9 @@
 }
 
 .btn-outline-gold:hover {
-  background: rgba(196,180,154,0.08);
+  background: #C4B49A;
+  color: #1A1814;
+  border-color: #C4B49A;
 }
 
 /* Ghost: transparent, light border — less prominent actions */

@@ -65,13 +65,13 @@ function ProductCard({ product }: { product: Product }) {
       <div style={{ paddingTop: '14px' }}>
         <p style={{
           fontFamily: "'DM Sans', sans-serif", fontSize: '13px', fontWeight: 400,
-          color: '#3D3A34', marginBottom: '4px', lineHeight: 1.4,
+          color: '#3D3A34', marginBottom: '6px', lineHeight: 1.4,
         }}>
           {product.name}
         </p>
         <p style={{
-          fontFamily: "'DM Sans', sans-serif", fontSize: '12px', fontWeight: 300,
-          color: '#8A7F6E',
+          fontFamily: "'DM Sans', sans-serif", fontSize: '15px', fontWeight: 500,
+          color: '#1A1814', letterSpacing: '0.01em',
         }}>
           {product.price}
         </p>
