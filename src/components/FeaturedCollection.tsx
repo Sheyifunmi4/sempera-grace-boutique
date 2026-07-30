@@ -53,17 +53,17 @@ export const COLLECTIONS: Record<CollectionSlug, { slug: CollectionSlug; title: 
   belle: {
     slug: 'belle',
     title: 'The BELLE Collection',
-    tagline: 'Softness, with intention. Feminine without trying too hard…',
+    tagline: 'For women who love softness with structure.',
   },
   elan: {
     slug: 'elan',
     title: 'The ELÁN Collection',
-    tagline: 'Timeless silhouettes. Refined tailoring. Effortless elegance.',
+    tagline: 'For moments worth dressing beautifully for.',
   },
   ease: {
     slug: 'ease',
     title: 'The EASE Collection',
-    tagline: 'For mothers that love to slay with grace...',
+    tagline: 'For every stage of motherhood, beautifully considered.',
   },
 };
 

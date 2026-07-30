@@ -9,42 +9,42 @@ const chapters = [
     year: '2018',
     label: 'The Beginning',
     title: 'A sketchpad and a dream.',
-    body: 'It started in a small Lagos apartment — a founder tired of fashion that didn\'t feel like her. Too stiff. Too Western. Too much. She picked up a pencil and started drawing what she actually wanted to wear: clothes that felt like a second skin, that moved when she moved.',
+    body: 'It started in a small Lagos apartment. A founder, tired of fashion that didn\'t feel like her. Too stiff. Too Western. Too much. She picked up a pencil and started drawing what she actually wanted to wear: clothes that felt like a second skin, that moved when she moved.',
     side: 'left',
   },
   {
     year: '2019',
     label: 'The Name',
     title: 'Sempéra was born.',
-    body: '"Sempiternal" — eternal — and "era." A name that holds both permanence and time. Not trend-driven. Not disposable. Every piece made to outlast the season it was born in.',
+    body: '"Sempiternal", eternal, and "era." A name that holds both permanence and time. Not trend-driven. Not disposable. Every piece made to outlast the season it was born in.',
     side: 'right',
   },
   {
     year: '2020',
     label: 'First Collection',
-    title: 'ÉLÁN — eight pieces. Zero left.',
-    body: 'The first collection launched quietly — no PR campaign, no influencer seeding. Eight pieces posted to a WhatsApp group and an Instagram story. Sold out in 48 hours.',
+    title: 'ÉLÁN: eight pieces. Zero left.',
+    body: 'The first collection launched quietly, with no PR campaign, no influencer seeding. Eight pieces posted to a WhatsApp group and an Instagram story. Sold out in 48 hours.',
     side: 'left',
   },
   {
     year: '2021',
     label: 'The Showroom',
     title: 'A space where women could feel.',
-    body: 'A small Lagos showroom opened — by appointment only. Women came not just to buy, but to try, to breathe, to ask questions. The showroom taught us: luxury is not in the price tag. It\'s in how the experience makes you feel.',
+    body: 'A small Lagos showroom opened, by appointment only. Women came not just to buy, but to try, to breathe, to ask questions. The showroom taught us: luxury is not in the price tag. It\'s in how the experience makes you feel.',
     side: 'right',
   },
   {
     year: '2022',
     label: 'BELLE Collection',
     title: 'For women who refuse to be subtle.',
-    body: 'BELLE was our boldest bet — fuller silhouettes, richer fabrications, statement embroidery. Women wrote to say it was the first time they\'d worn something and felt both dressed up and completely themselves.',
+    body: 'BELLE was our boldest bet, with fuller silhouettes, richer fabrications, and statement embroidery. Women wrote to say it was the first time they\'d worn something and felt both dressed up and completely themselves.',
     side: 'left',
   },
   {
     year: 'Now',
     label: 'Designed with Grace',
     title: 'Still handcrafted. Still her.',
-    body: 'Every piece is still reviewed by the founder before it ships. The team has grown but the standard hasn\'t moved. A woman who gets dressed and feels exactly like herself — feminine, put-together, at ease — is a woman who can do anything.',
+    body: 'Every piece is still reviewed by the founder before it ships. The team has grown but the standard hasn\'t moved. A woman who gets dressed and feels exactly like herself, feminine, put-together and at ease, is a woman who can do anything.',
     side: 'right',
   },
 ];
@@ -60,7 +60,7 @@ const BELIEFS = [
 
 const PROMISES = [
   { label: 'One thing',     full: 'When you wear Sempéra, we want one thing for you:' },
-  { label: 'Feel yourself', full: 'Not to feel dressed up — but to feel like yourself, only more so.' },
+  { label: 'Feel yourself', full: 'Not to feel dressed up, but to feel like yourself, only more so.' },
   { label: 'Never choose',  full: 'Because you should never have to choose between the woman you are and the way you want to dress.' },
 ];
 
@@ -366,7 +366,7 @@ export default function OurStory() {
             }}>
               <img
                 src={semperaWoman}
-                alt="Sheyifunmi Olalekan — Sempéra Founder"
+                alt="Sheyifunmi Olalekan, Sempéra Founder"
                 style={{
                   width: '100%', height: '100%',
                   objectFit: 'cover', objectPosition: '50% 15%',
@@ -399,7 +399,7 @@ export default function OurStory() {
             {[
               'For a long time, getting dressed felt like a compromise.',
               'Sempéra began from a quiet refusal to accept that.',
-              'We believe women deserve clothing that holds all of who they are — through every season, every version, and every moment.',
+              'We believe women deserve clothing that holds all of who they are, through every season, every version, and every moment.',
               'Every piece begins with one question.',
               <em key="q" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '1.5rem', fontStyle: 'italic', fontWeight: 300 }}>Does this feel as good as it looks?</em>,
             ].map((para, i) => (

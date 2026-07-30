@@ -1,19 +1,19 @@
 const PILLARS = [
   {
-    title: 'Intentional',
-    body: 'Every design decision is deliberate. Nothing is accidental. Nothing is filler.',
+    title: ‘Intentional’,
+    body: ‘Every piece earns its place. Designed to be worn often, lived in fully, and reached for again.’,
   },
   {
-    title: 'Feminine',
-    body: "Not soft for softness’s sake — feminine because that is a form of power.",
+    title: ‘Ready’,
+    body: "Beautiful clothing shouldn’t keep you waiting. When the moment comes, your outfit should already be there.",
   },
   {
-    title: 'Enduring',
-    body: 'We do not chase trends. We build pieces that outlast them.',
+    title: ‘Enduring’,
+    body: ‘Designed beyond seasons, so your wardrobe evolves instead of being replaced every few months.’,
   },
   {
-    title: 'Honest',
-    body: "We say what a garment is, what it's made of, and who made it.",
+    title: ‘Effortless’,
+    body: ‘Getting dressed should feel simple. Less searching. Less waiting. More living.’,
   },
 ];
 

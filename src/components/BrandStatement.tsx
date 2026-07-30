@@ -18,7 +18,7 @@ export default function BrandStatement() {
           lineHeight: 1.25,
           marginBottom: '36px',
         }}>
-          Designed for the woman who knows who she is.
+          Beautiful clothing. Ready when you are.
         </h2>
 
         <div style={{ width: '40px', height: '1px', background: '#C4B49A', margin: '0 auto 36px' }} />
@@ -31,8 +31,19 @@ export default function BrandStatement() {
           lineHeight: 1.85,
           marginBottom: '20px',
         }}>
-          At Sempéra, we create ready-to-wear pieces for women who want to get dressed
-          and feel exactly like themselves — feminine, put-together, and at ease.
+          At Sempéra, we believe beautiful clothing should be ready when life happens.
+        </p>
+
+        <p style={{
+          fontFamily: "'DM Sans', sans-serif",
+          fontSize: '15px',
+          fontWeight: 300,
+          color: '#3D3A34',
+          lineHeight: 1.85,
+          marginBottom: '20px',
+        }}>
+          Thoughtfully designed pieces for everyday life and the occasions that matter most.
+          So getting dressed feels effortless.
         </p>
 
         <p style={{
@@ -43,7 +54,8 @@ export default function BrandStatement() {
           lineHeight: 1.85,
           marginBottom: '48px',
         }}>
-          Every piece begins with one question: does this feel as good as it looks?
+          Because the best clothes don't just look beautiful. They make getting dressed
+          the easiest part of your day.
         </p>
 
         <Link
