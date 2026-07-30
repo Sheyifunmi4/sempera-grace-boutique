@@ -127,9 +127,9 @@ export default function SizeGuide() {
                 }}>
                   {COLS.map((col) => (
                     <td key={col.key} style={{
-                      fontFamily: "'DM Sans', sans-serif", fontSize: '13px', fontWeight: 300,
-                      color: col.key === 'uk' ? '#1A1814' : '#3D3A34',
+                      fontFamily: "'DM Sans', sans-serif", fontSize: '13px',
                       fontWeight: col.key === 'uk' ? 500 : 300,
+                      color: col.key === 'uk' ? '#1A1814' : '#3D3A34',
                       padding: '14px 16px 14px 0',
                     }}>
                       {(row as any)[col.key]}

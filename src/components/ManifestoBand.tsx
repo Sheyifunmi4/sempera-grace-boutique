@@ -1,19 +1,19 @@
 const PILLARS = [
   {
-    title: ‘Intentional’,
-    body: ‘Every piece earns its place. Designed to be worn often, lived in fully, and reached for again.’,
+    title: 'Intentional',
+    body: 'Every piece earns its place. Designed to be worn often, lived in fully, and reached for again.',
   },
   {
-    title: ‘Ready’,
-    body: "Beautiful clothing shouldn’t keep you waiting. When the moment comes, your outfit should already be there.",
+    title: 'Ready',
+    body: "Beautiful clothing shouldn't keep you waiting. When the moment comes, your outfit should already be there.",
   },
   {
-    title: ‘Enduring’,
-    body: ‘Designed beyond seasons, so your wardrobe evolves instead of being replaced every few months.’,
+    title: 'Enduring',
+    body: 'Designed beyond seasons, so your wardrobe evolves instead of being replaced every few months.',
   },
   {
-    title: ‘Effortless’,
-    body: ‘Getting dressed should feel simple. Less searching. Less waiting. More living.’,
+    title: 'Effortless',
+    body: 'Getting dressed should feel simple. Less searching. Less waiting. More living.',
   },
 ];
 
