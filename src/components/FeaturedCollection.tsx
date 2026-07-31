@@ -90,6 +90,20 @@ function mapRow(row: any): Product {
   };
 }
 
+const ELAN_ORDER = [
+  'SP-EL-1234', 'SP-EL-1235', 'SP-EL-1237', 'SP-EL-1239',
+  'SP-EL-1236', 'SP-EL-1238', 'SP-EL-50',
+];
+
+function applyElanOrder(products: Product[]): Product[] {
+  const priority = new Map(ELAN_ORDER.map((code, i) => [code, i]));
+  return [...products].sort((a, b) => {
+    const ia = priority.has(a.code) ? priority.get(a.code)! : 999;
+    const ib = priority.has(b.code) ? priority.get(b.code)! : 999;
+    return ia - ib;
+  });
+}
+
 export async function fetchProducts(opts?: { collection?: string; limit?: number }): Promise<Product[]> {
   try {
     let url = `${SUPABASE_URL}/rest/v1/products?status=neq.hidden&order=code.asc&select=*`;
@@ -329,6 +343,7 @@ export default function FeaturedCollection({
     let list = collection
       ? allProducts.filter((p) => p.collection === collection)
       : allProducts;
+    if (collection === 'elan') list = applyElanOrder(list);
     if (limit && limit > 0) list = list.slice(0, limit);
     return list;
   }, [allProducts, collection, limit]);

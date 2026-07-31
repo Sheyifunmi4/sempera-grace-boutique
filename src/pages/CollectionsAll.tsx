@@ -5,6 +5,20 @@ import SemperaNav from '@/components/SemperaNav';
 import SemperaFooter from '@/components/SemperaFooter';
 import { useProducts, type Product } from '@/components/FeaturedCollection';
 
+const ELAN_ORDER = [
+  'SP-EL-1234', 'SP-EL-1235', 'SP-EL-1237', 'SP-EL-1239',
+  'SP-EL-1236', 'SP-EL-1238', 'SP-EL-50',
+];
+
+function applyElanOrder(products: Product[]): Product[] {
+  const priority = new Map(ELAN_ORDER.map((code, i) => [code, i]));
+  return [...products].sort((a, b) => {
+    const ia = priority.has(a.code) ? priority.get(a.code)! : 999;
+    const ib = priority.has(b.code) ? priority.get(b.code)! : 999;
+    return ia - ib;
+  });
+}
+
 const PAGE_SIZE = 9;
 
 const COLLECTION_LABELS: Record<string, string> = {
@@ -85,9 +99,12 @@ export default function CollectionsAll() {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [activeFilter, setActiveFilter] = useState<string>('all');
 
-  const filtered = activeFilter === 'all'
-    ? (allProducts ?? [])
-    : (allProducts ?? []).filter((p) => p.collection === activeFilter);
+  const filtered = (() => {
+    const list = activeFilter === 'all'
+      ? (allProducts ?? [])
+      : (allProducts ?? []).filter((p) => p.collection === activeFilter);
+    return activeFilter === 'elan' ? applyElanOrder(list) : list;
+  })();
 
   const visible = filtered.slice(0, visibleCount);
   const hasMore = visibleCount < filtered.length;
