@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useCart, SIZES } from '@/contexts/CartContext';
 import { formatNaira } from '@/components/FeaturedCollection';
 import { DELIVERY_OPTIONS, deliveryFee, type DeliveryZone } from '@/lib/delivery';
+import { saveOrder } from '@/lib/orders';
 
 const EMAILJS_SERVICE_ID           = 'service_hvb7ck2';
 const EMAILJS_ADMIN_TEMPLATE_ID    = 'template_rfca346';
@@ -45,6 +46,7 @@ export default function Checkout() {
   const [paying, setPaying] = useState(false);
   const [error, setError]   = useState('');
   const [placedRef, setPlacedRef] = useState<string | null>(null);
+  const [waUrl, setWaUrl]   = useState<string>('');
 
   useEffect(() => {
     if (!loading && !user) navigate('/auth?redirect=/checkout', { replace: true });
@@ -104,6 +106,37 @@ export default function Checkout() {
       `*Total charged:* ${formatNaira(paidViaCard ? charge : orderTotal)}`,
     ].filter(Boolean).join('\n');
 
+    // Save order to Supabase
+    await saveOrder({
+      reference:          orderRef,
+      user_id:            user.id,
+      customer_email:     user.email!,
+      customer_name:      form.name.trim(),
+      customer_phone:     form.phone.trim(),
+      delivery_address:   form.address.trim(),
+      delivery_city:      form.city.trim(),
+      delivery_zone:      form.zone,
+      notes:              form.notes.trim(),
+      subtotal_ngn:       subtotal,
+      delivery_ngn:       delivery,
+      processing_fee_ngn: paidViaCard ? fee : 0,
+      total_ngn:          paidViaCard ? charge : orderTotal,
+      payment_method:     paidViaCard ? 'card' : 'whatsapp',
+      payment_status:     paidViaCard ? 'paid' : 'pending',
+      status:             paidViaCard ? 'paid' : 'confirmed',
+      items: items.map((it) => ({
+        product_id:     it.productId,
+        product_code:   it.product.code,
+        product_name:   it.product.name,
+        image_url:      it.product.images[0] ?? null,
+        size:           it.size,
+        quantity:       it.quantity,
+        unit_price_ngn: it.product.priceNgn,
+        line_total_ngn: it.product.priceNgn * it.quantity,
+      })),
+    });
+
+    // Send emails (non-blocking)
     try {
       const templateParams = {
         customer_name:  form.name.trim(),
@@ -122,10 +155,11 @@ export default function Checkout() {
         emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_ADMIN_TEMPLATE_ID,    templateParams, EMAILJS_PUBLIC_KEY),
         emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_CUSTOMER_TEMPLATE_ID, templateParams, EMAILJS_PUBLIC_KEY),
       ]);
-    } catch { /* email failure is non-blocking */ }
+    } catch { /* non-blocking */ }
 
-    const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(orderSummary)}`;
-    window.open(waUrl, '_blank');
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(orderSummary)}`;
+    setWaUrl(url);
+    if (!paidViaCard) window.open(url, '_blank');
   };
 
   const handlePayWithCard = () => {
@@ -193,20 +227,26 @@ export default function Checkout() {
           </h1>
           <span className="gold-divider mx-auto mb-6" />
           <p className="font-sans text-muted-foreground mb-2" style={{ fontWeight: 300, lineHeight: 1.8 }}>
-            Your order has been confirmed and our team has been notified on WhatsApp.
-          </p>
-          <p className="font-sans text-muted-foreground mb-2" style={{ fontWeight: 300, lineHeight: 1.8 }}>
-            A confirmation email has also been sent to your inbox.
+            Your order is confirmed. A confirmation email has been sent to your inbox.
           </p>
           <p className="font-sans text-muted-foreground mb-8" style={{ fontSize: '0.8rem' }}>
             Reference: <span className="text-foreground">{placedRef}</span>
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer" className="btn-gold">
-              Open WhatsApp
-            </a>
-            <Link to="/" className="btn-outline-gold">Continue Shopping</Link>
+            <Link to={`/order/${placedRef}`} className="btn-gold">
+              Track My Order
+            </Link>
+            {waUrl && (
+              <a href={waUrl} target="_blank" rel="noopener noreferrer" className="btn-outline-gold inline-flex items-center justify-center gap-2">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}>
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                  <path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.555 4.117 1.528 5.847L.057 23.882l6.196-1.624A11.954 11.954 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.898 0-3.68-.487-5.23-1.342l-.374-.222-3.88 1.018 1.034-3.775-.244-.389A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+                </svg>
+                Message on WhatsApp
+              </a>
+            )}
           </div>
+          <Link to="/" className="block mt-4 font-sans text-sm text-muted-foreground hover:text-foreground transition-colors">← Continue shopping</Link>
         </section>
         <SemperaFooter />
       </div>
