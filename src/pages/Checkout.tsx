@@ -2,25 +2,13 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Minus, Plus, Trash2, ShoppingCart, Loader2, CreditCard } from 'lucide-react';
 import emailjs from '@emailjs/browser';
+import PaystackPop from '@paystack/inline-js';
 import SemperaNav from '@/components/SemperaNav';
 import SemperaFooter from '@/components/SemperaFooter';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart, SIZES } from '@/contexts/CartContext';
 import { formatNaira } from '@/components/FeaturedCollection';
 import { DELIVERY_OPTIONS, deliveryFee, type DeliveryZone } from '@/lib/delivery';
-
-declare const PaystackPop: {
-  setup(opts: {
-    key: string;
-    email: string;
-    amount: number; // kobo
-    currency: string;
-    ref: string;
-    metadata?: Record<string, unknown>;
-    onClose(): void;
-    callback(response: { reference: string }): void;
-  }): { openIframe(): void };
-};
 
 const EMAILJS_SERVICE_ID           = 'service_hvb7ck2';
 const EMAILJS_ADMIN_TEMPLATE_ID    = 'template_rfca346';
@@ -150,14 +138,10 @@ export default function Checkout() {
       return;
     }
 
-    if (typeof PaystackPop === 'undefined') {
-      setError('Payment provider failed to load. Please refresh the page and try again.');
-      return;
-    }
-
     const orderRef = `SP-${Date.now().toString(36).toUpperCase()}`;
 
-    const handler = PaystackPop.setup({
+    const popup = new PaystackPop();
+    popup.newTransaction({
       key:      PAYSTACK_PUBLIC_KEY,
       email:    user.email!,
       amount:   charge * 100, // kobo
@@ -172,10 +156,10 @@ export default function Checkout() {
           { display_name: 'Items',          variable_name: 'items',          value: items.map((it) => `${it.product.code} ×${it.quantity}`).join(', ') },
         ],
       },
-      onClose() {
+      onCancel() {
         setPaying(false);
       },
-      async callback(response) {
+      async onSuccess(response: { reference: string }) {
         setPaying(true);
         await sendNotifications(response.reference, true);
         clear();
@@ -183,8 +167,6 @@ export default function Checkout() {
         setPaying(false);
       },
     });
-
-    handler.openIframe();
   };
 
   const handleWhatsApp = async () => {
