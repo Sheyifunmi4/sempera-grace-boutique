@@ -145,6 +145,16 @@ export default function Checkout() {
     if (v) return setError(v);
     setError('');
 
+    if (!PAYSTACK_PUBLIC_KEY) {
+      setError('Online payment is not configured. Please use WhatsApp to place your order.');
+      return;
+    }
+
+    if (typeof PaystackPop === 'undefined') {
+      setError('Payment provider failed to load. Please refresh the page and try again.');
+      return;
+    }
+
     const orderRef = `SP-${Date.now().toString(36).toUpperCase()}`;
 
     const handler = PaystackPop.setup({
@@ -341,12 +351,22 @@ export default function Checkout() {
               <button
                 onClick={handlePayWithCard}
                 disabled={paying || missingSize}
-                className="btn-gold w-full mt-6 flex items-center justify-center gap-2"
-                style={{ opacity: paying || missingSize ? 0.6 : 1, cursor: paying ? 'wait' : 'pointer', fontSize: '11px', letterSpacing: '0.14em', padding: '16px 24px' }}
+                className="w-full mt-6 flex items-center justify-center gap-2"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif", fontSize: '12px', fontWeight: 500,
+                  letterSpacing: '0.16em', textTransform: 'uppercase',
+                  background: paying || missingSize ? '#3D3A34' : '#1A1814',
+                  color: '#F5F0E8',
+                  border: 'none', padding: '18px 24px',
+                  cursor: paying ? 'wait' : missingSize ? 'not-allowed' : 'pointer',
+                  transition: 'background 0.2s ease',
+                }}
+                onMouseEnter={(e) => { if (!paying && !missingSize) e.currentTarget.style.background = '#C4B49A'; e.currentTarget.style.color = '#1A1814'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = paying || missingSize ? '#3D3A34' : '#1A1814'; e.currentTarget.style.color = '#F5F0E8'; }}
               >
                 {paying
                   ? <><Loader2 size={16} className="animate-spin" /> Processing…</>
-                  : <><CreditCard size={16} /> Pay with Card</>
+                  : <><CreditCard size={16} /> Make Payment</>
                 }
               </button>
 
@@ -378,9 +398,29 @@ export default function Checkout() {
                 Request via WhatsApp
               </button>
 
-              <p className="text-center font-sans text-muted-foreground mt-4" style={{ fontSize: '0.72rem', lineHeight: 1.6 }}>
-                Card payments are secured by Paystack.<br />Processing fee is covered by the customer.
-              </p>
+              {/* Paystack security badge */}
+              <div style={{
+                marginTop: '16px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                padding: '10px 14px',
+                border: '0.5px solid rgba(196,180,154,0.35)',
+              }}>
+                {/* Paystack logo mark */}
+                <svg width="20" height="20" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="200" height="200" rx="40" fill="#00C3F7"/>
+                  <rect x="40" y="60" width="120" height="22" rx="11" fill="white"/>
+                  <rect x="40" y="96" width="120" height="22" rx="11" fill="white" fillOpacity="0.7"/>
+                  <rect x="40" y="132" width="80" height="22" rx="11" fill="white" fillOpacity="0.4"/>
+                </svg>
+                <div>
+                  <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '10px', fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#1A1814', lineHeight: 1.2 }}>
+                    Secured by Paystack
+                  </p>
+                  <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '9px', fontWeight: 300, color: '#8A7F6E', letterSpacing: '0.04em', lineHeight: 1.4 }}>
+                    256-bit SSL · PCI-DSS compliant
+                  </p>
+                </div>
+              </div>
               <Link to="/" className="block text-center mt-4 font-sans text-sm text-muted-foreground hover:text-foreground transition-colors">← Continue shopping</Link>
             </aside>
           </div>
