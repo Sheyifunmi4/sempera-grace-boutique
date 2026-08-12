@@ -26,6 +26,7 @@ import CollectionsAll from "./pages/CollectionsAll";
 import SizeGuide from "./pages/SizeGuide";
 import CareGuide from "./pages/CareGuide";
 import OrderDetails from "./pages/OrderDetails";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -69,6 +70,7 @@ const App = () => (
               <Route path="/size-guide" element={<SizeGuide />} />
               <Route path="/care-guide" element={<CareGuide />} />
               <Route path="/order/:reference" element={<OrderDetails />} />
+              <Route path="/admin" element={<Admin />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

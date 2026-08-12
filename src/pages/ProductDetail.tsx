@@ -59,9 +59,11 @@ export default function ProductDetail() {
   const nextImg = () => setActiveImg((prev) => (prev + 1) % images.length);
   const prevImg = () => setActiveImg((prev) => (prev - 1 + images.length) % images.length);
 
+  const outOfStock = product.stockQuantity === 0;
+
   return (
     <div className="min-h-screen bg-background">
-      <SemperaNav onRequestPiece={() => setModalOpen(true)} />
+      <SemperaNav onRequestPiece={() => outOfStock && setModalOpen(true)} />
 
       <main className="pt-32">
         {/* Breadcrumb */}
@@ -87,8 +89,25 @@ export default function ProductDetail() {
                   src={images[activeImg].src}
                   alt={images[activeImg].label}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  style={{ opacity: outOfStock ? 0.72 : 1 }}
                 />
-                {images.length > 1 && (
+                {outOfStock && (
+                  <div style={{
+                    position: 'absolute', inset: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: 'rgba(26,24,20,0.42)',
+                  }}>
+                    <span style={{
+                      fontFamily: "'DM Sans', sans-serif", fontSize: '11px', fontWeight: 500,
+                      letterSpacing: '0.22em', textTransform: 'uppercase',
+                      color: '#F5F0E8', padding: '8px 20px',
+                      border: '1px solid rgba(245,240,232,0.6)',
+                    }}>
+                      Out of Stock
+                    </span>
+                  </div>
+                )}
+                {!outOfStock && images.length > 1 && (
                   <>
                     <button
                       onClick={prevImg}
@@ -138,75 +157,89 @@ export default function ProductDetail() {
                   {product.description}
                 </p>
 
-                {/* Price */}
-                <div className="flex items-center gap-4">
+                {/* Price + OOS tag */}
+                <div className="flex items-center gap-4 flex-wrap">
                   <span className="font-sans text-muted-foreground line-through" style={{ fontSize: '1rem', fontWeight: 300 }}>
                     {product.originalPrice}
                   </span>
                   <span className="font-sans" style={{ fontSize: '1.5rem', fontWeight: 500, letterSpacing: '0.03em', color: '#b8965a' }}>
                     {product.price}
                   </span>
+                  {outOfStock && (
+                    <span style={{
+                      fontFamily: "'DM Sans', sans-serif", fontSize: '9px', fontWeight: 500,
+                      letterSpacing: '0.18em', textTransform: 'uppercase',
+                      color: '#F5F0E8', background: '#3D3A34',
+                      padding: '4px 10px',
+                    }}>
+                      Out of Stock
+                    </span>
+                  )}
                 </div>
 
                 {/* Delivery Info */}
-                <div style={{ marginTop: '16px', padding: '14px 18px', background: 'hsl(var(--muted)/0.4)', borderLeft: '3px solid #b8965a' }}>
-                  <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.62rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#b8965a', marginBottom: '10px', fontWeight: 400 }}>
-                    Delivery
-                  </p>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.82rem', color: 'hsl(var(--muted-foreground))', fontWeight: 300 }}>
-                      📍 <strong style={{ fontWeight: 400, color: 'hsl(var(--foreground))' }}>Lagos:</strong> 3–5 working days
+                {!outOfStock && (
+                  <div style={{ marginTop: '16px', padding: '14px 18px', background: 'hsl(var(--muted)/0.4)', borderLeft: '3px solid #b8965a' }}>
+                    <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.62rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#b8965a', marginBottom: '10px', fontWeight: 400 }}>
+                      Delivery
                     </p>
-                    <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.82rem', color: 'hsl(var(--muted-foreground))', fontWeight: 300 }}>
-                      🇳🇬 <strong style={{ fontWeight: 400, color: 'hsl(var(--foreground))' }}>Outside Lagos:</strong> 5–7 working days
-                    </p>
-                    <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.82rem', color: 'hsl(var(--muted-foreground))', fontWeight: 300 }}>
-                      🌍 <strong style={{ fontWeight: 400, color: 'hsl(var(--foreground))' }}>International:</strong> timeline advised on request
-                    </p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.82rem', color: 'hsl(var(--muted-foreground))', fontWeight: 300 }}>
+                        📍 <strong style={{ fontWeight: 400, color: 'hsl(var(--foreground))' }}>Lagos:</strong> 3–5 working days
+                      </p>
+                      <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.82rem', color: 'hsl(var(--muted-foreground))', fontWeight: 300 }}>
+                        🇳🇬 <strong style={{ fontWeight: 400, color: 'hsl(var(--foreground))' }}>Outside Lagos:</strong> 5–7 working days
+                      </p>
+                      <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.82rem', color: 'hsl(var(--muted-foreground))', fontWeight: 300 }}>
+                        🌍 <strong style={{ fontWeight: 400, color: 'hsl(var(--foreground))' }}>International:</strong> timeline advised on request
+                      </p>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               <span className="gold-divider" />
 
-              {/* Sizes — interactive picker */}
-              <div>
-                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '12px' }}>
-                  <h3 className="font-sans text-foreground" style={{ fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 400, margin: 0 }}>
-                    Select Size {product.sizes && <span className="text-muted-foreground">(available: {product.sizes})</span>}
-                  </h3>
-                  <button
-                    onClick={() => setShowSizeGuide(true)}
-                    style={{
-                      background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-                      fontFamily: "'DM Sans', sans-serif", fontSize: '11px', fontWeight: 400,
-                      color: '#8A7F6E', letterSpacing: '0.04em', textDecoration: 'underline',
-                      textUnderlineOffset: '3px',
-                    }}
-                  >
-                    Find your size
-                  </button>
+              {/* Sizes — only shown when in stock */}
+              {!outOfStock && (
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '12px' }}>
+                    <h3 className="font-sans text-foreground" style={{ fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 400, margin: 0 }}>
+                      Select Size {product.sizes && <span className="text-muted-foreground">(available: {product.sizes})</span>}
+                    </h3>
+                    <button
+                      onClick={() => setShowSizeGuide(true)}
+                      style={{
+                        background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+                        fontFamily: "'DM Sans', sans-serif", fontSize: '11px', fontWeight: 400,
+                        color: '#8A7F6E', letterSpacing: '0.04em', textDecoration: 'underline',
+                        textUnderlineOffset: '3px',
+                      }}
+                    >
+                      Find your size
+                    </button>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {SIZES.map((s) => {
+                      const active = selectedSize === s;
+                      return (
+                        <button
+                          key={s}
+                          onClick={() => setSelectedSize(s)}
+                          className="px-4 py-2 border font-sans text-sm transition-colors duration-200"
+                          style={{
+                            borderColor: active ? '#b8965a' : 'hsl(var(--border))',
+                            backgroundColor: active ? '#b8965a' : 'transparent',
+                            color: active ? '#ffffff' : 'hsl(var(--foreground))',
+                          }}
+                        >
+                          UK {s}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {SIZES.map((s) => {
-                    const active = selectedSize === s;
-                    return (
-                      <button
-                        key={s}
-                        onClick={() => setSelectedSize(s)}
-                        className="px-4 py-2 border font-sans text-sm transition-colors duration-200"
-                        style={{
-                          borderColor: active ? '#b8965a' : 'hsl(var(--border))',
-                          backgroundColor: active ? '#b8965a' : 'transparent',
-                          color: active ? '#ffffff' : 'hsl(var(--foreground))',
-                        }}
-                      >
-                        UK {s}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+              )}
 
               {/* Fabric Details */}
               {product.fabric && (
@@ -236,31 +269,30 @@ export default function ProductDetail() {
 
               {/* CTA */}
               <div className="space-y-4 pt-2">
-                <button
-                  onClick={() => selectedSize && addItem(product.id, selectedSize, 1)}
-                  disabled={!selectedSize}
-                  className="btn-gold w-full"
-                  style={{ opacity: 1, cursor: selectedSize ? 'pointer' : 'not-allowed', position: 'relative' }}
-                >
-                  Add to Cart
-                  {!selectedSize && (
-                    <span style={{ display: 'block', fontSize: '9px', letterSpacing: '0.1em', opacity: 0.65, marginTop: '2px' }}>
-                      — select a size above —
-                    </span>
-                  )}
-                </button>
-                <button onClick={() => setModalOpen(true)} className="btn-outline-gold w-full">
-                  Request This Piece Instead
-                </button>
-                <a
-                  href={`https://wa.me/2348027825606?text=${whatsappMessage}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block text-center font-sans text-muted-foreground hover:text-foreground transition-colors"
-                  style={{ textDecoration: 'none', fontSize: '0.85rem' }}
-                >
-                  or enquire via WhatsApp →
-                </a>
+                {outOfStock ? (
+                  <>
+                    <p className="font-sans text-muted-foreground" style={{ fontSize: '0.9rem', lineHeight: 1.7, fontWeight: 300 }}>
+                      This piece is currently out of stock. Submit a request and we will notify you when it becomes available.
+                    </p>
+                    <button onClick={() => setModalOpen(true)} className="btn-gold w-full">
+                      Request This Piece
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => selectedSize && addItem(product.id, selectedSize, 1)}
+                    disabled={!selectedSize}
+                    className="btn-gold w-full"
+                    style={{ opacity: 1, cursor: selectedSize ? 'pointer' : 'not-allowed', position: 'relative' }}
+                  >
+                    Add to Cart
+                    {!selectedSize && (
+                      <span style={{ display: 'block', fontSize: '9px', letterSpacing: '0.1em', opacity: 0.65, marginTop: '2px' }}>
+                        — select a size above —
+                      </span>
+                    )}
+                  </button>
+                )}
               </div>
             </div>
           </div>

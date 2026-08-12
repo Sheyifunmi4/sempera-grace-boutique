@@ -34,6 +34,7 @@ export interface Product {
   sizes: string;
   status: string;
   collection: string;
+  stockQuantity: number;
 }
 
 // Pull a whole-Naira number out of a price string like "₦45,000" → 45000.
@@ -87,6 +88,7 @@ function mapRow(row: any): Product {
     sizes: row.sizes || '6–22',
     status: row.status || 'active',
     collection: row.collection || 'elan',
+    stockQuantity: typeof row.stock_quantity === 'number' ? row.stock_quantity : 0,
   };
 }
 
@@ -179,6 +181,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product, onRequest, onAddToCart }: ProductCardProps) {
   const [currentImg, setCurrentImg] = useState(0);
+  const outOfStock = product.stockQuantity === 0;
 
   const nextImg = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -199,12 +202,28 @@ export function ProductCard({ product, onRequest, onAddToCart }: ProductCardProp
           src={product.images[currentImg]}
           alt={`${product.name} — view ${currentImg + 1}`}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          style={{ opacity: outOfStock ? 0.7 : 1 }}
           onError={(e) => {
-            // Fallback if image fails to load
             (e.target as HTMLImageElement).src = 'https://placehold.co/400x500/f5ead8/b8965a?text=Image+Unavailable';
           }}
         />
-        {product.images.length > 1 && (
+        {outOfStock && (
+          <div style={{
+            position: 'absolute', inset: 0,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'rgba(26,24,20,0.45)',
+          }}>
+            <span style={{
+              fontFamily: "'DM Sans', sans-serif", fontSize: '10px', fontWeight: 500,
+              letterSpacing: '0.2em', textTransform: 'uppercase',
+              color: '#F5F0E8', padding: '6px 14px',
+              border: '1px solid rgba(245,240,232,0.6)',
+            }}>
+              Out of Stock
+            </span>
+          </div>
+        )}
+        {!outOfStock && product.images.length > 1 && (
           <>
             <button
               onClick={prevImg}
@@ -222,7 +241,7 @@ export function ProductCard({ product, onRequest, onAddToCart }: ProductCardProp
             </button>
           </>
         )}
-        {product.images.length > 1 && (
+        {!outOfStock && product.images.length > 1 && (
           <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5">
             {product.images.map((_, i) => (
               <button
@@ -285,7 +304,11 @@ export function ProductCard({ product, onRequest, onAddToCart }: ProductCardProp
             <Link to={`/product/${product.id}`} className="btn-outline-gold flex-1 text-center">
               View Details
             </Link>
-            {onAddToCart ? (
+            {outOfStock ? (
+              <button onClick={() => onRequest(product)} className="btn-gold flex-1">
+                Request This Piece
+              </button>
+            ) : onAddToCart ? (
               <button onClick={() => onAddToCart(product)} className="btn-gold flex-1">
                 Add to Cart
               </button>
@@ -295,15 +318,6 @@ export function ProductCard({ product, onRequest, onAddToCart }: ProductCardProp
               </button>
             )}
           </div>
-          {onAddToCart && (
-            <button
-              onClick={() => onRequest(product)}
-              className="font-sans text-muted-foreground hover:text-foreground transition-colors duration-300 text-center"
-              style={{ fontSize: '0.78rem', letterSpacing: '0.05em' }}
-            >
-              or request this piece →
-            </button>
-          )}
         </div>
       </div>
     </div>

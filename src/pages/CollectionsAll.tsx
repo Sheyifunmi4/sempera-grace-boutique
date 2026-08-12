@@ -31,6 +31,7 @@ function ProductCard({ product }: { product: Product }) {
   const [hovered, setHovered] = useState(false);
   const img1 = product.images[0];
   const img2 = product.images[1];
+  const outOfStock = product.stockQuantity === 0;
 
   return (
     <Link
@@ -46,11 +47,11 @@ function ProductCard({ product }: { product: Product }) {
           alt={product.name}
           style={{
             width: '100%', height: '100%', objectFit: 'cover', display: 'block',
-            opacity: hovered && img2 ? 0 : 1,
+            opacity: outOfStock ? 0.65 : hovered && img2 ? 0 : 1,
             transition: 'opacity 0.4s ease',
           }}
         />
-        {img2 && (
+        {img2 && !outOfStock && (
           <img
             src={img2}
             alt={product.name}
@@ -74,6 +75,23 @@ function ProductCard({ product }: { product: Product }) {
             {COLLECTION_LABELS[product.collection]}
           </span>
         )}
+        {/* Out of Stock overlay */}
+        {outOfStock && (
+          <div style={{
+            position: 'absolute', inset: 0,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'rgba(26,24,20,0.38)',
+          }}>
+            <span style={{
+              fontFamily: "'DM Sans', sans-serif", fontSize: '9px', fontWeight: 500,
+              letterSpacing: '0.2em', textTransform: 'uppercase',
+              color: '#F5F0E8', padding: '5px 12px',
+              border: '1px solid rgba(245,240,232,0.55)',
+            }}>
+              Out of Stock
+            </span>
+          </div>
+        )}
       </div>
       {/* Info */}
       <div style={{ paddingTop: '14px' }}>
@@ -85,7 +103,7 @@ function ProductCard({ product }: { product: Product }) {
         </p>
         <p style={{
           fontFamily: "'DM Sans', sans-serif", fontSize: '15px', fontWeight: 500,
-          color: '#1A1814', letterSpacing: '0.01em',
+          color: outOfStock ? '#8A7F6E' : '#1A1814', letterSpacing: '0.01em',
         }}>
           {product.price}
         </p>

@@ -81,14 +81,14 @@ export default function Checkout() {
     return '';
   };
 
-  const sendNotifications = async (orderRef: string, paidViaCard: boolean) => {
+  const sendNotifications = async (orderRef: string) => {
     const itemLines = items
       .map((it) => `• ${it.product.name} (${it.product.code}) — Size UK ${it.size} × ${it.quantity} — ${formatNaira(it.product.priceNgn * it.quantity)}`)
       .join('\n');
     const deliveryLabel = DELIVERY_OPTIONS.find((o) => o.zone === form.zone)?.label || form.zone;
     const orderSummary = [
       `*Sempéra Order — ${orderRef}*`,
-      paidViaCard ? `*Payment: PAID via card ✓*` : `*Payment: Pending (WhatsApp request)*`,
+      `*Payment: PAID via card ✓*`,
       ``,
       `*Customer:* ${form.name.trim()}`,
       `*Phone:* ${form.phone.trim()}`,
@@ -102,8 +102,8 @@ export default function Checkout() {
       ``,
       `*Subtotal:* ${formatNaira(subtotal)}`,
       `*Delivery:* ${formatNaira(delivery)}`,
-      paidViaCard ? `*Processing fee:* ${formatNaira(fee)}` : '',
-      `*Total charged:* ${formatNaira(paidViaCard ? charge : orderTotal)}`,
+      `*Paystack Fees:* ${formatNaira(fee)}`,
+      `*Total charged:* ${formatNaira(charge)}`,
     ].filter(Boolean).join('\n');
 
     // Save order to Supabase
@@ -119,11 +119,11 @@ export default function Checkout() {
       notes:              form.notes.trim(),
       subtotal_ngn:       subtotal,
       delivery_ngn:       delivery,
-      processing_fee_ngn: paidViaCard ? fee : 0,
-      total_ngn:          paidViaCard ? charge : orderTotal,
-      payment_method:     paidViaCard ? 'card' : 'whatsapp',
-      payment_status:     paidViaCard ? 'paid' : 'pending',
-      status:             paidViaCard ? 'paid' : 'confirmed',
+      processing_fee_ngn: fee,
+      total_ngn:          charge,
+      payment_method:     'card',
+      payment_status:     'paid',
+      status:             'paid',
       items: items.map((it) => ({
         product_id:     it.productId,
         product_code:   it.product.code,
@@ -144,10 +144,10 @@ export default function Checkout() {
         customer_phone: form.phone.trim(),
         product_name:   items.map((it) => it.product.name).join(', '),
         product_code:   items.map((it) => it.product.code).join(', '),
-        product_price:  formatNaira(paidViaCard ? charge : orderTotal),
+        product_price:  formatNaira(charge),
         size:           items.map((it) => `UK ${it.size}`).join(', '),
         quantity:       items.reduce((s, it) => s + it.quantity, 0),
-        notes: `[${paidViaCard ? 'PAID via Paystack' : 'WhatsApp Request'} — ${orderRef}]\nDelivery: ${deliveryLabel}\nAddress: ${form.address.trim()}, ${form.city.trim()}\n\n${form.notes.trim()}`,
+        notes: `[PAID via Paystack — ${orderRef}]\nDelivery: ${deliveryLabel}\nAddress: ${form.address.trim()}, ${form.city.trim()}\n\n${form.notes.trim()}`,
         to_email:  user.email,
         reply_to:  user.email,
       };
@@ -159,7 +159,6 @@ export default function Checkout() {
 
     const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(orderSummary)}`;
     setWaUrl(url);
-    if (!paidViaCard) window.open(url, '_blank');
   };
 
   const handlePayWithCard = () => {
@@ -168,7 +167,7 @@ export default function Checkout() {
     setError('');
 
     if (!PAYSTACK_PUBLIC_KEY) {
-      setError('Online payment is not configured. Please use WhatsApp to place your order.');
+      setError('Online payment is not configured. Please contact us directly to place your order.');
       return;
     }
 
@@ -195,24 +194,12 @@ export default function Checkout() {
       },
       async onSuccess(response: { reference: string }) {
         setPaying(true);
-        await sendNotifications(response.reference, true);
+        await sendNotifications(response.reference);
         clear();
         setPlacedRef(response.reference);
         setPaying(false);
       },
     });
-  };
-
-  const handleWhatsApp = async () => {
-    const v = validate();
-    if (v) return setError(v);
-    setError('');
-    setPaying(true);
-    const orderRef = `REQ-${Date.now().toString(36).toUpperCase()}`;
-    await sendNotifications(orderRef, false);
-    clear();
-    setPlacedRef(orderRef);
-    setPaying(false);
   };
 
   // ── Success ──
@@ -359,7 +346,7 @@ export default function Checkout() {
               <div className="space-y-3 font-sans" style={{ fontSize: '0.92rem' }}>
                 <Row label="Subtotal" value={formatNaira(subtotal)} />
                 <Row label={`Delivery — ${DELIVERY_OPTIONS.find((o) => o.zone === form.zone)?.label}`} value={formatNaira(delivery)} />
-                <Row label="Processing fee (1.5%)" value={formatNaira(fee)} muted />
+                <Row label="Paystack Fees (1.5%)" value={formatNaira(fee)} muted />
                 <div className="h-px bg-border my-3" />
                 <div className="flex items-center justify-between">
                   <span className="font-serif text-foreground" style={{ fontSize: '1.05rem' }}>Total</span>
@@ -390,34 +377,6 @@ export default function Checkout() {
                   ? <><Loader2 size={16} className="animate-spin" /> Processing…</>
                   : <><CreditCard size={16} /> Make Payment</>
                 }
-              </button>
-
-              {/* Divider */}
-              <div className="flex items-center gap-3 my-4">
-                <div className="h-px flex-1 bg-border" />
-                <span className="font-sans text-muted-foreground" style={{ fontSize: '0.7rem', letterSpacing: '0.1em' }}>OR</span>
-                <div className="h-px flex-1 bg-border" />
-              </div>
-
-              {/* Secondary: WhatsApp request */}
-              <button
-                onClick={handleWhatsApp}
-                disabled={paying || missingSize}
-                className="w-full flex items-center justify-center gap-2"
-                style={{
-                  fontFamily: "'DM Sans', sans-serif", fontSize: '11px', fontWeight: 400,
-                  letterSpacing: '0.14em', textTransform: 'uppercase',
-                  background: 'transparent', color: '#3D3A34',
-                  border: '1px solid #C4B49A', padding: '13px 24px',
-                  cursor: paying ? 'wait' : 'pointer',
-                  opacity: paying || missingSize ? 0.6 : 1,
-                }}
-              >
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}>
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                  <path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.555 4.117 1.528 5.847L.057 23.882l6.196-1.624A11.954 11.954 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.898 0-3.68-.487-5.23-1.342l-.374-.222-3.88 1.018 1.034-3.775-.244-.389A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
-                </svg>
-                Request via WhatsApp
               </button>
 
               {/* Paystack security badge */}
