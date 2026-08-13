@@ -607,11 +607,12 @@ textarea.form-input{resize:vertical;min-height:80px;}
                 <th>Sizes</th>
                 <th>Status</th>
                 <th>Requests</th>
+                <th>Stock</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody id="products-tbody">
-              <tr><td colspan="9" class="table-empty"><div class="spinner"></div><br/>Loading products...</td></tr>
+              <tr><td colspan="10" class="table-empty"><div class="spinner"></div><br/>Loading products...</td></tr>
             </tbody>
           </table>
         </div>
@@ -993,6 +994,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
           <div class="form-group full"><label class="form-label">Description</label><textarea class="form-input" id="pf-description" placeholder="Product description..."></textarea></div>
           <div class="form-group full"><label class="form-label">Fabric Details</label><textarea class="form-input" id="pf-fabric" placeholder="Fabric composition..."></textarea></div>
           <div class="form-group full"><label class="form-label">Care Instructions</label><textarea class="form-input" id="pf-care" placeholder="Care instructions..."></textarea></div>
+          <div class="form-group"><label class="form-label">Stock Quantity</label><input class="form-input" id="pf-stock" type="number" min="0" step="1" placeholder="0"/><small style="color:var(--muted);font-size:0.7rem;">Units available. 0 = out of stock (shown on website).</small></div>
         </div>
       </div>
 
@@ -1645,9 +1647,15 @@ async function saveOrderFromModal(id) {
 function renderProducts(data) {
   const products = data || allProducts;
   const tbody = document.getElementById('products-tbody');
-  if (!products.length) { tbody.innerHTML = '<tr><td colspan="9" class="table-empty">No products found.</td></tr>'; return; }
+  if (!products.length) { tbody.innerHTML = '<tr><td colspan="10" class="table-empty">No products found.</td></tr>'; return; }
 
-  tbody.innerHTML = products.map(p => `
+  tbody.innerHTML = products.map(p => {
+    const stock = p.stock_quantity ?? 0;
+    const oos = stock === 0;
+    const stockCell = oos
+      ? `<span style="display:inline-flex;align-items:center;gap:5px;"><strong style="color:#ef4444;">0</strong><span style="font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;background:#fee2e2;color:#991b1b;padding:2px 6px;border-radius:2px;">OOS</span></span>`
+      : `<strong style="color:${stock <= 2 ? '#d97706' : 'var(--dark)'};">${stock}</strong>`;
+    return `
     <tr>
       <td style="font-size:0.72rem;font-weight:500;">${esc(p.code)}</td>
       <td>
@@ -1660,12 +1668,13 @@ function renderProducts(data) {
       <td>${esc(p.sizes||'–')}</td>
       <td><span class="badge ${p.status==='active'?'badge-delivered':p.status==='soldout'?'badge-cancelled':'badge-contacted'}">${p.status||'active'}</span></td>
       <td>${p.total_requests||0}</td>
+      <td style="text-align:center;">${stockCell}</td>
       <td style="display:flex;gap:6px;">
         <button class="btn-sm" onclick="openProductForm('${p.id}')">Edit</button>
         <button class="btn-sm danger" onclick="toggleProductStatus('${p.id}','${p.status}')">${p.status==='active'?'Hide':'Show'}</button>
       </td>
-    </tr>
-  `).join('');
+    </tr>`;
+  }).join('');
 }
 
 function filterProducts() {
@@ -1790,6 +1799,7 @@ function openProductForm(id) {
   document.getElementById('pf-description').value = p?.description || '';
   document.getElementById('pf-fabric').value = p?.fabric || '';
   document.getElementById('pf-care').value = p?.care || '';
+  document.getElementById('pf-stock').value = p?.stock_quantity ?? 5;
   document.getElementById('image-previews').innerHTML = '';
   document.getElementById('save-status').textContent = '';
 
@@ -1834,6 +1844,7 @@ async function saveProduct() {
       description: document.getElementById('pf-description').value.trim(),
       fabric: document.getElementById('pf-fabric').value.trim(),
       care: document.getElementById('pf-care').value.trim(),
+      stock_quantity: parseInt(document.getElementById('pf-stock').value, 10) || 0,
       image_urls: allImageUrls,
     };
 
