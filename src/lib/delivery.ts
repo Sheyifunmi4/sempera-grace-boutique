@@ -4,6 +4,12 @@
 // (supabase/functions/verify-order/index.ts). If you change a fee here,
 // change it there too — the server recomputes the total and will reject a
 // payment whose amount doesn't match.
+// Checkout fee switches. Flip either to true to bring that charge back.
+// CHARGE_DELIVERY:     add the zone's delivery fee to the amount paid.
+// PASS_PAYSTACK_FEE:   gross up the charge so Sempéra receives the full amount.
+export const CHARGE_DELIVERY = false;
+export const PASS_PAYSTACK_FEE = false;
+
 export type DeliveryZone = 'lagos' | 'outside' | 'international';
 
 export interface DeliveryOption {

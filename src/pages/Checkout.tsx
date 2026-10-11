@@ -8,7 +8,7 @@ import SemperaFooter from '@/components/SemperaFooter';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart, SIZES } from '@/contexts/CartContext';
 import { formatNaira } from '@/components/FeaturedCollection';
-import { DELIVERY_OPTIONS, deliveryFee, type DeliveryZone } from '@/lib/delivery';
+import { DELIVERY_OPTIONS, deliveryFee, CHARGE_DELIVERY, PASS_PAYSTACK_FEE, type DeliveryZone } from '@/lib/delivery';
 import { saveOrder } from '@/lib/orders';
 
 const EMAILJS_SERVICE_ID           = 'service_hvb7ck2';
@@ -18,7 +18,7 @@ const EMAILJS_PUBLIC_KEY           = '441l47N72miy9mYmB';
 const WHATSAPP_NUMBER              = '2348027825606';
 const PAYSTACK_PUBLIC_KEY          = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY as string;
 
-// Gross-up so Sempéra receives the exact order amount.
+// Gross-up so Sempéra receives the exact order amount (only used if PASS_PAYSTACK_FEE).
 // Paystack local fee: 1.5% + ₦100 flat (for amounts > ₦2,500), capped at ₦2,000.
 function grossUp(ngn: number): { charge: number; fee: number } {
   const RATE = 0.015;
@@ -63,9 +63,11 @@ export default function Checkout() {
 
   if (loading || !user) return null;
 
-  const delivery   = deliveryFee(form.zone);
+  // Fee switches live in '@/lib/delivery'. By default delivery is arranged
+  // separately and Paystack deducts its own fee at settlement.
+  const delivery   = CHARGE_DELIVERY ? deliveryFee(form.zone) : 0;
   const orderTotal = subtotal + delivery;
-  const { charge, fee } = grossUp(orderTotal);
+  const { charge, fee } = PASS_PAYSTACK_FEE ? grossUp(orderTotal) : { charge: orderTotal, fee: 0 };
   const missingSize = items.some((it) => !it.size);
   const update = (field: string, value: string) => {
     setForm((f) => ({ ...f, [field]: value }));
@@ -101,8 +103,8 @@ export default function Checkout() {
       itemLines,
       ``,
       `*Subtotal:* ${formatNaira(subtotal)}`,
-      `*Delivery:* ${formatNaira(delivery)}`,
-      `*Paystack Fees:* ${formatNaira(fee)}`,
+      CHARGE_DELIVERY ? `*Delivery:* ${formatNaira(delivery)}` : `*Delivery fee:* To be arranged (${deliveryLabel})`,
+      PASS_PAYSTACK_FEE ? `*Paystack Fees:* ${formatNaira(fee)}` : '',
       `*Total charged:* ${formatNaira(charge)}`,
     ].filter(Boolean).join('\n');
 
@@ -320,7 +322,7 @@ export default function Checkout() {
                       style={{ borderColor: 'hsl(var(--border))' }}
                     >
                       {DELIVERY_OPTIONS.map((o) => (
-                        <option key={o.zone} value={o.zone}>{o.label} — {formatNaira(o.fee)} ({o.note})</option>
+                        <option key={o.zone} value={o.zone}>{o.label}{CHARGE_DELIVERY ? ` — ${formatNaira(o.fee)}` : ''} ({o.note})</option>
                       ))}
                     </select>
                   </div>
@@ -345,8 +347,8 @@ export default function Checkout() {
               <h2 className="font-serif text-foreground mb-5" style={{ fontSize: '1.3rem', fontWeight: 400 }}>Order Total</h2>
               <div className="space-y-3 font-sans" style={{ fontSize: '0.92rem' }}>
                 <Row label="Subtotal" value={formatNaira(subtotal)} />
-                <Row label={`Delivery — ${DELIVERY_OPTIONS.find((o) => o.zone === form.zone)?.label}`} value={formatNaira(delivery)} />
-                <Row label="Paystack Fees (1.5%)" value={formatNaira(fee)} muted />
+                <Row label={`Delivery — ${DELIVERY_OPTIONS.find((o) => o.zone === form.zone)?.label}`} value={CHARGE_DELIVERY ? formatNaira(delivery) : 'Arranged separately'} muted={!CHARGE_DELIVERY} />
+                {PASS_PAYSTACK_FEE && <Row label="Paystack Fees (1.5%)" value={formatNaira(fee)} muted />}
                 <div className="h-px bg-border my-3" />
                 <div className="flex items-center justify-between">
                   <span className="font-serif text-foreground" style={{ fontSize: '1.05rem' }}>Total</span>
